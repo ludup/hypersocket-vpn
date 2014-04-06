@@ -38,6 +38,10 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 	@Override
 	public boolean start(HypersocketClient<?> serviceClient) {
 
+		if(log.isInfoEnabled()) {
+			log.info("Starting Network Resources");
+		}
+		
 		this.serviceClient = serviceClient;
 		try {
 			String json = serviceClient.getTransport().get("myNetworkResources");
