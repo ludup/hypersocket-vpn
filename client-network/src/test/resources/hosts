@@ -9,5 +9,5 @@ ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
 
 # Some predefined aliases
-127.0.0.4  example4.local
-127.0.0.10 example10.local
+192.168.10.4  example4.local
+192.168.10.10 example10.local

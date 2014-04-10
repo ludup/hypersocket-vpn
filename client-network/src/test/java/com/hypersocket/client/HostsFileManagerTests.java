@@ -17,12 +17,19 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.BasicConfigurator;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hypersocket.client.hosts.HostsFileManager;
 
 public class HostsFileManagerTests {
 
+	@BeforeClass
+	public static void startup() {
+		BasicConfigurator.configure();
+	}
+	
 	@Test
 	public void test() throws FileNotFoundException, IOException {
 
@@ -55,22 +62,9 @@ public class HostsFileManagerTests {
 			HostsFileManager manager = new HostsFileManager(tempHostsFile, new DummyAliasCommand());
 			
 			
-			Assert.assertEquals(true, manager.getAliasPool().contains("127.0.0.255"));
+			Assert.assertEquals(true, manager.getAliasPool().contains("192.168.10.254"));
 			Assert.assertEquals(254, manager.getAliasPool().size());
 			
-			int expectedSize = 254;
-			for(int i=0;i<=255;i++) {
-				for(int x=0;x<=255;x++) {
-					Assert.assertEquals(expectedSize, manager.getAliasPool().size());
-					for(int y=(i==0 && x==0?2:1);y<=255;y++) {
-						System.out.println("Checking IP exists: 127." + i + "." + x + "." + y);
-						Assert.assertEquals(true, manager.getAliasPool().contains("127." + i + "." + x + "." + y));
-					}
-					manager.generatePool();
-					expectedSize += 255;
-				}
-			}
-
 			manager.cleanup();
 
 		} finally {
@@ -80,29 +74,32 @@ public class HostsFileManagerTests {
 
 	public void addAliases(HostsFileManager manager) throws IOException {
 
-		String alias1 = manager.getAlias("example2.local");
-		Assert.assertEquals("Expected 127.0.0.2", "127.0.0.2", alias1);
+		String alias1 = manager.getAlias("example1.local");
+		Assert.assertEquals("Expected 192.168.10.1", "192.168.10.1", alias1);
 
-		String alias2 = manager.getAlias("example3.local");
-		Assert.assertEquals("Expected 127.0.0.3", "127.0.0.3", alias2);
+		String alias2 = manager.getAlias("example2.local");
+		Assert.assertEquals("Expected 192.168.10.2", "192.168.10.2", alias2);
 
-		// 127.0.0.4 is skipped because its predefined in the hosts file
-		String alias3 = manager.getAlias("example5.local");
-		Assert.assertEquals("Expected 127.0.0.5", "127.0.0.5", alias3);
+		String alias3 = manager.getAlias("example3.local");
+		Assert.assertEquals("Expected 192.168.10.3", "192.168.10.3", alias3);
+		
+		// 192.168.10.4 is skipped because its predefined in the hosts file
+		String alias5 = manager.getAlias("example5.local");
+		Assert.assertEquals("Expected 192.168.10.5", "192.168.10.5", alias5);
 
 	}
 
 	public void getAliases(HostsFileManager manager) throws IOException {
 
 		String alias1 = manager.getAlias("example2.local");
-		Assert.assertEquals("Expected 127.0.0.2", "127.0.0.2", alias1);
+		Assert.assertEquals("Expected 192.168.10.2", "192.168.10.2", alias1);
 
 		String alias2 = manager.getAlias("example3.local");
-		Assert.assertEquals("Expected 127.0.0.3", "127.0.0.3", alias2);
+		Assert.assertEquals("Expected 192.168.10.3", "192.168.10.3", alias2);
 
-		// 127.0.0.4 is skipped because its predefined in the hosts file
+		// 192.168.10.4 is skipped because its predefined in the hosts file
 		String alias3 = manager.getAlias("example5.local");
-		Assert.assertEquals("Expected 127.0.0.5", "127.0.0.5", alias3);
+		Assert.assertEquals("Expected 192.168.10.5", "192.168.10.5", alias3);
 	}
 	
 	

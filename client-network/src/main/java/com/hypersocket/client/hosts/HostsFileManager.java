@@ -15,13 +15,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.jboss.netty.handler.ipfilter.CIDR;
+import org.jboss.netty.handler.ipfilter.CIDR4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,18 +42,20 @@ public class HostsFileManager {
 	File hostsFile;
 	List<String> content = new ArrayList<String>();
 	LinkedList<String> aliasPool = new LinkedList<String>();
-
 	Map<String, String> hostsToLoopbackAlias = new HashMap<String, String>();
-	AliasCommand aliasCommand = null;
-	int poolIndexA = 0;
-	int poolIndexB = 0;
+	
+	int _8bits = 192;
+	int _16bits = 168;
+	int _24bits = 10;
+	
 	
 	static final String BEGIN = "#----HYPERSOCKET BEGIN----";
 
 	public HostsFileManager(File hostsFile, AliasCommand aliasCommand)
 			throws IOException {
 		this.hostsFile = hostsFile;
-		this.aliasCommand = aliasCommand;
+		
+		selectNextRange();
 		generatePool();
 		loadFile();
 
@@ -60,6 +69,55 @@ public class HostsFileManager {
 		});
 	}
 
+	private void selectNextRange() throws IOException {
+		while(!checkRange(_8bits, _16bits, _24bits) && _24bits < 255) {
+			_24bits++;
+		}
+		
+		if(_24bits==255 && !checkRange(_8bits, _16bits, _24bits)) {
+			_8bits = 10;
+			_16bits = 240;
+			_24bits = 10;
+			
+			while(!checkRange(_8bits, _16bits, _24bits) && _24bits < 255) {
+				_24bits++;
+			}
+			
+			if(_24bits==255 && !checkRange(_8bits, _16bits, _24bits)) {
+				throw new IOException("Unable to allocate IP range");
+			}
+		}
+		
+		if(log.isInfoEnabled()) {
+			log.info("Selected IP range " + _8bits + "." + _16bits + "." + _24bits);
+		}
+	}
+	
+	private boolean checkRange(int _8bits, int _16bits, int _24bits) throws SocketException, UnknownHostException {
+		
+		Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+		while(e.hasMoreElements()) {
+			NetworkInterface net = e.nextElement();
+			for(InterfaceAddress i : net.getInterfaceAddresses()) {
+				String range = _8bits + "." + _16bits + "." + _24bits;
+				if(log.isInfoEnabled()) {
+					log.info("Checking interface " + i.toString());
+				}
+				if(i.getNetworkPrefixLength() > 0 && i.getNetworkPrefixLength() <= 31) {
+					
+					CIDR c = CIDR4.newCIDR(range + ".0" + "/" + i.getNetworkPrefixLength());
+					
+					if(c.contains(i.getAddress())) {
+						if(log.isInfoEnabled()) {
+							log.warn(i.getAddress() + " appears to be in our chosen range " + range + ".0" + "/" + i.getNetworkPrefixLength());
+						}
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
 	public List<String> getAliasPool() {
 		return aliasPool;
 	}
@@ -95,20 +153,15 @@ public class HostsFileManager {
 	}
 
 	public void generatePool() throws IOException {
-		if (poolIndexA > 255) {
-			poolIndexA = 0;
-			poolIndexB++;
-			if(poolIndexB > 255) {
-				throw new IOException(
-					"Loopback address pool has run out of pooled addresses");
-			}
+
+		
+		selectNextRange();
+		
+		for (int i=1; i <= 254; i++) {
+			System.out.println("Generating " + _8bits + "." + _16bits + "." + _24bits + "." + i);
+			aliasPool.addLast(_8bits + "." + _16bits + "." + _24bits + "." + i);
 		}
-		int i = (poolIndexB == 0 && poolIndexA == 0) ? 2 : 1;
-		for (; i <= 255; i++) {
-			System.out.println("Generating " + "127." + poolIndexB + "." + poolIndexA + "." + i);
-			aliasPool.addLast("127." + poolIndexB + "." + poolIndexA + "." + i);
-		}
-		poolIndexA++;
+		_24bits++;
 	}
 
 	public void cleanup() throws IOException {
@@ -153,12 +206,6 @@ public class HostsFileManager {
 
 		if (!outputAliases) {
 			for (String alias : hostsToLoopbackAlias.values()) {
-				if (aliasCommand != null && !aliasCommand.deleteAlias(alias)) {
-					if (log.isWarnEnabled()) {
-						log.warn("Failed to remove loopback alias " + alias);
-					}
-					continue;
-				}
 				aliasPool.addLast(alias);
 			}
 			hostsToLoopbackAlias.clear();
@@ -227,13 +274,6 @@ public class HostsFileManager {
 		}
 		hostsToLoopbackAlias.put(hostname, aliasPool.removeFirst());
 		String alias = getAlias(hostname);
-
-		if (aliasCommand != null) {
-			if (!aliasCommand.createAlias(alias)) {
-				throw new IOException("Failed to create localhost alias "
-						+ alias);
-			}
-		}
 
 		flushFile(true);
 		return alias;
