@@ -207,13 +207,13 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 		String alias = mgr.getAlias(resource.getHostname());
 
 		int actualPort;
-		if ((actualPort = serviceClient.getTransport().startLocalForwarding(alias, 0, resource)) > 0) {
+		if ((actualPort = serviceClient.getTransport().startLocalForwarding("127.0.0.1", 0, resource)) > 0) {
 			try {
-				redirector.startRedirecting(alias, resource.getPort(), alias, actualPort);
+				redirector.startRedirecting(alias, resource.getPort(), "127.0.0.1", actualPort);
 				resource.setLocalPort(actualPort);
-				resource.setLocalInterface(alias);
+				resource.setLocalInterface("127.0.0.1");
 				
-				localForwards.put(alias + ":" + actualPort, resource);
+				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
 				return true;
 			} catch (Exception e) {
 				log.error("Failed to redirect local forwarding", e);
