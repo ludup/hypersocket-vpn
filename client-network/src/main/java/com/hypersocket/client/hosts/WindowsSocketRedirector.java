@@ -21,17 +21,23 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 	
 		File currentDriverFile = new File("bin"
 				+ File.separator
+				+ "windows"
+				+ File.separator
 				+ arch
 				+ File.separator
 				+ "ip_redirect_driver.sys");
 		
 		installCommand = new File("bin"
 				+ File.separator
+				+ "windows"
+				+ File.separator
 				+ arch
 				+ File.separator
 				+ "installer.exe");
 		
 		redirectCommand = new File("bin"
+				+ File.separator
+				+ "windows"
 				+ File.separator
 				+ arch
 				+ File.separator
