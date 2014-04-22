@@ -20,7 +20,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.hypersocket</groupId>
-			<artifactId>hypersocket-jquery</artifactId>
+			<artifactId>hypersocket-ui-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
