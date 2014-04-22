@@ -34,7 +34,7 @@ import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
-import com.hypersocket.ui.jquery.JQueryUIContentHandler;
+import com.hypersocket.ui.UserInterfaceContentHandler;
 
 @Service
 @Transactional
@@ -61,7 +61,7 @@ public class NetworkResourceServiceImpl extends
 	MenuService menuService;
 
 	@Autowired
-	JQueryUIContentHandler jQueryUIContentHandler;
+	UserInterfaceContentHandler jQueryUIContentHandler;
 
 	public NetworkResourceServiceImpl() {
 
@@ -83,7 +83,7 @@ public class NetworkResourceServiceImpl extends
 			permissionService.registerPermission(p.getResourceKey(), cat);
 		}
 
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "networkResources",
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "networkResources", "fa-sitemap",
 				"networkResources", 100, NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
