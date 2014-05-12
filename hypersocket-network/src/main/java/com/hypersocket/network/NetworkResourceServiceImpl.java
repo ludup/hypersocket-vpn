@@ -328,4 +328,42 @@ public class NetworkResourceServiceImpl extends
 		return NetworkResourcePermission.class;
 	}
 
+	@Override
+	protected void fireResourceCreationEvent(NetworkResource resource) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void fireResourceCreationEvent(NetworkResource resource,
+			Throwable t) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void fireResourceUpdateEvent(NetworkResource resource) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void fireResourceUpdateEvent(NetworkResource resource, Throwable t) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void fireResourceDeletionEvent(NetworkResource resource) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void fireResourceDeletionEvent(NetworkResource resource,
+			Throwable t) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -13,11 +13,13 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hypersocket.repository.DeletedCriteria;
 import com.hypersocket.resource.AbstractAssignableResourceRepositoryImpl;
 
 @Repository
+@Transactional
 public class NetworkResourceRepositoryImpl extends
 		AbstractAssignableResourceRepositoryImpl<NetworkResource> implements
 		NetworkResourceRepository {
@@ -40,16 +42,8 @@ public class NetworkResourceRepositoryImpl extends
 	@Override
 	public void deleteProtocol(NetworkProtocol protocol) {
 		
-		NetworkProtocol tmp;
-		int idx = 0;
-		do {
-			tmp = getProtocolByName(protocol.getName() + " [#" + (++idx) + " deleted]", true);
-		} while(tmp!=null);
+		delete(protocol);
 		
-		protocol.setDeleted(true);
-		protocol.setName(protocol.getName() + " [#" + idx + " deleted]");
-		
-		saveProtocol(protocol);
 	}
 
 	@Override
