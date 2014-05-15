@@ -34,10 +34,10 @@ import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
+import com.hypersocket.tables.ColumnSort;
 import com.hypersocket.ui.UserInterfaceContentHandler;
 
 @Service
-@Transactional
 public class NetworkResourceServiceImpl extends
 		AbstractAssignableResourceServiceImpl<NetworkResource> implements
 		NetworkResourceService {
@@ -164,6 +164,22 @@ public class NetworkResourceServiceImpl extends
 	public List<NetworkProtocol> getProtocols() {
 		return resourceRepository.getProtocols();
 	}
+	
+	@Override
+	public long getProtocolCount(String searchPattern) throws AccessDeniedException {
+		
+		assertPermission(NetworkResourcePermission.READ);
+		
+		return resourceRepository.getProtocolCount(searchPattern);
+	}
+	
+	@Override
+	public List<NetworkProtocol> searchProtocols(String searchPattern, int start, int length, ColumnSort[] sorting) throws AccessDeniedException {
+		
+		assertPermission(NetworkResourcePermission.READ);
+		
+		return resourceRepository.searchProtocols(searchPattern, start, length, sorting);
+	}
 
 	@Override
 	public NetworkProtocol getProtocolById(Long id)
@@ -287,29 +303,18 @@ public class NetworkResourceServiceImpl extends
 			Set<Role> roles, Realm realm) throws ResourceCreationException,
 			AccessDeniedException {
 
-		assertPermission(NetworkResourcePermission.CREATE);
+		NetworkResource resource = new NetworkResource();
+		
+		resource.setName(name);
+		resource.setHostname(hostname);
+		resource.setDestinationHostname(destinationHostname);
+		resource.setRealm(realm);
+		resource.setProtocols(protocols);
+		resource.setRoles(roles);
+		
+		createResource(resource);
 
-		try {
-			getResourceByName(name);
-			throw new ResourceCreationException(RESOURCE_BUNDLE,
-					"error.resourceExists", name);
-
-		} catch (ResourceNotFoundException e) {
-
-			NetworkResource resource = new NetworkResource();
-			resource.setName(name);
-			resource.setHostname(hostname);
-			resource.setDestinationHostname(destinationHostname);
-
-			resource.setRealm(realm);
-
-			resourceRepository.saveResource(resource);
-
-			resource.getProtocols().addAll(protocols);
-			resource.getRoles().addAll(roles);
-
-			return resource;
-		}
+		return resource;
 
 	}
 

@@ -1,107 +1,83 @@
-<div id="contentNetwork">
-	<ul id="networkTabs">
-		<li><a href="#tabEndPoints"><span localize="endpoints.label"></span></a></li>
-		<li><a href="#tabProtocols"><span localize="protocols.label"></span></a></li>
-	</ul>
-	<div id="tabEndPoints"></div>
-	<div id="tabProtocols"></div>
-	
+<div id="contentProtocols">
+	<div class="modal" id="addProtocolForm" tabindex="-1" role="dialog" dialog-for="contentProtocols">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="dialogError"></div>
 
-	<div id="addProtocolForm" class="dialog" dialog-for="tabProtocols">
-		<form class="form">
-			<div class="dialogError"></div>
-			<div class="formInputField">
-				<label for="protocolName" class="formLabel"
-					localize="protocol.protocolName.label"></label> <input type="text"
-					name="protocolName" id="protocolName"
-					class="formInput text ui-widget-content ui-corner-all" />
+					<div class="propertyItem form-group">
+						<label class="col-md-3 control-label" localize="protocol.protocolName.label"></label>
+						<div class="propertyValue col-md-9">
+							<input type="text" class="form-control propertyInput"
+								placeholder="" id="protocolName" maxlength="" name="protocolName" value="">
+							<div>
+								<span class="help-block" localize="protocol.protocolName.info"></span>
+							</div>
+						</div>
+					</div>
+					<div class="propertyItem form-group">
+						<label class="col-md-3 control-label" localize="protocol.transport.label"></label>
+						<div class="propertyValue col-md-9">
+							<div id="transportButton"></div>
+							<div>
+								<span class="help-block" localize="protocol.transport.info"></span>
+							</div>
+						</div>
+					</div>
+					<div class="propertyItem form-group">
+						<label class="col-md-3 control-label" localize="protocol.start.label"></label>
+						<div class="propertyValue col-md-9">
+							<input type="text" class="form-control propertyInput"
+								placeholder="" id="start" maxlength="" name="start" value="">
+							<div>
+								<span class="help-block" localize="protocol.start.info"></span>
+							</div>
+						</div>
+					</div>
+					<div class="propertyItem form-group">
+						<label class="col-md-3 control-label" localize="protocol.end.label"></label>
+						<div class="propertyValue col-md-9">
+							<input type="text" class="form-control propertyInput"
+								placeholder="" id="end" maxlength="" name="end" value="">
+							<div>
+								<span class="help-block" localize="protocol.end.info"></span>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" id="protocolId" name="protocolId" value="" />
+				</div>
+				<div class="modal-footer"></div>
+				</div>
 			</div>
-			<div class="formInputField">
-				<label for="transport" class="formLabel"
-					localize="protocol.transport.label"></label> <select
-					name="transport" id="transport"
-					class="formInput text ui-widget-content ui-corner-all">
-					<option value="TCP">TCP</option>
-					<option value="UDP">UDP</option>
-				</select>
-			</div>
-			<div class="formInputField">
-				<label for="start" class="formLabel" localize="protocol.start.label"></label>
-				<input type="text" name="start" id="start"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div class="formInputField">
-				<label for="end" class="formLabelOptional"
-					localize="protocol.end.label"></label> <input type="text"
-					name="end" id="end"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<input type="hidden" id="protocolId" name="resourceId" value="" />
-		</form>
+		</div>
 	</div>
-
-	<div id="addResourceForm" class="dialog" dialog-for="tabEndPoints">
-		<form class="form">
-			<div class="dialogError"></div>
-			<div class="formInputField">
-				<label for="resourceName" class="formLabel"
-					localize="endpoint.resourceName.label"></label> <input type="text"
-					name="resourceName" id="resourceName"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div class="formInputField">
-				<label for="hostname" class="formLabel"
-					localize="endpoint.hostname.label"></label> <input type="text"
-					name="hostname" id="hostname"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div class="formInputField">
-				<label for="destinationHostname" class="formLabel"
-					localize="endpoint.destinationHostname.label"></label> <input type="text"
-					name="destinationHostname" id="destinationHostname"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div id="resourceTabs" class="tabContent">
-				<ul id="addResourceFormTabs">
-					<li><a href="#protocols"><span
-							localize="endpoint.protocols.label"></span></a></li>
-					<li><a href="#roles"><span localize="endpoint.roles.label"></span></a></li>
-				</ul>
-				<div id="protocols"></div>
-				<div id="roles"></div>
-			</div>
-			<input type="hidden" id="resourceId" name="resourceId" value="" />
-		</form>
-	</div>
-</div>
-
 <script type="text/javascript">
 
+
 	$(document).ready(function() {
-		$('#contentNetwork').localize();
-		$('#contentNetwork').tabs();
-	
-		getJSON('networkProtocols', null, function(data) {
-			$('#protocols').multipleSelect({
-				values : data.resources,
-				selectedIsObjectList : true,
-				resourceKey : 'endpoint'
-			});
+
+		$('#contentProtocols').localize();
+		
+		$('#transportButton').selectButton({
+			id: 'transport',
+			options: [{ id: 'TCP', name: 'TCP', value: 'TCP' }, 
+			          { id: 'UDP', name: 'UDP', value: 'UDP'}, 
+			          { id: 'BOTH', name: 'BOTH', value: 'BOTH' }],
+			nameIsResourceKey: false,
+			name: 'TCP',
+			value: 'TCP'
 		});
-	
-		if(currentMenu.canCreate || currentMenu.canUpdate) {
-			getJSON('roles', null, function(data) {
-				$('#roles').multipleSelect({
-					values : data.resources,
-					selectedIsObjectList : true,
-					resourceKey : 'endpoint'
-				});
-			});
-		}
-	
-		$('#tabProtocols').resourcePage(
+
+		$('#contentProtocols').ajaxResourcePage(
 				{
-				tableUrl : "networkProtocols",
+				title: getResource('protocols.title'),
+				icon: 'fa-exchange',
+				tableUrl : "table/networkProtocols",
 				resourceUrl : "networkProtocol",
 				fields : [ { name: "name" }, 
 				           { name: "transport" },
@@ -152,99 +128,12 @@
 					$('#start').val(resource.startPort);
 					$('#end').val(resource.endPort);
 					$('#protocolId').val(resource.id);
+				},
+				complete: function() {
+					loadComplete();
 				}
 			});
 
-		$('#tabEndPoints')
-				.resourcePage(
-						{
-						id : "EndPoints",
-						tableUrl : "networkResources",
-						resourceUrl : "networkResource",
-						fields : [ { name: "name" }, 
-						           { name: "hostname" },
-						           { name: "destinationHostname"}, 
-						           { name: "protocolsDesc" } ],
-						resourceKey : "endpoint",
-						canCreate: currentMenu.canCreate,
-						canUpdate: currentMenu.canUpdate,
-						canDelete: currentMenu.canDelete,
-						validate : function() {
-
-							if ($('#resourceName').val() == '') {
-								$('#addResourceForm').resourceDialog('error',
-										"error.nameRequired");
-								return false;
-							}
-
-							if ($('#hostname').val() == '') {
-								$('#addResourceForm').resourceDialog('error',
-										"error.hostnameRequired");
-								return false;
-							}
-							
-							if(isValidIpv4Address($('#hostname').val())
-									|| isValidIpv6Address($('#hostname').val())) { 
-								$('#addResourceForm').resourceDialog('error', "error.hostnameIsIPAddress");
-								return false;
-							}  
-							
-							if(!isValidHostname($('#hostname').val())) { 
-				 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
-				 				return false;
-				 			}  
-
-							if($('#destinationHostname').val().length > 0) {
-								if(!isValidHostname($('#destinationHostname').val()) 
-										&& !isValidIpv4Address($('#destinationHostname').val()) 
-										&& !isValidIpv6Address($('#destinationHostname').val())) {
-									$('#addResourceForm').resourceDialog('error', "error.destinationInvalid");
-					 				return false;
-								}
-							}
-							return true;
-						},
-						clearDialog : function() {
-							$('#resourceName').val('');
-							$('#hostname').val('');
-							$('#destinationHostname').val('');
-							$('#protocols').multipleSelect();
-							$('#roles').multipleSelect();
-							$('#resourceId').val('');
-						},
-						createResource : function() {
-							resource = new Object();
-							resource.name = $('#resourceName').val();
-							resource.hostname = $('#hostname').val();
-							resource.destinationHostname = $('#destinationHostname').val();
-							resource.protocols = $('#protocols')
-									.multipleSelectValues();
-							resource.roles = $('#roles').multipleSelectValues();
-							resource.id = $('#resourceId').val();
-							return resource;
-						},
-						displayResource : function(resource) {
-							$('#resourceName').val(resource.name);
-							$('#hostname').val(resource.hostname);
-							$('#destinationHostname').val(resource.destinationHostname);
-							$('#resourceId').val(resource.id);
-							$('#protocols').multipleSelect({
-								selected : resource.protocols,
-								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
-							});
-							$('#roles').multipleSelect({
-								selected : resource.roles,
-								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
-							});
-						},
-						complete : function() {
-
-							$('#resourceTabs').tabs();
-
-							loadComplete();
-						}
-					});
+		
 	});
 </script>

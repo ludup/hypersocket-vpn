@@ -15,13 +15,15 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.realm.Principal;
 import com.hypersocket.realm.Realm;
+import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
+import com.hypersocket.tables.ColumnSort;
 
 
-public interface NetworkResourceService extends AuthenticatedService {
+public interface NetworkResourceService extends AuthenticatedService, AbstractAssignableResourceService<NetworkResource> {
 
 	static final String RESOURCE_BUNDLE = "NetworkResourceService";
 	
@@ -54,4 +56,9 @@ public interface NetworkResourceService extends AuthenticatedService {
 	NetworkProtocol verifyResourceSession(NetworkResource resource, Integer port,
 			NetworkTransport transport, Session session)
 			throws AccessDeniedException;
+
+	long getProtocolCount(String searchPattern) throws AccessDeniedException;
+
+	List<NetworkProtocol> searchProtocols(String searchPattern, int start,
+			int length, ColumnSort[] sorting) throws AccessDeniedException;
 }

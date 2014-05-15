@@ -15,8 +15,10 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hypersocket.repository.CriteriaConfiguration;
 import com.hypersocket.repository.DeletedCriteria;
 import com.hypersocket.resource.AbstractAssignableResourceRepositoryImpl;
+import com.hypersocket.tables.ColumnSort;
 
 @Repository
 @Transactional
@@ -32,6 +34,27 @@ public class NetworkResourceRepositoryImpl extends
 	@Override
 	public List<NetworkProtocol> getProtocols() {
 		return allEntities(NetworkProtocol.class, new DeletedCriteria(false));
+	}
+	
+	@Override
+	public long getProtocolCount(String searchPattern) {
+		return getCount(NetworkProtocol.class, "name", searchPattern, new CriteriaConfiguration() {	
+			@Override
+			public void configure(Criteria criteria) {
+				criteria.add(Restrictions.eq("deleted", false));
+			}
+		});
+	}
+	
+	@Override
+	public List<NetworkProtocol> searchProtocols(String searchPattern, int start, int length, ColumnSort[] sorting) {
+		
+		return search(NetworkProtocol.class, "name", searchPattern, start, length, sorting, new CriteriaConfiguration() {	
+			@Override
+			public void configure(Criteria criteria) {
+				criteria.add(Restrictions.eq("deleted", false));
+			}
+		});
 	}
 	
 	@Override

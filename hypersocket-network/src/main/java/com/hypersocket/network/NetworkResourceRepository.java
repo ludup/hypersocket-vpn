@@ -12,6 +12,7 @@ import java.util.List;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.ResourceChangeException;
+import com.hypersocket.tables.ColumnSort;
 
 public interface NetworkResourceRepository extends
 		AbstractAssignableResourceRepository<NetworkResource> {
@@ -41,5 +42,10 @@ public interface NetworkResourceRepository extends
 	NetworkProtocol getProtocolByName(String name, boolean deleted);
 
 	NetworkResource getResourceByName(String name, boolean deleted);
+
+	List<NetworkProtocol> searchProtocols(String searchPattern, int start,
+			int length, ColumnSort[] sorting);
+
+	long getProtocolCount(String searchPattern);
 
 }

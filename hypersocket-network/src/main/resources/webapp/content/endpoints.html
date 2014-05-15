@@ -1,37 +1,61 @@
 <div id="contentEndpoints">
 
-	<div id="addResourceForm" class="dialog" dialog-for="tabEndPoints">
-		<form class="form">
-			<div class="dialogError"></div>
-			<div class="formInputField">
-				<label for="resourceName" class="formLabel"
-					localize="endpoint.resourceName.label"></label> <input type="text"
-					name="resourceName" id="resourceName"
-					class="formInput text ui-widget-content ui-corner-all" />
+	<div class="modal" id="addResourceForm" tabindex="-1" role="dialog" dialog-for="contentEndpoints">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="dialogError"></div>
+
+					<div class="propertyItem form-group">
+						<label class="col-md-3 control-label" localize="endpoint.resourceName.label"></label>
+						<div class="propertyValue col-md-9">
+							<input type="text" class="form-control propertyInput"
+								placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
+							<div>
+								<span class="help-block" localize="endpoint.resourceName.info"></span>
+							</div>
+						</div>
+					</div>
+						
+					<div id="endpointProperties"></div>
+					<div id="tabDetails" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-md-3 control-label" localize="endpoint.hostname.label"></label>
+							<div class="propertyValue col-md-9">
+								<input type="text" class="form-control propertyInput"
+									placeholder="" id="hostname" maxlength="" name="hostnaame" value="">
+								<div>
+									<span class="help-block" localize="endpoint.hostname.info"></span>
+								</div>
+							</div>
+						</div>
+						<div class="propertyItem form-group">
+							<label class="col-md-3 control-label" localize="endpoint.destinationHostname.label"></label>
+							<div class="propertyValue col-md-9">
+								<input type="text" class="form-control propertyInput"
+									placeholder="" id="destinationHostname" maxlength="" name="destinationHostname" value="">
+								<div>
+									<span class="help-block" localize="endpoint.destinationHostname.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="tabProtocols" class="dialogTab">
+						<div id="protocols"></div>
+					</div>
+					<div id="tabRoles" class="dialogTab">
+						<div id="roles"></div>
+					</div>
+					<input type="hidden" id="resourceId" name="resourceId" value="" />
+				</div>
+				<div class="modal-footer"></div>
 			</div>
-			<div class="formInputField">
-				<label for="hostname" class="formLabel"
-					localize="endpoint.hostname.label"></label> <input type="text"
-					name="hostname" id="hostname"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div class="formInputField">
-				<label for="destinationHostname" class="formLabel"
-					localize="endpoint.destinationHostname.label"></label> <input type="text"
-					name="destinationHostname" id="destinationHostname"
-					class="formInput text ui-widget-content ui-corner-all" />
-			</div>
-			<div id="resourceTabs" class="tabContent">
-				<ul id="addResourceFormTabs">
-					<li><a href="#protocols"><span
-							localize="endpoint.protocols.label"></span></a></li>
-					<li><a href="#roles"><span localize="endpoint.roles.label"></span></a></li>
-				</ul>
-				<div id="protocols"></div>
-				<div id="roles"></div>
-			</div>
-			<input type="hidden" id="resourceId" name="resourceId" value="" />
-		</form>
+		</div>
 	</div>
 </div>
 
@@ -57,17 +81,34 @@
 				});
 			});
 		}
-	
-		
 
-		$('#tabEndPoints').ajaxResourcePage(
+		$('#endpointProperties').propertyPage({
+			url : 'template/networkResource',
+			showButtons : false,
+			useTemplates : true,
+			canUpdate : currentMenu.canUpdate,
+			additionalTabs : [ {
+				id : "tabDetails",
+				name : getResource("details.label")
+			},
+			{
+				id : "tabProtocols",
+				name : getResource("protocols.label")
+			},
+			{
+				id : "tabRoles",
+				name : getResource("label.roles")
+			}]
+		});
+		
+		$('#contentEndpoints').ajaxResourcePage(
 						{
 						id : "EndPoints",
-						tableUrl : "networkResources",
+						title: getResource('endpoints.label'),
+						icon: 'fa-sitemap',
+						tableUrl : "table/networkResources",
 						resourceUrl : "networkResource",
 						fields : [ { name: "name" }, 
-						           { name: "hostname" },
-						           { name: "destinationHostname"}, 
 						           { name: "protocolsDesc" } ],
 						resourceKey : "endpoint",
 						canCreate: currentMenu.canCreate,

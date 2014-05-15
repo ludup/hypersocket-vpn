@@ -8,6 +8,7 @@
 package com.hypersocket.network.json;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,18 +31,25 @@ import com.hypersocket.i18n.I18N;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.network.NetworkProtocol;
+import com.hypersocket.network.NetworkProtocolColumns;
 import com.hypersocket.network.NetworkResource;
+import com.hypersocket.network.NetworkResourceColumns;
 import com.hypersocket.network.NetworkResourceService;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
+import com.hypersocket.tables.Column;
+import com.hypersocket.tables.ColumnSort;
+import com.hypersocket.tables.DataTablesResult;
+import com.hypersocket.tables.json.DataTablesPageProcessor;
 
 @Controller
 public class NetworkResourceController extends ResourceController {
@@ -89,7 +97,96 @@ public class NetworkResourceController extends ResourceController {
 			clearAuthenticatedContext(networkService);
 		}
 	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "table/networkResources", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult tableNetworkResources(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
 
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request), networkService);
+
+		try {
+			return processDataTablesRequest(request,
+					new DataTablesPageProcessor() {
+
+						@Override
+						public Column getColumn(int col) {
+							return NetworkResourceColumns.values()[col];
+						}
+
+						@Override
+						public List<?> getPage(String searchPattern, int start, int length,
+								ColumnSort[] sorting) throws UnauthorizedException, AccessDeniedException {
+							return networkService.searchResources(sessionUtils.getCurrentRealm(request), searchPattern, start, length, sorting);
+						}
+						
+						@Override
+						public Long getTotalCount(String searchPattern) throws UnauthorizedException, AccessDeniedException {
+							return networkService.getResourceCount(sessionUtils.getCurrentRealm(request), searchPattern);
+						}
+					});
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "table/networkProtocols", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult tableNetworkProtocols(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request), networkService);
+
+		try {
+			return processDataTablesRequest(request,
+					new DataTablesPageProcessor() {
+
+						@Override
+						public Column getColumn(int col) {
+							return NetworkProtocolColumns.values()[col];
+						}
+
+						@Override
+						public List<?> getPage(String searchPattern, int start, int length,
+								ColumnSort[] sorting) throws UnauthorizedException, AccessDeniedException {
+							return networkService.searchProtocols(searchPattern, start, length, sorting);
+						}
+						
+						@Override
+						public Long getTotalCount(String searchPattern) throws UnauthorizedException, AccessDeniedException {
+							return networkService.getProtocolCount(searchPattern);
+						}
+					});
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "template/networkResource", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceList<PropertyCategory> getResourceTemplate(HttpServletRequest request)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return new ResourceList<PropertyCategory>();
+		} finally {
+			clearAuthenticatedContext();
+		}	
+	}
+	
 	@AuthenticationRequired
 	@RequestMapping(value = "networkResource/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
