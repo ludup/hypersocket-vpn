@@ -10,11 +10,13 @@ package com.hypersocket.network;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hypersocket.realm.Realm;
 import com.hypersocket.repository.CriteriaConfiguration;
 import com.hypersocket.repository.DeletedCriteria;
 import com.hypersocket.resource.AbstractAssignableResourceRepositoryImpl;
@@ -25,6 +27,17 @@ import com.hypersocket.tables.ColumnSort;
 public class NetworkResourceRepositoryImpl extends
 		AbstractAssignableResourceRepositoryImpl<NetworkResource> implements
 		NetworkResourceRepository {
+
+	@Override
+	public List<NetworkResource> search(Realm realm, String searchPattern,
+			int start, int length, ColumnSort[] sorting, CriteriaConfiguration... configs) {
+		return super.search(realm, searchPattern, start, length, sorting, new CriteriaConfiguration() {
+			@Override
+			public void configure(Criteria criteria) {
+				criteria.setFetchMode("protocols", FetchMode.SELECT);
+			}
+		});
+	}
 
 	@Override
 	public void saveProtocol(NetworkProtocol protocol) {

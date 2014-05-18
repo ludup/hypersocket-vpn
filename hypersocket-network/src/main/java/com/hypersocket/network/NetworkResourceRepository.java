@@ -47,5 +47,4 @@ public interface NetworkResourceRepository extends
 			int length, ColumnSort[] sorting);
 
 	long getProtocolCount(String searchPattern);
-
 }
