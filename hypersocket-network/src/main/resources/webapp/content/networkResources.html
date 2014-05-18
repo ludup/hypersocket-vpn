@@ -5,13 +5,13 @@
 				<div class="col-sm-2">
 					<a class="large-button" id="buttonEndpoints"> <i
 						class="fa fa-sitemap"></i>
-						<p>End Points</p>
+						<p localize="endpoints.title"></p>
 					</a>
 				</div>
 				<div class="col-sm-2">
 					<a class="large-button" id="buttonProtocols"> <i
 						class="fa fa-exchange"></i>
-						<p>Protocols</p>
+						<p localize="protocols.title"></p>
 					</a>
 				</div>
 				<div class="col-sm-2"></div>
@@ -29,6 +29,8 @@
 </div>
 <script type="text/javascript">
 	function loadPage(page, element) {
+		
+		$('#networkResourcesContent').localize();
 		
 		$('#networkResourcesContent').find('.large-button-active').removeClass('large-button-active');
 		element.addClass('large-button-active');
