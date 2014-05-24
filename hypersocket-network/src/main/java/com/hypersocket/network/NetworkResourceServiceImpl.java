@@ -7,6 +7,8 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
+import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
+
 import java.util.List;
 import java.util.Set;
 
@@ -17,10 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.network.events.NetworkResourceSessionClosed;
+import com.hypersocket.network.events.NetworkResourceSessionOpened;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -60,6 +65,9 @@ public class NetworkResourceServiceImpl extends
 	MenuService menuService;
 
 	@Autowired
+	EventService eventService;
+	
+	@Autowired
 	UserInterfaceContentHandler jQueryUIContentHandler;
 
 	public NetworkResourceServiceImpl() {
@@ -89,6 +97,9 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
+		eventService.registerEvent(NetworkResourceSessionOpened.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceSessionClosed.class, RESOURCE_BUNDLE);
+		
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
 		}

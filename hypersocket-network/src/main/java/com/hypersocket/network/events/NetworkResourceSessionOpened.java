@@ -8,6 +8,8 @@ public class NetworkResourceSessionOpened extends NetworkResourceEvent {
 
 	private static final long serialVersionUID = -7729337279204702387L;
 
+	public static final String EVENT_RESOURCE_KEY = "networkResource.sessionOpened";
+	
 	public static final String ATTR_RESOURCE_NAME = "attr.resourceName";
 	public static final String ATTR_PROTOCOL_NAME = "attr.protocolName";
 	public static final String ATTR_DESTINATION_HOST = "attr.destinationHost";
@@ -15,7 +17,7 @@ public class NetworkResourceSessionOpened extends NetworkResourceEvent {
 	
 	public NetworkResourceSessionOpened(Object source,
 			boolean success, NetworkResource resource, Session session, Integer actualPort, NetworkProtocol protocol) {
-		super(source, "networkResource.sessionOpened", success, session);
+		super(source, EVENT_RESOURCE_KEY, success, session);
 		addAttribute(ATTR_RESOURCE_NAME, resource.getName());
 		addAttribute(ATTR_PROTOCOL_NAME, protocol.getName());
 		addAttribute(ATTR_DESTINATION_HOST, resource.resolveHostname());
@@ -24,7 +26,7 @@ public class NetworkResourceSessionOpened extends NetworkResourceEvent {
 
 	public NetworkResourceSessionOpened(Object source,
 			Throwable e, NetworkResource resource, Session session, Integer actualPort) {
-		super(source, "networkResource.sessionOpened", e, session);
+		super(source, EVENT_RESOURCE_KEY, e, session);
 		addAttribute(ATTR_RESOURCE_NAME, resource.getName());
 		addAttribute(ATTR_DESTINATION_HOST, resource.resolveHostname());
 		addAttribute(ATTR_DESTINATION_PORT, String.valueOf(actualPort));

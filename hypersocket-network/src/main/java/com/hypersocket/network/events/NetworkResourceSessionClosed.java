@@ -7,15 +7,17 @@ public class NetworkResourceSessionClosed extends NetworkResourceEvent {
 
 	private static final long serialVersionUID = -584310921887757202L;
 
+	public static final String EVENT_RESOURCE_KEY = "networkResource.sessionClosed";
+	
 	public NetworkResourceSessionClosed(Object source,
 			NetworkResource resource, Session session, long totalBytesIn,
 			long totalBytesOut) {
-		super(source, "networkResource.sessionClosed", true, session);
+		super(source, EVENT_RESOURCE_KEY, true, session);
 	}
 
 	public NetworkResourceSessionClosed(Object source, Throwable e,
 			NetworkResource resource, Session session) {
-		super(source, "networkResource.sessionClosed", e, session);
+		super(source, EVENT_RESOURCE_KEY, e, session);
 	}
 
 }
