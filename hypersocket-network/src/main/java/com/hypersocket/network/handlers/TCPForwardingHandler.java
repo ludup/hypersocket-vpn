@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import com.hypersocket.auth.AuthenticationService;
 import com.hypersocket.auth.json.UnauthorizedException;
-import com.hypersocket.bandwidth.BandwidthReportingService;
 import com.hypersocket.events.EventService;
 import com.hypersocket.network.NetworkProtocol;
 import com.hypersocket.network.NetworkResource;
@@ -34,6 +33,7 @@ import com.hypersocket.server.handlers.WebsocketHandler;
 import com.hypersocket.server.websocket.TCPForwardingClientCallback;
 import com.hypersocket.server.websocket.WebsocketClient;
 import com.hypersocket.server.websocket.WebsocketClientCallback;
+import com.hypersocket.session.ResourceSession;
 import com.hypersocket.session.Session;
 import com.hypersocket.session.SessionService;
 import com.hypersocket.session.json.SessionUtils;
@@ -61,9 +61,6 @@ public class TCPForwardingHandler implements WebsocketHandler {
 	@Autowired
 	EventService eventService;
 
-	@Autowired
-	BandwidthReportingService bandwidthReportingService;
-	
 	public TCPForwardingHandler() {
 
 	}
@@ -107,8 +104,12 @@ public class TCPForwardingHandler implements WebsocketHandler {
 			server.connect(new TCPForwardingHandlerCallback(callback, session,
 					resource, protocol, port));
 
+		} catch(AccessDeniedException ex) { 
+			// TODO Log event
+			throw ex;
 		} catch (ResourceNotFoundException e) {
-			eventService.publishEvent(new NetworkResourceSessionOpened(this, e, session));
+			// TODO Log event
+			throw new AccessDeniedException("Resource not found");
 		} finally {
 			networkService.clearPrincipalContext();
 		}
@@ -121,24 +122,39 @@ public class TCPForwardingHandler implements WebsocketHandler {
 		NetworkProtocol protocol;
 		Session session;
 		Integer port;
-
+		ResourceSession<NetworkResource> resourceSession;
+		
 		TCPForwardingHandlerCallback(WebsocketClientCallback callback,
 				Session session, NetworkResource resource, NetworkProtocol protocol, Integer port) {
 			this.callback = callback;
 			this.resource = resource;
 			this.protocol = protocol;
+			this.session = session;
 			this.port = port;
 		}
 
 		@Override
-		public void websocketAccepted(WebsocketClient client) {
+		public void websocketAccepted(final WebsocketClient client) {
 
 			callback.websocketAccepted(client);
 
-			eventService.publishEvent(new NetworkResourceSessionOpened(
+			if(!sessionService.hasResourceSession(session, resource)) {
+				eventService.publishEvent(new NetworkResourceSessionOpened(
 					TCPForwardingHandler.this, true, resource, session, port, protocol));
+			}
+		
+			resourceSession = new ResourceSession<NetworkResource>() {
+				@Override
+				public void close() {
+					client.close();
+				}
+				@Override
+				public NetworkResource getResource() {
+					return resource;
+				}
+			};
 			
-			bandwidthReportingService.startReporting(client);
+			sessionService.registerResourceSession(session, resourceSession);
 		}
 
 		@Override
@@ -154,12 +170,14 @@ public class TCPForwardingHandler implements WebsocketHandler {
 		public void websocketClosed(WebsocketClient client) {
 
 			callback.websocketClosed(client);
-
-			bandwidthReportingService.startReporting(client);
 			
-			eventService.publishEvent(new NetworkResourceSessionClosed(
-					TCPForwardingHandler.this, resource, session, client
-							.getTotalBytesIn(), client.getTotalBytesOut()));
+			sessionService.unregisterResourceSession(session, resourceSession);
+			
+			if(!sessionService.hasResourceSession(session, resource)) {
+				eventService.publishEvent(new NetworkResourceSessionClosed(
+						TCPForwardingHandler.this, resource, protocol, session, client
+								.getTotalBytesIn(), client.getTotalBytesOut(), port));
+			}
 		}
 
 		public int getPort() {

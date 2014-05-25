@@ -294,7 +294,7 @@ public class NetworkResourceController extends ResourceController {
 			return new ResourceStatus<NetworkResource>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
 					NetworkResourceService.RESOURCE_BUNDLE,
-					"protocol.deleted.info", preDeletedName));
+					"endpoint.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
 			return new ResourceStatus<NetworkResource>(false, e.getMessage());

@@ -7,8 +7,6 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
-
 import java.util.List;
 import java.util.Set;
 
