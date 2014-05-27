@@ -58,7 +58,7 @@ public class HostsFileManager {
 		
 		selectNextRange();
 		generatePool();
-		loadFile();
+		loadFile(true);
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
@@ -175,18 +175,22 @@ public class HostsFileManager {
 		flushFile(false);
 	}
 
-	private void loadFile() throws IOException {
+	private void loadFile(boolean processHypersocketEntries) throws IOException {
 		// Load and remove any aliases that might be left in the file
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				new FileInputStream(hostsFile)));
 
+		content.clear();
+		
 		try {
 			String str;
 			while ((str = reader.readLine()) != null && !str.equals(BEGIN)) {
 				content.add(str);
 			}
 
-			processContentForAliases();
+			if(processHypersocketEntries) {
+				processContentForAliases();
+			}
 
 		} finally {
 			reader.close();
@@ -236,6 +240,10 @@ public class HostsFileManager {
 	}
 
 	private void writeFile(File file, boolean outputAliases) throws IOException {
+		
+		// Load the latest content first in case user added entries
+		loadFile(false);
+		
 		FileOutputStream out = new FileOutputStream(file);
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
 		try {
