@@ -174,17 +174,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 		}
 		
 		stopAllForwarding();
-		
-		try {
-			if (mgr != null) {
-				mgr.cleanup();
-			}
-		} catch (IOException e) {
-			if (log.isErrorEnabled()) {
-				log.error("Error cleaning up hosts file manager", e);
-			}
-		}
-		
+			
 	}
 
 	@Override
@@ -226,10 +216,19 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 	}
 
 	public void stopAllForwarding() {
-		serviceClient.getTransport().stopAllForwarding();
+		
+		for(NetworkResource resource : localForwards.values()) {
+			stopLocalForwarding(resource, false);
+		}
+		
+		localForwards.clear();
 	}
 	
 	public void stopLocalForwarding(NetworkResource resource) {
+		stopLocalForwarding(resource, true);
+	}
+	
+	private void stopLocalForwarding(NetworkResource resource, boolean remove) {
 		String key = resource.getLocalInterface() + ":" + resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
 			serviceClient.getTransport().stopLocalForwarding(resource.getLocalInterface(), resource.getLocalPort());
@@ -238,7 +237,9 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 			} catch(Exception e) {
 				log.error("Failed to stop local forwarding redirect", e);
 			} finally {
-				localForwards.remove(key);
+				if(remove) {
+					localForwards.remove(key);
+				}
 			}
 		}
 	}

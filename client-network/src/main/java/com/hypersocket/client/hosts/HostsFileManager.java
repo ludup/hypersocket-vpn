@@ -293,4 +293,12 @@ public class HostsFileManager {
 		flushFile(true);
 		return alias;
 	}
+
+	public void removeHostname(String hostname) throws IOException {
+		
+		hostsToLoopbackAlias.remove(hostname);
+		
+		flushFile(true);
+		
+	}
 }
