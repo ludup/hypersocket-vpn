@@ -48,6 +48,7 @@ public class HostsFileManager {
 	int _16bits = 168;
 	int _24bits = 10;
 	
+	static HostsFileManager systemManager;
 	
 	static final String BEGIN = "#----HYPERSOCKET BEGIN----";
 
@@ -124,32 +125,38 @@ public class HostsFileManager {
 	
 	public static HostsFileManager getSystemHostsFile() throws IOException {
 
-		File hostsFile = null;
-
-		String osName = System.getProperty("os.name");
-		AliasCommand aliasCommand = null;
-
-		if (osName.startsWith("Mac")) {
-			hostsFile = new File("/private/etc/hosts");
-			aliasCommand = new OSXAliasCommand();
-		} else if (osName.startsWith("Linux")) {
-			hostsFile = new File("/etc/hosts");
-			aliasCommand = new LinuxAliasCommand();
-		} else if (osName.startsWith("Windows")) {
-			hostsFile = new File(System.getenv("SystemRoot"), "System32"
-					+ File.separator + "drivers" + File.separator + "etc"
-					+ File.separator + "hosts");
-		} else {
-			throw new IOException("Unsupported operating system " + osName);
+		synchronized(HostsFileManager.class) {
+			
+			if(systemManager!=null) {
+				return systemManager;
+			}
+			File hostsFile = null;
+	
+			String osName = System.getProperty("os.name");
+			AliasCommand aliasCommand = null;
+	
+			if (osName.startsWith("Mac")) {
+				hostsFile = new File("/private/etc/hosts");
+				aliasCommand = new OSXAliasCommand();
+			} else if (osName.startsWith("Linux")) {
+				hostsFile = new File("/etc/hosts");
+				aliasCommand = new LinuxAliasCommand();
+			} else if (osName.startsWith("Windows")) {
+				hostsFile = new File(System.getenv("SystemRoot"), "System32"
+						+ File.separator + "drivers" + File.separator + "etc"
+						+ File.separator + "hosts");
+			} else {
+				throw new IOException("Unsupported operating system " + osName);
+			}
+	
+			if (log.isInfoEnabled()) {
+				log.info("Starting hosts file manager for "
+						+ System.getProperty("os.name"));
+			}
+	
+			systemManager = new HostsFileManager(hostsFile, aliasCommand);
+			return systemManager;
 		}
-
-		if (log.isInfoEnabled()) {
-			log.info("Starting hosts file manager for "
-					+ System.getProperty("os.name"));
-		}
-
-		return new HostsFileManager(hostsFile, aliasCommand);
-
 	}
 
 	public void generatePool() throws IOException {
