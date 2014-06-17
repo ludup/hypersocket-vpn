@@ -299,7 +299,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setProtocols(protocols);
 		resource.setRoles(roles);
 
-		resourceRepository.saveResource(resource);
+		updateResource(resource);
 
 		return resource;
 
