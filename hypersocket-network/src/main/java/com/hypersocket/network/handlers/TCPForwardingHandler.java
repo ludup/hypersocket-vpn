@@ -66,7 +66,7 @@ public class TCPForwardingHandler implements WebsocketHandler {
 	}
 
 	@PostConstruct
-	public void postConstruct() {
+	private void postConstruct() {
 		server.registerWebsocketpHandler(this);
 	}
 
@@ -191,26 +191,5 @@ public class TCPForwardingHandler implements WebsocketHandler {
 			}
 			return hostname;
 		}
-
-		@Override
-		public String getResourceBundle() {
-			return NetworkResourceService.RESOURCE_BUNDLE;
-		}
-
-		@Override
-		public String getResourceKey() {
-			return "networkResources";
-		}
 	}
-
-	@Override
-	public String getResourceKey() {
-		return NetworkResourceService.RESOURCE_BUNDLE;
-	}
-
-	@Override
-	public String getResourceBundle() {
-		return "networkResources";
-	}
-
 }

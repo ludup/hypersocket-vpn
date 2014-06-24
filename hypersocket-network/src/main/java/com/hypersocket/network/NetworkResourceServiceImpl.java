@@ -95,6 +95,21 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "endpoints", "fa-sitemap",
+				"endpoints", 100, NetworkResourcePermission.READ,
+				NetworkResourcePermission.CREATE,
+				NetworkResourcePermission.UPDATE,
+				NetworkResourcePermission.DELETE),
+				"networkResources");
+
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "protocols", "fa-exchange",
+				"protocols", 200, NetworkResourcePermission.READ,
+				NetworkResourcePermission.CREATE,
+				NetworkResourcePermission.UPDATE,
+				NetworkResourcePermission.DELETE),
+				"networkResources");
+		
+		
 		eventService.registerEvent(NetworkResourceSessionOpened.class, RESOURCE_BUNDLE);
 		eventService.registerEvent(NetworkResourceSessionClosed.class, RESOURCE_BUNDLE);
 		
