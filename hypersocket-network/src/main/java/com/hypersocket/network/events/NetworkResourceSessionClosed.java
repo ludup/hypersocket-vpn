@@ -4,7 +4,7 @@ import com.hypersocket.network.NetworkProtocol;
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.session.Session;
 
-public class NetworkResourceSessionClosed extends NetworkResourceEvent {
+public class NetworkResourceSessionClosed extends NetworkResourceSessionEvent {
 
 	private static final long serialVersionUID = -584310921887757202L;
 

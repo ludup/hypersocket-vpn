@@ -7,6 +7,8 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
+import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
+
 import java.util.List;
 import java.util.Set;
 
@@ -22,8 +24,11 @@ import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.network.events.NetworkResourceCreatedEvent;
+import com.hypersocket.network.events.NetworkResourceDeletedEvent;
 import com.hypersocket.network.events.NetworkResourceSessionClosed;
 import com.hypersocket.network.events.NetworkResourceSessionOpened;
+import com.hypersocket.network.events.NetworkResourceUpdatedEvent;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -109,6 +114,9 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE),
 				"networkResources");
 		
+		eventService.registerEvent(NetworkResourceCreatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceUpdatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceDeletedEvent.class, RESOURCE_BUNDLE);
 		
 		eventService.registerEvent(NetworkResourceSessionOpened.class, RESOURCE_BUNDLE);
 		eventService.registerEvent(NetworkResourceSessionClosed.class, RESOURCE_BUNDLE);
@@ -358,40 +366,36 @@ public class NetworkResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(NetworkResource resource) {
-		// TODO Auto-generated method stub
-		
+		eventService.publishEvent(new NetworkResourceCreatedEvent(this, resource, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(NetworkResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
+		eventService.publishEvent(new NetworkResourceCreatedEvent(this, resource, t, getCurrentSession()));
 		
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(NetworkResource resource) {
-		// TODO Auto-generated method stub
+		eventService.publishEvent(new NetworkResourceUpdatedEvent(this, resource, getCurrentSession()));
 		
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(NetworkResource resource, Throwable t) {
-		// TODO Auto-generated method stub
-		
+		eventService.publishEvent(new NetworkResourceUpdatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(NetworkResource resource) {
-		// TODO Auto-generated method stub
-		
+		eventService.publishEvent(new NetworkResourceDeletedEvent(this, resource, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(NetworkResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-		
+		eventService.publishEvent(new NetworkResourceDeletedEvent(this, resource, t, getCurrentSession()));
 	}
 
 }
