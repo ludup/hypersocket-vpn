@@ -1,0 +1,143 @@
+<div id="contentWebsites">
+	<div class="modal" id="addWebsiteForm" tabindex="-1" role="dialog" dialog-for="contentWebsites">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="dialogError"></div>
+
+						<div class="propertyItem form-group">
+							<label class="col-md-3 control-label" localize="website.name.label"></label>
+							<div class="propertyValue col-md-9">
+								<input type="text" class="form-control propertyInput"
+									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
+								<div>
+									<span class="help-block" localize="website.name.info"></span>
+								</div>
+							</div>
+						</div>
+						
+						<div id="websiteProperties"></div>
+						<div id="tabDetails" class="dialogTab">
+							<div class="propertyItem form-group">
+								<label class="col-md-3 control-label" localize="website.url.label"></label>
+								<div class="propertyValue col-md-9">
+									<input type="text" class="form-control propertyInput"
+										placeholder="" id="url" maxlength="" name="url" value="">
+									<div>
+										<span class="help-block" localize="website.url.info"></span>
+									</div>
+								</div>
+							</div>
+					</div>
+					<div id="tabRoles" class="dialogTab">
+					<input type="hidden" id="resourceId" name="resourceId" value="" />
+				</div>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+				$('#contentWebsites').localize();
+					
+				if(currentMenu.canCreate || currentMenu.canUpdate) {
+					getJSON('roles', null, function(data) {
+						$('#tabRoles').multipleSelect({
+							values : data.resources,
+							selectedIsObjectList : true,
+							resourceKey : 'mount'
+						});
+					});
+				}
+				
+				$('#websiteProperties').propertyPage({
+					url : 'websites/template',
+					showButtons : false,
+					useTemplates : true,
+					canUpdate : currentMenu.canUpdate,
+					additionalTabs : [ {
+						id : "tabDetails",
+						name : getResource("website.details.label")
+					},
+					{
+						id : "tabRoles",
+						name : getResource("label.roles")
+					}]
+				});
+
+				$('#contentWebsites').ajaxResourcePage(
+						{
+							id : "Website",
+							tableUrl : "websites/table",
+							title: getResource("websites.label"),
+							icon: 'fa-globr',
+							resourceUrl : "websites/website",
+							fields : [ {
+								name : "name"
+							}],
+							resourceKey : "website",
+							canCreate: currentMenu.canCreate,
+							canUpdate: currentMenu.canUpdate,
+							canDelete: currentMenu.canDelete,
+							validate : function() {
+
+								if ($('#resourceName').val() == '') {
+									$('#addWebsiteForm').resourceDialog(
+											'error', "error.nameRequired");
+									return false;
+								}
+
+								if ($('#url').val() != '') {
+									// TODO validate URL
+									return true;
+								} else {
+									$('#addWebsiteForm').resourceDialog(
+											'error', "error.urlRequired");
+								}
+
+								return false;
+							},
+							clearDialog : function() {
+								
+								$('#resourceId').val('');
+								$('#resourceName').val('');
+								$('#url').val('');
+								$('#tabRoles').multipleSelect();
+								$('.clickableTab').first().trigger('click');
+							},
+							createResource : function() {
+								resource = new Object();
+								resource.id = $('#resourceId').val();
+								resource.name = $('#resourceName').val();
+								resource.launchUrl = $('#url').val();
+								resource.roles = $('#tabRoles').multipleSelectValues();
+								
+								return resource;
+							},
+							displayResource : function(resource) {
+								
+								$('#resourceId').val(resource.id);
+								$('#resourceName').val(resource.name);
+								$('#url').val(resource.launchUrl);
+								$('#tabRoles').multipleSelect({
+									selected : resource.roles,
+									selectedIsObjectList : true,
+									resourceKey : 'website'
+								});
+							},
+							complete : function() {
+								loadComplete();
+							}
+						});
+
+			});
+</script>
