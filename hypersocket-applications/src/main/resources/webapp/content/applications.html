@@ -1,0 +1,141 @@
+<!-- 
+	Replace any Application or Applications with Capitalized name of your resources e.g. Application or Applications
+	Replace any application or applications with lower case name of your resources e.g. application or applications
+ -->
+
+<div id="contentApplications">
+	<div class="modal" id="addApplicationForm" tabindex="-1" role="dialog" dialog-for="contentApplications">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<div class="dialogError"></div>
+
+						<div class="propertyItem form-group">
+							<label class="col-md-3 control-label" localize="application.name.label"></label>
+							<div class="propertyValue col-md-9">
+								<input type="text" class="form-control propertyInput"
+									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
+								<div>
+									<span class="help-block" localize="application.name.info"></span>
+								</div>
+							</div>
+						</div>
+						
+						<div id="applicationProperties"></div>
+						<div id="tabDetails" class="dialogTab">
+							<!-- Add any fields here or in additional tabs. Remember if you add
+							additional tabs to add them in the ajaxResourcePage call in the javascript
+							below -->
+					</div>
+					<div id="tabRoles" class="dialogTab">
+					<input type="hidden" id="resourceId" name="resourceId" value="" />
+				</div>
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+				$('#contentApplications').localize();
+					
+				if(currentMenu.canCreate || currentMenu.canUpdate) {
+					getJSON('roles', null, function(data) {
+						$('#tabRoles').multipleSelect({
+							values : data.resources,
+							selectedIsObjectList : true,
+							resourceKey : 'application'
+						});
+					});
+				}
+				
+				$('#applicationProperties').propertyPage({
+					url : 'applications/template',
+					showButtons : false,
+					useTemplates : true,
+					canUpdate : currentMenu.canUpdate,
+					additionalTabs : [ {
+						id : "tabDetails",
+						name : getResource("application.details.label")
+					},
+					{
+						id : "tabRoles",
+						name : getResource("label.roles")
+					}]
+				});
+
+				$('#contentApplications').ajaxResourcePage(
+						{
+							id : "Application",
+							tableUrl : "applications/table",
+							title: getResource("applications.label"),
+							icon: 'fa-desktop',
+							resourceUrl : "applications/application",
+							fields : [ {
+								name : "name"
+							}],
+							resourceKey : "application",
+							canCreate: currentMenu.canCreate,
+							canUpdate: currentMenu.canUpdate,
+							canDelete: currentMenu.canDelete,
+							validate : function() {
+
+								if ($('#resourceName').val() == '') {
+									$('#addApplicationForm').resourceDialog(
+											'error', "error.nameRequired");
+									return false;
+								}
+
+								// TODO validate any of your other fields
+								
+								return true;
+							},
+							clearDialog : function() {
+								
+								$('#resourceId').val('');
+								$('#resourceName').val('');
+								
+								// TODO add any other fields here
+								
+								$('#tabRoles').multipleSelect();
+								$('.clickableTab').first().trigger('click');
+							},
+							createResource : function() {
+								resource = new Object();
+								resource.id = $('#resourceId').val();
+								resource.name = $('#resourceName').val();
+								
+								// TODO add any other fields here
+								
+								resource.roles = $('#tabRoles').multipleSelectValues();
+								
+								return resource;
+							},
+							displayResource : function(resource) {
+								
+								$('#resourceId').val(resource.id);
+								$('#resourceName').val(resource.name);
+								
+								// TODO add any other fields here
+								
+								$('#tabRoles').multipleSelect({
+									selected : resource.roles,
+									selectedIsObjectList : true,
+									resourceKey : 'application'
+								});
+							},
+							complete : function() {
+								loadComplete();
+							}
+						});
+
+			});
+</script>
