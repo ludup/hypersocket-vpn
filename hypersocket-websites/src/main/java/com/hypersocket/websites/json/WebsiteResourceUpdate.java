@@ -8,6 +8,7 @@ public class WebsiteResourceUpdate {
 	Long id;
 	String name;
 	String launchUrl;
+	String additionalUrls;
 	Long[] roles;
 	
 	public WebsiteResourceUpdate() {
@@ -45,5 +46,15 @@ public class WebsiteResourceUpdate {
 	public void setLaunchUrl(String launchUrl) {
 		this.launchUrl = launchUrl;
 	}
+
+	public String getAdditionalUrls() {
+		return additionalUrls;
+	}
+
+	public void setAdditionalUrls(String additionalUrls) {
+		this.additionalUrls = additionalUrls;
+	}
+	
+	
 	
 }

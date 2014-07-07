@@ -1,6 +1,6 @@
 <div id="contentWebsites">
 	<div class="modal" id="addWebsiteForm" tabindex="-1" role="dialog" dialog-for="contentWebsites">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
@@ -30,6 +30,15 @@
 										placeholder="" id="url" maxlength="" name="url" value="">
 									<div>
 										<span class="help-block" localize="website.url.info"></span>
+									</div>
+								</div>
+							</div>
+							<div class="propertyItem form-group">
+								<label class="col-md-3 control-label" localize="website.additional.label"></label>
+								<div class="propertyValue col-md-9">
+									<div id="additionalUrls"></div>
+									<div>
+										<span class="help-block" localize="website.additional.info"></span>
 									</div>
 								</div>
 							</div>
@@ -73,13 +82,19 @@
 						name : getResource("label.roles")
 					}]
 				});
+				
+				$('#additionalUrls').multipleTextInput({ 
+						values : '',
+						disabled : false, 
+						resourceKey : 'additionalUrls'
+				});
 
 				$('#contentWebsites').ajaxResourcePage(
 						{
 							id : "Website",
 							tableUrl : "websites/table",
 							title: getResource("websites.label"),
-							icon: 'fa-globr',
+							icon: 'fa-globe',
 							resourceUrl : "websites/website",
 							fields : [ {
 								name : "name"
@@ -106,11 +121,11 @@
 
 								return false;
 							},
-							clearDialog : function() {
-								
+							clearDialog : function() {	
 								$('#resourceId').val('');
 								$('#resourceName').val('');
 								$('#url').val('');
+								$('#additionalUrls').multipleTextInput();
 								$('#tabRoles').multipleSelect();
 								$('.clickableTab').first().trigger('click');
 							},
@@ -119,15 +134,16 @@
 								resource.id = $('#resourceId').val();
 								resource.name = $('#resourceName').val();
 								resource.launchUrl = $('#url').val();
+								resource.additionalUrls = fixSplit($('#additionalUrls').multipleSelectValues());
 								resource.roles = $('#tabRoles').multipleSelectValues();
 								
 								return resource;
 							},
 							displayResource : function(resource) {
-								
 								$('#resourceId').val(resource.id);
 								$('#resourceName').val(resource.name);
 								$('#url').val(resource.launchUrl);
+								$('#additionalUrls').multipleTextInput({ values: splitFix(resource.additionalUrls) }); 
 								$('#tabRoles').multipleSelect({
 									selected : resource.roles,
 									selectedIsObjectList : true,

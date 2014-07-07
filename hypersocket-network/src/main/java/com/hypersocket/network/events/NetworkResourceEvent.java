@@ -2,10 +2,10 @@ package com.hypersocket.network.events;
 
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceService;
-import com.hypersocket.resource.ResourceEvent;
+import com.hypersocket.resource.AssignableResourceEvent;
 import com.hypersocket.session.Session;
 
-public class NetworkResourceEvent extends ResourceEvent {
+public class NetworkResourceEvent extends AssignableResourceEvent {
 
 	private static final long serialVersionUID = 8248391425589891659L;
 

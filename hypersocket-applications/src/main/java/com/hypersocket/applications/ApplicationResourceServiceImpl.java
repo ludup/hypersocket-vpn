@@ -6,6 +6,10 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hypersocket.applications.events.ApplicationResourceCreatedEvent;
+import com.hypersocket.applications.events.ApplicationResourceDeletedEvent;
+import com.hypersocket.applications.events.ApplicationResourceUpdatedEvent;
+import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
@@ -38,27 +42,37 @@ public class ApplicationResourceServiceImpl extends
 	@Autowired
 	MenuService menuService;
 
+	@Autowired
+	EventService eventService; 
+	
 	@PostConstruct
 	private void postConstruct() {
 
 		i18nService.registerBundle(RESOURCE_BUNDLE);
 
 		PermissionCategory cat = permissionService.registerPermissionCategory(
-				RESOURCE_BUNDLE, "category.websites");
+				RESOURCE_BUNDLE, "category.applications");
 
 		for (ApplicationResourcePermission p : ApplicationResourcePermission.values()) {
 			permissionService.registerPermission(p.getResourceKey(), cat);
 		}
 
-		/**
-		 * TODO add your menu item and other initialization.
-		 */
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
-				"applications", "fa-desktop", "applications", 200,
+				"applications", "fa-desktop", null, 200,
 				ApplicationResourcePermission.READ, ApplicationResourcePermission.CREATE,
 				ApplicationResourcePermission.UPDATE, ApplicationResourcePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
+				"applications", "fa-desktop", "applications", 0,
+				ApplicationResourcePermission.READ, ApplicationResourcePermission.CREATE,
+				ApplicationResourcePermission.UPDATE, ApplicationResourcePermission.DELETE),
+				"applications");
+		
+		eventService.registerEvent(ApplicationResourceCreatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(ApplicationResourceDeletedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(ApplicationResourceUpdatedEvent.class, RESOURCE_BUNDLE);
+		
 	}
 
 	@Override
@@ -78,40 +92,34 @@ public class ApplicationResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(ApplicationResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceCreatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(ApplicationResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceCreatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(ApplicationResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceUpdatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(ApplicationResource resource, Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceUpdatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(ApplicationResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceDeletedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(ApplicationResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new ApplicationResourceDeletedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override

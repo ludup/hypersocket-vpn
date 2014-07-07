@@ -13,11 +13,11 @@ public interface WebsiteResourceService extends
 		AbstractAssignableResourceService<WebsiteResource> {
 
 	WebsiteResource updateResource(WebsiteResource resourceById, String name,
-			String launchUrl, Set<Role> roles) throws ResourceChangeException,
-			AccessDeniedException;
+			String launchUrl, String additionalUrls, Set<Role> roles)
+			throws ResourceChangeException, AccessDeniedException;
 
 	WebsiteResource createResource(String name, String launchUrl,
-			Set<Role> roles, Realm realm) throws ResourceCreationException,
-			AccessDeniedException;
+			String additionalUrls, Set<Role> roles, Realm realm)
+			throws ResourceCreationException, AccessDeniedException;
 
 }

@@ -1,8 +1,7 @@
-package com.hypersocket.websites.json;
+package com.hypersocket.launcher.json;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,8 +22,12 @@ import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
+import com.hypersocket.launcher.LauncherOS;
+import com.hypersocket.launcher.LauncherResource;
+import com.hypersocket.launcher.LauncherResourceColumns;
+import com.hypersocket.launcher.LauncherResourceService;
+import com.hypersocket.launcher.LauncherResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
-import com.hypersocket.permissions.Role;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceChangeException;
@@ -36,39 +39,16 @@ import com.hypersocket.tables.Column;
 import com.hypersocket.tables.ColumnSort;
 import com.hypersocket.tables.DataTablesResult;
 import com.hypersocket.tables.json.DataTablesPageProcessor;
-import com.hypersocket.websites.WebsiteResource;
-import com.hypersocket.websites.WebsiteResourceColumns;
-import com.hypersocket.websites.WebsiteResourceService;
-import com.hypersocket.websites.WebsiteResourceServiceImpl;
 
 @Controller
-public class WebsiteResourceController extends ResourceController {
+public class LauncherResourceController extends ResourceController {
+
 
 	@Autowired
-	WebsiteResourceService websiteService;
+	LauncherResourceService resourceService;
 
 	@AuthenticationRequired
-	@RequestMapping(value = "websites/myWebsites", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<WebsiteResource> getResourcesByCurrentPrincipal(
-			HttpServletRequest request, HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException,
-			SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
-		try {
-			return new ResourceList<WebsiteResource>(
-					websiteService.getResources(sessionUtils
-							.getPrincipal(request)));
-		} finally {
-			clearAuthenticatedContext(websiteService);
-		}
-	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "websites/table", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "launchers/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public DataTablesResult tableNetworkResources(
@@ -77,7 +57,7 @@ public class WebsiteResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request), resourceService);
 
 		try {
 			return processDataTablesRequest(request,
@@ -85,7 +65,7 @@ public class WebsiteResourceController extends ResourceController {
 
 						@Override
 						public Column getColumn(int col) {
-							return WebsiteResourceColumns.values()[col];
+							return LauncherResourceColumns.values()[col];
 						}
 
 						@Override
@@ -93,7 +73,7 @@ public class WebsiteResourceController extends ResourceController {
 								int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
-							return websiteService.searchResources(
+							return resourceService.searchResources(
 									sessionUtils.getCurrentRealm(request),
 									searchPattern, start, length, sorting);
 						}
@@ -102,7 +82,7 @@ public class WebsiteResourceController extends ResourceController {
 						public Long getTotalCount(String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
-							return websiteService.getResourceCount(
+							return resourceService.getResourceCount(
 									sessionUtils.getCurrentRealm(request),
 									searchPattern);
 						}
@@ -113,7 +93,7 @@ public class WebsiteResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "websites/template", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "launchers/template", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<PropertyCategory> getResourceTemplate(
@@ -130,115 +110,126 @@ public class WebsiteResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "websites/website/{id}", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "launchers/launcher/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public WebsiteResource getResource(HttpServletRequest request,
+	public LauncherResource getResource(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable("id") Long id)
 			throws AccessDeniedException, UnauthorizedException,
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request), resourceService);
 		try {
-			return websiteService.getResourceById(id);
+			return resourceService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(websiteService);
+			clearAuthenticatedContext(resourceService);
 		}
 
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "websites/website", method = RequestMethod.POST, produces = { "application/json" })
+	@RequestMapping(value = "launchers/launcher", method = RequestMethod.POST, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<WebsiteResource> createOrUpdateNetworkResource(
+	public ResourceStatus<LauncherResource> createOrUpdateNetworkResource(
 			HttpServletRequest request, HttpServletResponse response,
-			@RequestBody WebsiteResourceUpdate resource)
+			@RequestBody LauncherResourceUpdate resource)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request), resourceService);
 		try {
 
-			WebsiteResource newResource;
+			LauncherResource newResource;
 
 			Realm realm = sessionUtils.getCurrentRealm(request);
 
-			Set<Role> roles = new HashSet<Role>();
-			for (Long id : resource.getRoles()) {
-				roles.add(permissionService.getRoleById(id, realm));
-			}
-
+			LauncherOS os = LauncherOS.values()[resource.getOs()];
+			
 			if (resource.getId() != null) {
-				newResource = websiteService.updateResource(
-						websiteService.getResourceById(resource.getId()),
-						resource.getName(), resource.getLaunchUrl(),
-						resource.getAdditionalUrls(), roles);
+				newResource = resourceService.updateResource(
+						resourceService.getResourceById(resource.getId()),
+						resource.getName(),
+						resource.getExe(),
+						resource.getArgs(),
+						os);
 			} else {
-				newResource = websiteService.createResource(resource.getName(),
-						resource.getLaunchUrl(), resource.getAdditionalUrls(),
-						roles, realm);
+				newResource = resourceService.createResource(
+						resource.getName(),
+						realm,
+						resource.getExe(),
+						resource.getArgs(),
+						os);
 			}
-			return new ResourceStatus<WebsiteResource>(newResource,
+			return new ResourceStatus<LauncherResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
-							WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
+							LauncherResourceServiceImpl.RESOURCE_BUNDLE,
 							resource.getId() != null ? "resource.updated.info"
 									: "resource.created.info", resource
 									.getName()));
 
 		} catch (ResourceChangeException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+			return new ResourceStatus<LauncherResource>(false,
+					I18N.getResource(sessionUtils.getLocale(request),
+							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} catch (ResourceCreationException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+			return new ResourceStatus<LauncherResource>(false,
+					I18N.getResource(sessionUtils.getLocale(request),
+							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+			return new ResourceStatus<LauncherResource>(false,
+					I18N.getResource(sessionUtils.getLocale(request),
+							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} finally {
 			clearAuthenticatedContext();
 		}
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "websites/website/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
+	@RequestMapping(value = "launchers/launcher/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<WebsiteResource> deleteResource(
+	public ResourceStatus<LauncherResource> deleteResource(
 			HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("id") Long id) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request), resourceService);
 		try {
 
-			WebsiteResource resource = websiteService.getResourceById(id);
+			LauncherResource resource = resourceService.getResourceById(id);
 
 			if (resource == null) {
-				return new ResourceStatus<WebsiteResource>(false,
+				return new ResourceStatus<LauncherResource>(false,
 						I18N.getResource(sessionUtils.getLocale(request),
-								WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
+								LauncherResourceServiceImpl.RESOURCE_BUNDLE,
 								"error.invalidResourceId", id));
 			}
 
 			String preDeletedName = resource.getName();
-			websiteService.deleteResource(resource);
+			resourceService.deleteResource(resource);
 
-			return new ResourceStatus<WebsiteResource>(true, I18N.getResource(
+			return new ResourceStatus<LauncherResource>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
-					WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
-					"endpoint.deleted.info", preDeletedName));
+					LauncherResourceServiceImpl.RESOURCE_BUNDLE,
+					"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<WebsiteResource>(false, e.getMessage());
+			return new ResourceStatus<LauncherResource>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
+	}
+	
+	@RequestMapping(value = "launchers/os", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceList<LauncherOS> getResourcesByCurrentPrincipal(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException {
+		return new ResourceList<LauncherOS>(Arrays.asList(LauncherOS.values()));
 	}
 }

@@ -112,11 +112,12 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	public WebsiteResource updateResource(WebsiteResource website, String name,
-			String launchUrl, Set<Role> roles) throws ResourceChangeException,
-			AccessDeniedException {
+			String launchUrl, String additionalUrls, Set<Role> roles)
+			throws ResourceChangeException, AccessDeniedException {
 
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
+		website.setAdditionalUrls(additionalUrls);
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
@@ -126,12 +127,13 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	public WebsiteResource createResource(String name, String launchUrl,
-			Set<Role> roles, Realm realm) throws ResourceCreationException,
-			AccessDeniedException {
+			String additionalUrls, Set<Role> roles, Realm realm)
+			throws ResourceCreationException, AccessDeniedException {
 
 		WebsiteResource website = new WebsiteResource();
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
+		website.setAdditionalUrls(additionalUrls);
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
