@@ -1,5 +1,7 @@
 package com.hypersocket.network.events;
 
+import java.util.Map;
+
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceService;
 import com.hypersocket.resource.AssignableResourceEvent;
