@@ -7,8 +7,6 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
-
 import java.util.List;
 import java.util.Set;
 
@@ -69,7 +67,7 @@ public class NetworkResourceServiceImpl extends
 
 	@Autowired
 	EventService eventService;
-	
+
 	@Autowired
 	UserInterfaceContentHandler jQueryUIContentHandler;
 
@@ -84,43 +82,51 @@ public class NetworkResourceServiceImpl extends
 			log.debug("Constructing NetworkResourceService");
 		}
 
-		i18nService.registerBundle(RESOURCE_BUNDLE);
+		i18nService.registerBundle(NetworkResourceService.RESOURCE_BUNDLE);
 
 		PermissionCategory cat = permissionService.registerPermissionCategory(
-				RESOURCE_BUNDLE, "category.networkResources");
+				NetworkResourceService.RESOURCE_BUNDLE,
+				"category.networkResources");
 
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
 			permissionService.registerPermission(p.getResourceKey(), cat);
 		}
 
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "networkResources", "fa-sitemap",
-				"networkResources", 100, NetworkResourcePermission.READ,
+		menuService.registerMenu(new MenuRegistration(
+				NetworkResourceService.RESOURCE_BUNDLE, "networkResources",
+				"fa-sitemap", "networkResources", 100,
+				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE),
-				MenuService.MENU_RESOURCES);
+				NetworkResourcePermission.DELETE), MenuService.MENU_RESOURCES);
 
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "endpoints", "fa-sitemap",
-				"endpoints", 100, NetworkResourcePermission.READ,
+		menuService.registerMenu(new MenuRegistration(
+				NetworkResourceService.RESOURCE_BUNDLE, "endpoints",
+				"fa-sitemap", "endpoints", 100, NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE),
-				"networkResources");
+				NetworkResourcePermission.DELETE), "networkResources");
 
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "protocols", "fa-exchange",
-				"protocols", 200, NetworkResourcePermission.READ,
+		menuService.registerMenu(new MenuRegistration(
+				NetworkResourceService.RESOURCE_BUNDLE, "protocols",
+				"fa-exchange", "protocols", 200,
+				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE),
-				"networkResources");
-		
-		eventService.registerEvent(NetworkResourceCreatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(NetworkResourceUpdatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(NetworkResourceDeletedEvent.class, RESOURCE_BUNDLE);
-		
-		eventService.registerEvent(NetworkResourceSessionOpened.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(NetworkResourceSessionClosed.class, RESOURCE_BUNDLE);
-		
+				NetworkResourcePermission.DELETE), "networkResources");
+
+		eventService.registerEvent(NetworkResourceCreatedEvent.class,
+				NetworkResourceService.RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceUpdatedEvent.class,
+				NetworkResourceService.RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceDeletedEvent.class,
+				NetworkResourceService.RESOURCE_BUNDLE);
+
+		eventService.registerEvent(NetworkResourceSessionOpened.class,
+				NetworkResourceService.RESOURCE_BUNDLE);
+		eventService.registerEvent(NetworkResourceSessionClosed.class,
+				NetworkResourceService.RESOURCE_BUNDLE);
+
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
 		}
@@ -185,31 +191,35 @@ public class NetworkResourceServiceImpl extends
 			}
 		}
 
-		throw new AccessDeniedException(I18N.getResource(
-					getCurrentLocale(), RESOURCE_BUNDLE,
-					"error.portNoAuthorized", port, resource.getName()));
-		
+		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
+				RESOURCE_BUNDLE, "error.portNoAuthorized", port,
+				resource.getName()));
+
 	}
 
 	@Override
 	public List<NetworkProtocol> getProtocols() {
 		return resourceRepository.getProtocols();
 	}
-	
+
 	@Override
-	public long getProtocolCount(String searchPattern) throws AccessDeniedException {
-		
+	public long getProtocolCount(String searchPattern)
+			throws AccessDeniedException {
+
 		assertPermission(NetworkResourcePermission.READ);
-		
+
 		return resourceRepository.getProtocolCount(searchPattern);
 	}
-	
+
 	@Override
-	public List<NetworkProtocol> searchProtocols(String searchPattern, int start, int length, ColumnSort[] sorting) throws AccessDeniedException {
-		
+	public List<NetworkProtocol> searchProtocols(String searchPattern,
+			int start, int length, ColumnSort[] sorting)
+			throws AccessDeniedException {
+
 		assertPermission(NetworkResourcePermission.READ);
-		
-		return resourceRepository.searchProtocols(searchPattern, start, length, sorting);
+
+		return resourceRepository.searchProtocols(searchPattern, start, length,
+				sorting);
 	}
 
 	@Override
@@ -335,14 +345,14 @@ public class NetworkResourceServiceImpl extends
 			AccessDeniedException {
 
 		NetworkResource resource = new NetworkResource();
-		
+
 		resource.setName(name);
 		resource.setHostname(hostname);
 		resource.setDestinationHostname(destinationHostname);
 		resource.setRealm(realm);
 		resource.setProtocols(protocols);
 		resource.setRoles(roles);
-		
+
 		createResource(resource);
 
 		return resource;
@@ -366,36 +376,42 @@ public class NetworkResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(NetworkResource resource) {
-		eventService.publishEvent(new NetworkResourceCreatedEvent(this, resource, getCurrentSession()));
+		eventService.publishEvent(new NetworkResourceCreatedEvent(this,
+				resource, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(NetworkResource resource,
 			Throwable t) {
-		eventService.publishEvent(new NetworkResourceCreatedEvent(this, resource, t, getCurrentSession()));
-		
+		eventService.publishEvent(new NetworkResourceCreatedEvent(this,
+				resource, t, getCurrentSession()));
+
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(NetworkResource resource) {
-		eventService.publishEvent(new NetworkResourceUpdatedEvent(this, resource, getCurrentSession()));
-		
+		eventService.publishEvent(new NetworkResourceUpdatedEvent(this,
+				resource, getCurrentSession()));
+
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(NetworkResource resource, Throwable t) {
-		eventService.publishEvent(new NetworkResourceUpdatedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new NetworkResourceUpdatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(NetworkResource resource) {
-		eventService.publishEvent(new NetworkResourceDeletedEvent(this, resource, getCurrentSession()));
+		eventService.publishEvent(new NetworkResourceDeletedEvent(this,
+				resource, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(NetworkResource resource,
 			Throwable t) {
-		eventService.publishEvent(new NetworkResourceDeletedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new NetworkResourceDeletedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 }
