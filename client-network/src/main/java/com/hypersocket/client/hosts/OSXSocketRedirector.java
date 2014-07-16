@@ -18,7 +18,7 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 		
 		if(Boolean.getBoolean("hypersocket.development")) {
 
-			redirectNke = new File("../hypersocket-client/bin/macosx/RedirectNKE.kext");
+			redirectNke = new File("../client-install4j/bin/macosx/RedirectNKE.kext");
 			File tmpNke = File.createTempFile("nke", "tmp2");
 			
 			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
@@ -46,7 +46,7 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			}
 			
 			redirectNke = tmpNke;
-			redirectCmd = new File("../hypersocket-client/bin/macosx/RedirectCMD");		
+			redirectCmd = new File("../client-install4j/bin/macosx/RedirectCMD");		
 		} else {
 			
 			redirectNke = new File("bin/macosx/RedirectNKE.kext");
