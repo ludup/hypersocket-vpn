@@ -37,34 +37,70 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 	@Override
 	public boolean start(HypersocketClient<?> serviceClient) {
-
+		
+		this.serviceClient = serviceClient;
+		
 		if(log.isInfoEnabled()) {
 			log.info("Starting Network Resources");
 		}
 		
-		this.serviceClient = serviceClient;
+		startNetworkResources();
+		
+
+		
+		return true;
+	}
+	
+	protected void startWebsites() {
+		try {
+			String json = serviceClient.getTransport().get("websites/myWebsites");
+
+			int errors = processWebsiteResources(json);
+
+			if (errors > 0) {
+				// Warn
+				serviceClient.showWarning(errors + " websites could not be opened.");
+			}
+
+		} catch (IOException e) {
+			if (log.isErrorEnabled()) {
+				log.error("Could not start network resources", e);
+			}
+		}
+	}
+	
+	protected int processWebsiteResources(String json) throws IOException {
+		
+		return processResourceList(json, new ResourceMapper() {
+
+			@Override
+			public boolean processResource(JSONObject resource) {
+				
+				return false;
+			}
+			
+		});
+	}
+	
+	protected void startNetworkResources() {
 		try {
 			String json = serviceClient.getTransport().get("myNetworkResources");
 
-			int errors = processNetworkResources(json, serviceClient);
+			int errors = processNetworkResources(json);
 
 			if (errors > 0) {
 				// Warn
 				serviceClient.showWarning(errors + " ports could not be opened.");
 			}
 
-			return true;
 		} catch (IOException e) {
 			if (log.isErrorEnabled()) {
 				log.error("Could not start network resources", e);
 			}
-			return false;
 		}
-
 	}
 	
-	protected int processNetworkResources(String json, HypersocketClient<?> serviceClient) throws IOException {
-
+	protected int processResourceList(String json, ResourceMapper mapper) throws IOException {
 		try {
 			JSONParser parser = new JSONParser();
 
@@ -76,14 +112,39 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 			JSONArray fields = (JSONArray) result.get("resources");
 
-			int totalPorts = 0;
+			int totalResources = 0;
 			int totalErrors = 0;
 
 			@SuppressWarnings("unchecked")
 			Iterator<JSONObject> it = (Iterator<JSONObject>) fields.iterator();
 			while (it.hasNext()) {
-				JSONObject field = it.next();
+				if(!mapper.processResource(it.next())) {
+					totalErrors++;
+				} 
+				totalResources++;
+			}
 
+			if (totalErrors == totalResources) {
+				// We could not start any resources
+				throw new IOException("No resources could be started!");
+			}
+
+			return totalErrors;
+
+		} catch (ParseException e) {
+			throw new IOException("Failed to parse network resources json", e);
+		}
+	}
+	
+	protected int processNetworkResources(String json) throws IOException {
+
+		return processResourceList(json, new ResourceMapper() {
+
+			@Override
+			public boolean processResource(JSONObject field) {
+				
+				boolean success = false;
+				
 				String hostname = (String) field.get("hostname");
 				String name = (String) field.get("name");
 				Long id = (Long) field.get("id");
@@ -120,11 +181,11 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 					if (transport.equals("TCP")) {
 
 						for (long port = startPort; port <= endPort; port++) {
-							totalPorts++;
+
 							try {
 								NetworkResource resource = new NetworkResource(
 										id, hostname, (int) port);
-								boolean success = startLocalForwarding(resource);
+								boolean started = startLocalForwarding(resource);
 
 								if (log.isInfoEnabled()) {
 									log.info("Local forwarding to "
@@ -135,14 +196,14 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 													: " failed"));
 								}
 
-								if (!success) {
-									totalErrors++;
-								} else {
+								if (started) {
 									template.addLiveResource(resource);
+									success = true;
+								} else {
+									break;
 								}
 
 							} catch (Exception e) {
-								totalErrors++;
 								if (log.isErrorEnabled()) {
 									log.error(
 											"Failed to start local forwarding",
@@ -152,18 +213,11 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 						}
 					}
 				}
+				
+				return success;
 			}
-
-			if (totalErrors == totalPorts) {
-				// We could not start any resources
-				throw new IOException("No network resources could be started!");
-			}
-
-			return totalErrors;
-
-		} catch (ParseException e) {
-			throw new IOException("Failed to parse network resources json", e);
-		}
+			
+		});
 	}
 
 	@Override
