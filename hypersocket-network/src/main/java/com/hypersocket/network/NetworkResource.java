@@ -23,11 +23,11 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import com.hypersocket.resource.AssignableResource;
+import com.hypersocket.network.handlers.ForwardingResource;
 
 @Entity
 @Table(name="network_resources", uniqueConstraints = {@UniqueConstraint(columnNames={"name"})})
-public class NetworkResource extends AssignableResource {
+public class NetworkResource extends ForwardingResource {
 
 	@Column(name="hostname")
 	String hostname;
@@ -79,6 +79,27 @@ public class NetworkResource extends AssignableResource {
 			buf.append(protocol.getName());
 		}
 		return buf.toString();
+	}
+
+	public NetworkProtocol getNetworkProtocol(Integer port, NetworkTransport transport) {
+		for (NetworkProtocol protocol : getProtocols()) {
+
+			if (protocol.getTransport() == transport
+					|| protocol.getTransport() == NetworkTransport.BOTH) {
+				if (protocol.getEndPort() != null) {
+					if (protocol.getStartPort().intValue() >= port.intValue()
+							&& port.intValue() <= protocol.getEndPort()
+									.intValue()) {
+						return protocol;
+					}
+				} else {
+					if (protocol.getStartPort().equals(port)) {
+						return protocol;
+					}
+				}
+			}
+		}
+		return null;
 	}
 	
 }

@@ -1,14 +1,18 @@
 package com.hypersocket.websites;
 
+import java.net.URL;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hypersocket.events.EventService;
+import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -18,6 +22,10 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.session.Session;
+import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
+import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
+import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
 
 public class WebsiteResourceServiceImpl extends
 		AbstractAssignableResourceServiceImpl<WebsiteResource> implements
@@ -37,6 +45,9 @@ public class WebsiteResourceServiceImpl extends
 	@Autowired
 	MenuService menuService;
 
+	@Autowired
+	EventService eventService; 
+	
 	@PostConstruct
 	private void postConstruct() {
 
@@ -74,40 +85,35 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, getCurrentSession(), resource));
 
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource, Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
@@ -140,6 +146,29 @@ public class WebsiteResourceServiceImpl extends
 		createResource(website);
 
 		return website;
+	}
+
+	@Override
+	public void verifyResourceSession(WebsiteResource resource,
+			String hostname, int port, NetworkTransport transport,
+			Session session) throws AccessDeniedException {
+		
+		for(URL url : resource.getUrls()) {
+			if(hostname.equalsIgnoreCase(url.getHost())) {
+				if(url.getPort() > -1) {
+					if(url.getPort() == port) {
+						return;
+					}
+				} else if(url.getDefaultPort() == port) {
+					return;
+				}
+			}
+		}
+		
+		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
+				RESOURCE_BUNDLE, "error.urlNotAuthorized", hostname, port,
+				resource.getName()));
+		
 	}
 
 }

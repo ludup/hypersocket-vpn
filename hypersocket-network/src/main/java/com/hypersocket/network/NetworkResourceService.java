@@ -10,7 +10,7 @@ package com.hypersocket.network;
 import java.util.List;
 import java.util.Set;
 
-import com.hypersocket.auth.AuthenticatedService;
+import com.hypersocket.network.handlers.ForwardingService;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.realm.Principal;
@@ -23,7 +23,7 @@ import com.hypersocket.session.Session;
 import com.hypersocket.tables.ColumnSort;
 
 
-public interface NetworkResourceService extends AuthenticatedService, AbstractAssignableResourceService<NetworkResource> {
+public interface NetworkResourceService extends ForwardingService<NetworkResource>, AbstractAssignableResourceService<NetworkResource> {
 
 	static final String RESOURCE_BUNDLE = "NetworkResourceService";
 	
@@ -53,12 +53,11 @@ public interface NetworkResourceService extends AuthenticatedService, AbstractAs
 
 	List<NetworkResource> getResources(Realm realm) throws AccessDeniedException;
 
-	NetworkProtocol verifyResourceSession(NetworkResource resource, Integer port,
-			NetworkTransport transport, Session session)
-			throws AccessDeniedException;
-
 	long getProtocolCount(String searchPattern) throws AccessDeniedException;
 
 	List<NetworkProtocol> searchProtocols(String searchPattern, int start,
 			int length, ColumnSort[] sorting) throws AccessDeniedException;
+
+	NetworkProtocol verifyPort(NetworkResource resource, Integer port,
+			NetworkTransport transport) throws AccessDeniedException;
 }

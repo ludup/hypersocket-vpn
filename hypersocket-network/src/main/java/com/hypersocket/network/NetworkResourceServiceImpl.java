@@ -7,6 +7,8 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
+import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
+
 import java.util.List;
 import java.util.Set;
 
@@ -133,24 +135,23 @@ public class NetworkResourceServiceImpl extends
 	}
 
 	@Override
-	public NetworkProtocol verifyResourceSession(NetworkResource resource,
-			Integer port, NetworkTransport transport, Session session)
-			throws AccessDeniedException {
-
+	public void verifyResourceSession(NetworkResource resource,
+			String hostname, int port, NetworkTransport transport,
+			Session session) throws AccessDeniedException {
+		
 		if (log.isDebugEnabled()) {
 			log.debug("Requested NetworkResource session for resource "
 					+ resource.getName() + " on session " + session.getId());
 		}
 
-		NetworkProtocol protocol = verifyPort(resource, port, transport);
-
+		verifyPort(resource, port, transport);
+		
 		if (log.isDebugEnabled()) {
 			log.debug("Verified NetworkResource, creating resource session for resource "
 					+ resource.getName() + " on session " + session.getId());
 		}
-		return protocol;
-
 	}
+	
 
 	public NetworkProtocol verifyPort(NetworkResource resource, Integer port,
 			NetworkTransport transport) throws AccessDeniedException {
@@ -160,40 +161,15 @@ public class NetworkResourceServiceImpl extends
 					+ resource.getName());
 		}
 
-		for (NetworkProtocol protocol : resource.getProtocols()) {
+		NetworkProtocol protocol = resource.getNetworkProtocol(port, transport);
 
-			if (log.isDebugEnabled()) {
-				log.debug("Checking against " + protocol.getName()
-						+ " startPort=" + protocol.getStartPort() + " endPort="
-						+ protocol.getEndPort());
-			}
-			if (protocol.getTransport() == transport
-					|| protocol.getTransport() == NetworkTransport.BOTH) {
-				if (protocol.getEndPort() != null) {
-					if (protocol.getStartPort().intValue() >= port.intValue()
-							&& port.intValue() <= protocol.getEndPort()
-									.intValue()) {
-						if (log.isDebugEnabled()) {
-							log.debug("Matched port " + port
-									+ " with protocol " + protocol.getName());
-						}
-						return protocol;
-					}
-				} else {
-					if (protocol.getStartPort().equals(port)) {
-						if (log.isDebugEnabled()) {
-							log.debug("Matched port " + port
-									+ " with protocol " + protocol.getName());
-						}
-						return protocol;
-					}
-				}
-			}
+		if(protocol==null) {
+			throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
+					RESOURCE_BUNDLE, "error.portNoAuthorized", port,
+					resource.getName()));
 		}
-
-		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
-				RESOURCE_BUNDLE, "error.portNoAuthorized", port,
-				resource.getName()));
+		
+		return protocol;
 
 	}
 

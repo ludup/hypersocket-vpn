@@ -29,7 +29,6 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.HypersocketServer;
 import com.hypersocket.server.handlers.HttpResponseProcessor;
-import com.hypersocket.server.handlers.WebsocketHandler;
 import com.hypersocket.server.websocket.TCPForwardingClientCallback;
 import com.hypersocket.server.websocket.WebsocketClient;
 import com.hypersocket.server.websocket.WebsocketClientCallback;
@@ -39,30 +38,16 @@ import com.hypersocket.session.SessionService;
 import com.hypersocket.session.json.SessionUtils;
 
 @Component
-public class TCPForwardingHandler implements WebsocketHandler {
+public class TCPForwardingHandler extends
+		AbstractForwardingHandler<NetworkResource> {
 
 	static Logger log = LoggerFactory.getLogger(TCPForwardingHandler.class);
 
 	@Autowired
-	SessionService sessionService;
-
-	@Autowired
-	SessionUtils sessionUtils;
-
-	@Autowired
-	AuthenticationService authenticationService;
-
-	@Autowired
 	NetworkResourceService networkService;
 
-	@Autowired
-	HypersocketServer server;
-
-	@Autowired
-	EventService eventService;
-
 	public TCPForwardingHandler() {
-
+		super("tunnel");
 	}
 
 	@PostConstruct
@@ -71,125 +56,35 @@ public class TCPForwardingHandler implements WebsocketHandler {
 	}
 
 	@Override
-	public boolean handlesRequest(HttpServletRequest request) {
-		return request.getRequestURI().startsWith(server.resolvePath("tunnel"));
+	protected ForwardingService<NetworkResource> getService() {
+		return networkService;
 	}
 
 	@Override
-	public void acceptWebsocket(HttpServletRequest request,
-			HttpServletResponse response, WebsocketClientCallback callback,
-			HttpResponseProcessor processor) throws UnauthorizedException,
-			AccessDeniedException {
-
-		if (!sessionService.isLoggedOn(sessionUtils.getActiveSession(request),
-				true)) {
-			throw new UnauthorizedException();
-		}
-
-		Session session = sessionUtils.getActiveSession(request);
-
-		networkService.setCurrentSession(session,
-				sessionUtils.getLocale(request));
-
-		try {
-			Long resourceId = Long
-					.parseLong(request.getParameter("resourceId"));
-
-			Integer port = Integer.parseInt(request.getParameter("port"));
-
-			NetworkResource resource = networkService.getResourceById(resourceId);
-			NetworkProtocol protocol = networkService.verifyResourceSession(
-					resource, port, NetworkTransport.TCP, session);
-
-			server.connect(new TCPForwardingHandlerCallback(callback, session,
-					resource, protocol, port));
-
-		} catch(AccessDeniedException ex) { 
-			// TODO Log event
-			throw ex;
-		} catch (ResourceNotFoundException e) {
-			// TODO Log event
-			throw new AccessDeniedException("Resource not found");
-		} finally {
-			networkService.clearPrincipalContext();
-		}
+	protected void fireResourceOpenSuccessEvent(Session session,
+			NetworkResource resource, String hostname, Integer port) {
+		eventService.publishEvent(new NetworkResourceSessionOpened(this, true,
+				resource, session, port, resource.getNetworkProtocol(port,
+						NetworkTransport.TCP)));
 	}
 
-	class TCPForwardingHandlerCallback implements TCPForwardingClientCallback {
+	@Override
+	protected void fireResourceSessionOpenFailedEvent(Throwable cause,
+			Session session, NetworkResource resource, String hostname,
+			Integer port) {
+		eventService.publishEvent(new NetworkResourceSessionOpened(this, cause,
+				resource, session, port));
 
-		WebsocketClientCallback callback;
-		NetworkResource resource;
-		NetworkProtocol protocol;
-		Session session;
-		Integer port;
-		ResourceSession<NetworkResource> resourceSession;
-		
-		TCPForwardingHandlerCallback(WebsocketClientCallback callback,
-				Session session, NetworkResource resource, NetworkProtocol protocol, Integer port) {
-			this.callback = callback;
-			this.resource = resource;
-			this.protocol = protocol;
-			this.session = session;
-			this.port = port;
-		}
+	}
 
-		@Override
-		public void websocketAccepted(final WebsocketClient client) {
+	@Override
+	protected void fireResourceSessionClosedEvent(NetworkResource resource,
+			Session session, String hostname, Integer port, long totalBytesIn,
+			long totalBytesOut) {
+		eventService.publishEvent(new NetworkResourceSessionClosed(this,
+				resource, resource.getNetworkProtocol(port,
+						NetworkTransport.TCP), session, totalBytesIn,
+				totalBytesOut, port));
 
-			callback.websocketAccepted(client);
-
-			if(!sessionService.hasResourceSession(session, resource)) {
-				eventService.publishEvent(new NetworkResourceSessionOpened(
-					TCPForwardingHandler.this, true, resource, session, port, protocol));
-			}
-		
-			resourceSession = new ResourceSession<NetworkResource>() {
-				@Override
-				public void close() {
-					client.close();
-				}
-				@Override
-				public NetworkResource getResource() {
-					return resource;
-				}
-			};
-			
-			sessionService.registerResourceSession(session, resourceSession);
-		}
-
-		@Override
-		public void websocketRejected(Throwable cause) {
-
-			callback.websocketRejected(cause);
-
-			eventService.publishEvent(new NetworkResourceSessionOpened(
-					TCPForwardingHandler.this, cause, resource, session, port));
-		}
-
-		@Override
-		public void websocketClosed(WebsocketClient client) {
-
-			callback.websocketClosed(client);
-			
-			sessionService.unregisterResourceSession(session, resourceSession);
-			
-			if(!sessionService.hasResourceSession(session, resource)) {
-				eventService.publishEvent(new NetworkResourceSessionClosed(
-						TCPForwardingHandler.this, resource, protocol, session, client
-								.getTotalBytesIn(), client.getTotalBytesOut(), port));
-			}
-		}
-
-		public int getPort() {
-			return port;
-		}
-
-		public String getHostname() {
-			String hostname = resource.getDestinationHostname();
-			if (hostname == null || hostname.equals("")) {
-				hostname = resource.getHostname();
-			}
-			return hostname;
-		}
 	}
 }

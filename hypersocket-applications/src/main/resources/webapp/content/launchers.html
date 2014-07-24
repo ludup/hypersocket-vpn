@@ -57,49 +57,8 @@
 								</div>
 							</div>
 						</div>
-						<div id="tabConnections">
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.label.label"></label>
-								<div class="propertyValue col-xs-9">
-									<input type="text" class="form-control propertyInput"
-										placeholder="" id="label" maxlength="" name="label" value="">
-									<div>
-										<span class="help-block" localize="launcher.label.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.protocol.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="protocolButton"></div>
-									<div>
-										<span class="help-block" localize="launcher.protocol.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label"></label>
-								<div class="propertyValue col-xs-9">
-									<button id="addConnection" class="btn btn-success">Add Tunnel</button>
-									<div>
-										<span class="help-block" localize="launcher.connection.info"></span>
-									</div>
-								</div>
-							</div>
-							<table class="table table-condensed">
-								<tr>
-									<th>Label</th>
-									<th>Variables</th>
-									<th>Protocol</th>
-									<th></th>
-								</tr>
-								<tr>
-									<td>Hostname</td>
-									<td>${hostname},${hostname:port}</td>
-									<td>RDP (3389)</td>
-									<td></td>
-								</tr>
-							</table>
+						<div id="tabProtocols">
+							<div id="protocols"></div>
 						</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>
@@ -110,6 +69,14 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 				$('#contentLaunchers').localize();
+				
+				getJSON('networkProtocols', null, function(data) {
+					$('#protocols').multipleSelect({
+						values : data.resources,
+						selectedIsObjectList : true,
+						resourceKey : 'endpoint'
+					});
+				});
 				
 				$('#osButton').selectButton({
 					id: 'os',
@@ -147,8 +114,8 @@
 						id : "tabProgram",
 						name : getResource("tabProgram.label")
 					},{
-						id : "tabConnections",
-						name : getResource("tabConnections.label")
+						id : "tabProtocols",
+						name : getResource("protocols.title")
 					}]
 				});
 				
@@ -188,6 +155,7 @@
 								$('#args').multipleTextInput({ values: []});
 								$('#os').val('0');
 								$('#os').trigger('change');
+								$('#protocols').multipleSelect();
 
 								$('.clickableTab').first().trigger('click');
 							},
@@ -198,6 +166,7 @@
 								resource.exe = $('#exe').val();
 								resource.args = fixSplit($('#args').multipleSelectValues());
 								resource.os = $('#os').val();
+								resource.protocols = $('#protocols').multipleSelectValues();
 								return resource;
 							},
 							displayResource : function(resource) {
@@ -208,6 +177,11 @@
 								$('#args').multipleTextInput({ values: splitFix(resource.args)});
 								$('#os').val(resource.os.id);
 								$('#os').trigger('change');
+								$('#protocols').multipleSelect({
+									selected : resource.protocols,
+									selectedIsObjectList : true,
+									resourceKey : 'endpoint'
+								});
 							},
 							complete : function() {
 								loadComplete();
