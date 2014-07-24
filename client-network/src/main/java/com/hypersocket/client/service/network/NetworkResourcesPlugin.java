@@ -29,6 +29,7 @@ import com.hypersocket.client.rmi.ResourceService;
 import com.hypersocket.client.rmi.WebsiteResourceLauncher;
 import com.hypersocket.client.rmi.WebsiteResourceTemplate;
 import com.hypersocket.client.service.ServicePlugin;
+import com.hypersocket.utils.IPAddressValidator;
 
 public class NetworkResourcesPlugin implements ServicePlugin {
 
@@ -142,6 +143,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 			URL url = new URL(forwardedUrl);
 
 			String hostname = url.getHost();
+			
 			int port = url.getPort();
 			if (port == -1) {
 				port = url.getDefaultPort();
