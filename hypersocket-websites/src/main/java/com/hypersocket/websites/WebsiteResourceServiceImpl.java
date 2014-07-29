@@ -25,6 +25,8 @@ import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.session.Session;
 import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
 import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
+import com.hypersocket.websites.events.WebsiteResourceSessionClosed;
+import com.hypersocket.websites.events.WebsiteResourceSessionOpened;
 import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
 
 public class WebsiteResourceServiceImpl extends
@@ -66,6 +68,13 @@ public class WebsiteResourceServiceImpl extends
 				WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
+		eventService.registerEvent(WebsiteResourceCreatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceUpdatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceDeletedEvent.class, RESOURCE_BUNDLE);
+		
+		eventService.registerEvent(WebsiteResourceSessionOpened.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceSessionClosed.class, RESOURCE_BUNDLE);
+		
 	}
 
 	@Override

@@ -10,7 +10,7 @@ package com.hypersocket.launcher;
 import com.hypersocket.permissions.PermissionType;
 
 
-public enum LauncherResourcePermission implements PermissionType {
+public enum ApplicationLauncherResourcePermission implements PermissionType {
 	
 	CREATE("create"),
 	READ("read"),
@@ -24,7 +24,7 @@ public enum LauncherResourcePermission implements PermissionType {
 	 */
 	private final static String name = "launcher";
 	
-	private LauncherResourcePermission(final String val) {
+	private ApplicationLauncherResourcePermission(final String val) {
 		this.val = name + "." + val;
 	}
 	

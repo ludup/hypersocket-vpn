@@ -1,7 +1,7 @@
 package com.hypersocket.network.events;
 
-import com.hypersocket.network.NetworkProtocol;
 import com.hypersocket.network.NetworkResource;
+import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.session.Session;
 
 public class NetworkResourceSessionOpened extends NetworkResourceSessionEvent {

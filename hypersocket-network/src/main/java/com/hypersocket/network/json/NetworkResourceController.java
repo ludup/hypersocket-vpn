@@ -30,8 +30,8 @@ import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
-import com.hypersocket.network.NetworkProtocol;
-import com.hypersocket.network.NetworkProtocolColumns;
+import com.hypersocket.launcher.ApplicationLauncherResource;
+import com.hypersocket.launcher.ApplicationLauncherResourceService;
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceColumns;
 import com.hypersocket.network.NetworkResourceService;
@@ -40,6 +40,8 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.properties.PropertyCategory;
+import com.hypersocket.protocols.NetworkProtocol;
+import com.hypersocket.protocols.NetworkProtocolService;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
@@ -58,10 +60,16 @@ public class NetworkResourceController extends ResourceController {
 	NetworkResourceService networkService;
 
 	@Autowired
+	NetworkProtocolService protocolService; 
+	
+	@Autowired
+	ApplicationLauncherResourceService launcherService;
+	
+	@Autowired
 	PermissionService permissionService;
 
 	@AuthenticationRequired
-	@RequestMapping(value = "myNetworkResources", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/personal", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<NetworkResource> getResourcesByCurrentPrincipal(
@@ -80,7 +88,7 @@ public class NetworkResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "networkResources", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/list", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<NetworkResource> getResources(
@@ -99,7 +107,7 @@ public class NetworkResourceController extends ResourceController {
 	}
 	
 	@AuthenticationRequired
-	@RequestMapping(value = "table/networkResources", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public DataTablesResult tableNetworkResources(final HttpServletRequest request,
@@ -133,45 +141,9 @@ public class NetworkResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 	}
-	
-	@AuthenticationRequired
-	@RequestMapping(value = "table/networkProtocols", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public DataTablesResult tableNetworkProtocols(final HttpServletRequest request,
-			HttpServletResponse response) throws AccessDeniedException,
-			UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
-
-		try {
-			return processDataTablesRequest(request,
-					new DataTablesPageProcessor() {
-
-						@Override
-						public Column getColumn(int col) {
-							return NetworkProtocolColumns.values()[col];
-						}
-
-						@Override
-						public List<?> getPage(String searchPattern, int start, int length,
-								ColumnSort[] sorting) throws UnauthorizedException, AccessDeniedException {
-							return networkService.searchProtocols(searchPattern, start, length, sorting);
-						}
-						
-						@Override
-						public Long getTotalCount(String searchPattern) throws UnauthorizedException, AccessDeniedException {
-							return networkService.getProtocolCount(searchPattern);
-						}
-					});
-		} finally {
-			clearAuthenticatedContext();
-		}
-	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "template/networkResource", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/template", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<PropertyCategory> getResourceTemplate(HttpServletRequest request)
@@ -188,7 +160,7 @@ public class NetworkResourceController extends ResourceController {
 	}
 	
 	@AuthenticationRequired
-	@RequestMapping(value = "networkResource/{id}", method = RequestMethod.GET, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/networkResource/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public NetworkResource getResource(HttpServletRequest request,
@@ -207,7 +179,7 @@ public class NetworkResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "networkResource", method = RequestMethod.POST, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/networkResource", method = RequestMethod.POST, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceStatus<NetworkResource> createOrUpdateNetworkResource(
@@ -225,9 +197,14 @@ public class NetworkResourceController extends ResourceController {
 
 			Set<NetworkProtocol> protocols = new HashSet<NetworkProtocol>();
 			for (Long id : resource.getProtocols()) {
-				protocols.add(networkService.getProtocolById(id));
+				protocols.add(protocolService.getResourceById(id));
 			}
-
+			
+			Set<ApplicationLauncherResource> launchers = new HashSet<ApplicationLauncherResource>();
+			for(Long id : resource.getLaunchers()) {
+				launchers.add(launcherService.getResourceById(id));
+			}
+			
 			Set<Role> roles = new HashSet<Role>();
 			for (Long id : resource.getRoles()) {
 				roles.add(permissionService.getRoleById(id, realm));
@@ -237,10 +214,10 @@ public class NetworkResourceController extends ResourceController {
 				newResource = networkService.updateResource(
 						networkService.getResourceById(resource.getId()),
 						resource.getName(), resource.getHostname(), resource.getDestinationHostname(), protocols,
-						roles);
+						launchers, roles);
 			} else {
 				newResource = networkService.createResource(resource.getName(),
-						resource.getHostname(), resource.getDestinationHostname(), protocols, roles, realm);
+						resource.getHostname(), resource.getDestinationHostname(), protocols, launchers, roles, realm);
 			}
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
@@ -267,7 +244,7 @@ public class NetworkResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "networkResource/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
+	@RequestMapping(value = "networkResources/networkResource/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceStatus<NetworkResource> deleteResource(
@@ -298,132 +275,6 @@ public class NetworkResourceController extends ResourceController {
 
 		} catch (ResourceException e) {
 			return new ResourceStatus<NetworkResource>(false, e.getMessage());
-		} finally {
-			clearAuthenticatedContext();
-		}
-	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "networkProtocols", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<NetworkProtocol> getProtocols(
-			HttpServletRequest request, HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
-		try {
-			return new ResourceList<NetworkProtocol>(
-					networkService.getProtocols());
-		} finally {
-			clearAuthenticatedContext(networkService);
-		}
-	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "networkProtocol/{id}", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public NetworkProtocol getProtocol(HttpServletRequest request,
-			HttpServletResponse response, @PathVariable("id") Long id)
-			throws AccessDeniedException, UnauthorizedException,
-			ResourceNotFoundException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
-		try {
-			return networkService.getProtocolById(id);
-		} finally {
-			clearAuthenticatedContext(networkService);
-		}
-
-	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "networkProtocol", method = RequestMethod.POST, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<NetworkProtocol> createOrUpdateNetworProtocol(
-			HttpServletRequest request, HttpServletResponse response,
-			@RequestBody NetworkProtocolUpdate protocol)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
-		try {
-
-			NetworkProtocol newProtocol;
-
-			if (protocol.getId() != null) {
-				newProtocol = networkService.updateProtocol(
-						networkService.getProtocolById(protocol.getId()),
-						protocol.getName(),
-						NetworkTransport.valueOf(protocol.getTransport()),
-						protocol.getStartPort(), protocol.getEndPort());
-			} else {
-				newProtocol = networkService.createProtocol(protocol.getName(),
-						NetworkTransport.valueOf(protocol.getTransport()),
-						protocol.getStartPort(), protocol.getEndPort());
-			}
-			return new ResourceStatus<NetworkProtocol>(newProtocol,
-					I18N.getResource(sessionUtils.getLocale(request),
-							NetworkResourceService.RESOURCE_BUNDLE, protocol
-									.getId() != null ? "protocol.updated.info"
-									: "protocol.created.info", protocol
-									.getName()));
-
-		} catch (ResourceChangeException e) {
-			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceCreationException e) {
-			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} finally {
-			clearAuthenticatedContext();
-		}
-	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "networkProtocol/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<NetworkProtocol> deleteProtocol(
-			HttpServletRequest request, HttpServletResponse response,
-			@PathVariable("id") Long id) throws AccessDeniedException,
-			UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
-		try {
-
-			NetworkProtocol protocol = networkService.getProtocolById(id);
-
-			if (protocol == null) {
-				return new ResourceStatus<NetworkProtocol>(false,
-						I18N.getResource(sessionUtils.getLocale(request),
-								NetworkResourceService.RESOURCE_BUNDLE,
-								"error.invalidProtocolId", id));
-			}
-
-			String preDeletedName = protocol.getName();
-			networkService.deleteProtocol(protocol);
-
-			return new ResourceStatus<NetworkProtocol>(true, I18N.getResource(
-					sessionUtils.getLocale(request),
-					NetworkResourceService.RESOURCE_BUNDLE,
-					"protocol.deleted.info", preDeletedName));
-
-		} catch (ResourceChangeException e) {
-			return new ResourceStatus<NetworkProtocol>(false, e.getMessage());
-		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<NetworkProtocol>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}

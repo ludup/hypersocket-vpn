@@ -6,8 +6,8 @@ import com.hypersocket.resource.AbstractResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 
-public interface LauncherResourceService extends
-		AbstractResourceService<LauncherResource> {
+public interface ApplicationLauncherResourceService extends
+		AbstractResourceService<ApplicationLauncherResource> {
 
 	/**
 	 * TODO rename this class to match your entity. Modify updateResource,
@@ -15,12 +15,12 @@ public interface LauncherResourceService extends
 	 * have defined in your entity.
 	 */
 
-	LauncherResource updateResource(LauncherResource resourceById, String name,
-			String exe, String args, LauncherOS os)
+	ApplicationLauncherResource updateResource(ApplicationLauncherResource resourceById, String name,
+			String exe, String args, ApplicationLauncherOS os)
 			throws ResourceChangeException, AccessDeniedException;
 
-	LauncherResource createResource(String name, Realm realm, String exe,
-			String args, LauncherOS os) throws ResourceCreationException,
+	ApplicationLauncherResource createResource(String name, Realm realm, String exe,
+			String args, ApplicationLauncherOS os) throws ResourceCreationException,
 			AccessDeniedException;
 
 }

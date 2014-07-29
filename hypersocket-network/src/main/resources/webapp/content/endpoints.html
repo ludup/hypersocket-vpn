@@ -48,6 +48,9 @@
 					<div id="tabProtocols" class="dialogTab">
 						<div id="protocols"></div>
 					</div>
+					<div id="tabApplications" class="dialogTab">
+						<div id="applications"></div>
+					</div>
 					<div id="tabRoles" class="dialogTab">
 						<div id="roles"></div>
 					</div>
@@ -64,7 +67,7 @@
 	$(document).ready(function() {
 		$('#contentEndpoints').localize();
 	
-		getJSON('networkProtocols', null, function(data) {
+		getJSON('networkProtocols/list', null, function(data) {
 			$('#protocols').multipleSelect({
 				values : data.resources,
 				selectedIsObjectList : true,
@@ -72,6 +75,14 @@
 			});
 		});
 	
+		getJSON('launchers/list', null, function(data) {
+			$('#applications').multipleSelect({
+				values : data.resources,
+				selectedIsObjectList : true,
+				resourceKey : 'endpoint'
+			});
+		});
+		
 		if(currentMenu.canCreate || currentMenu.canUpdate) {
 			getJSON('roles', null, function(data) {
 				$('#roles').multipleSelect({
@@ -83,7 +94,7 @@
 		}
 
 		$('#endpointProperties').propertyPage({
-			url : 'template/networkResource',
+			url : 'networkResources/template',
 			showButtons : false,
 			useTemplates : true,
 			canUpdate : currentMenu.canUpdate,
@@ -96,6 +107,10 @@
 				name : getResource("protocols.title")
 			},
 			{
+				id : "tabApplications",
+				name : getResource("launchers.title")
+			},
+			{
 				id : "tabRoles",
 				name : getResource("label.roles")
 			}]
@@ -106,8 +121,8 @@
 						id : "EndPoints",
 						title: getResource('endpoints.title'),
 						icon: 'fa-sitemap',
-						tableUrl : "table/networkResources",
-						resourceUrl : "networkResource",
+						tableUrl : "networkResources/table",
+						resourceUrl : "networkResources/networkResource",
 						fields : [ { name: "name" }, 
 						           { name: "protocolsDesc" } ],
 						resourceKey : "endpoint",
@@ -127,12 +142,6 @@
 										"error.hostnameRequired");
 								return false;
 							}
-							
-							if(isValidIpv4Address($('#hostname').val())
-									|| isValidIpv6Address($('#hostname').val())) { 
-								$('#addResourceForm').resourceDialog('error', "error.hostnameIsIPAddress");
-								return false;
-							}  
 							
 							if(!isValidHostname($('#hostname').val())) { 
 				 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
@@ -154,8 +163,11 @@
 							$('#hostname').val('');
 							$('#destinationHostname').val('');
 							$('#protocols').multipleSelect();
+							$('#applications').multipleSelect();
 							$('#roles').multipleSelect();
 							$('#resourceId').val('');
+							
+							$('.endpointPropertiesTab').first().trigger('click');
 						},
 						createResource : function() {
 							resource = new Object();
@@ -163,6 +175,8 @@
 							resource.hostname = $('#hostname').val();
 							resource.destinationHostname = $('#destinationHostname').val();
 							resource.protocols = $('#protocols')
+									.multipleSelectValues();
+							resource.launchers = $('#applications')
 									.multipleSelectValues();
 							resource.roles = $('#roles').multipleSelectValues();
 							resource.id = $('#resourceId').val();
@@ -175,6 +189,11 @@
 							$('#resourceId').val(resource.id);
 							$('#protocols').multipleSelect({
 								selected : resource.protocols,
+								selectedIsObjectList : true,
+								resourceKey : 'endpoint'
+							});
+							$('#applications').multipleSelect({
+								selected : resource.launchers,
 								selectedIsObjectList : true,
 								resourceKey : 'endpoint'
 							});

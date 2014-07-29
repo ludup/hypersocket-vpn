@@ -10,6 +10,7 @@ package com.hypersocket.network.handlers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.hypersocket.auth.AuthenticationService;
 import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.events.EventService;
-import com.hypersocket.network.NetworkProtocol;
-import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkTransport;
-import com.hypersocket.network.events.NetworkResourceSessionClosed;
-import com.hypersocket.network.events.NetworkResourceSessionOpened;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.HypersocketServer;
@@ -93,8 +90,11 @@ public abstract class AbstractForwardingHandler<T extends ForwardingResource> im
 
 			T resource = getService().getResourceById(resourceId);
 			
-			if(hostname==null) {
+			if(StringUtils.isEmpty(hostname)) {
 				hostname = resource.getDestinationHostname();
+				if(StringUtils.isEmpty(hostname)) {
+					hostname = resource.getHostname();
+				}
 			}
 			
 			getService().verifyResourceSession(

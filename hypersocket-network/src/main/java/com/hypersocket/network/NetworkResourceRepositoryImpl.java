@@ -39,71 +39,7 @@ public class NetworkResourceRepositoryImpl extends
 		});
 	}
 
-	@Override
-	public void saveProtocol(NetworkProtocol protocol) {
-		save(protocol);
-	}
-
-	@Override
-	public List<NetworkProtocol> getProtocols() {
-		return allEntities(NetworkProtocol.class, new DeletedCriteria(false));
-	}
 	
-	@Override
-	public long getProtocolCount(String searchPattern) {
-		return getCount(NetworkProtocol.class, "name", searchPattern, new CriteriaConfiguration() {	
-			@Override
-			public void configure(Criteria criteria) {
-				criteria.add(Restrictions.eq("deleted", false));
-			}
-		});
-	}
-	
-	@Override
-	public List<NetworkProtocol> searchProtocols(String searchPattern, int start, int length, ColumnSort[] sorting) {
-		
-		return search(NetworkProtocol.class, "name", searchPattern, start, length, sorting, new CriteriaConfiguration() {	
-			@Override
-			public void configure(Criteria criteria) {
-				criteria.add(Restrictions.eq("deleted", false));
-			}
-		});
-	}
-	
-	@Override
-	public NetworkProtocol getProtocolById(Long id) {
-		return get("id", id, NetworkProtocol.class, new DeletedCriteria(false));
-	}
-
-	@Override
-	public void deleteProtocol(NetworkProtocol protocol) {
-		
-		delete(protocol);
-		
-	}
-
-	@Override
-	public NetworkProtocol getProtocolByName(String name) {
-		return get("name", name, NetworkProtocol.class, new DeletedCriteria(false));
-	}
-
-	@Override
-	public NetworkProtocol getProtocolByName(String name, boolean deleted) {
-		return get("name", name, NetworkProtocol.class, new DeletedCriteria(deleted));
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<NetworkResource> getResourcesByProtocol(NetworkProtocol protocol) {
-		
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(NetworkResource.class);
-		crit.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-		crit.add(Restrictions.eq("deleted", false));
-		crit = crit.createCriteria("protocols");
-		crit.add(Restrictions.eq("id", protocol.getId()));
-		
-		return (List<NetworkResource>)crit.list();
-	}
 
 	@Override
 	protected Class<NetworkResource> getResourceClass() {

@@ -1,19 +1,13 @@
-package com.hypersocket.network;
+package com.hypersocket.protocols;
 
 import com.hypersocket.tables.Column;
 
 public enum NetworkProtocolColumns implements Column {
 
-	NAME,
-	TRANSPORT,
-	PORT;
+	NAME;
 	
 	public String getColumnName() {
 		switch(this.ordinal()) {
-		case 1:
-			return "transport";
-		case 2:
-			return "startPort";
 		default:
 			return "name";
 		}

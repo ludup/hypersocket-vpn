@@ -57,9 +57,6 @@
 								</div>
 							</div>
 						</div>
-						<div id="tabProtocols">
-							<div id="protocols"></div>
-						</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>
 				<div class="modal-footer"></div>
@@ -70,27 +67,9 @@
 	$(document).ready(function() {
 				$('#contentLaunchers').localize();
 				
-				getJSON('networkProtocols/list', null, function(data) {
-					$('#protocols').multipleSelect({
-						values : data.resources,
-						selectedIsObjectList : true,
-						resourceKey : 'endpoint'
-					});
-				});
-				
 				$('#osButton').selectButton({
 					id: 'os',
 					url: 'launchers/os',
-					nameAttr: 'name',
-					valueAttr: 'id',
-					nameIsResourceKey: false,
-					changed: function(os) {
-					}
-				});
-				
-				$('#protocolButton').selectButton({
-					id: 'protocol',
-					url: 'networkProtocols',
 					nameAttr: 'name',
 					valueAttr: 'id',
 					nameIsResourceKey: false,
@@ -113,9 +92,6 @@
 					additionalTabs : [ {
 						id : "tabProgram",
 						name : getResource("tabProgram.label")
-					},{
-						id : "tabProtocols",
-						name : getResource("protocols.title")
 					}]
 				});
 				
@@ -155,9 +131,8 @@
 								$('#args').multipleTextInput({ values: []});
 								$('#os').val('0');
 								$('#os').trigger('change');
-								$('#protocols').multipleSelect();
 
-								$('.clickableTab').first().trigger('click');
+								$('.launcherPropertiesTab').first().trigger('click');
 							},
 							createResource : function() {
 								resource = new Object();
@@ -166,7 +141,6 @@
 								resource.exe = $('#exe').val();
 								resource.args = fixSplit($('#args').multipleSelectValues());
 								resource.os = $('#os').val();
-								resource.protocols = $('#protocols').multipleSelectValues();
 								return resource;
 							},
 							displayResource : function(resource) {
@@ -177,11 +151,6 @@
 								$('#args').multipleTextInput({ values: splitFix(resource.args)});
 								$('#os').val(resource.os.id);
 								$('#os').trigger('change');
-								$('#protocols').multipleSelect({
-									selected : resource.protocols,
-									selectedIsObjectList : true,
-									resourceKey : 'endpoint'
-								});
 							},
 							complete : function() {
 								loadComplete();

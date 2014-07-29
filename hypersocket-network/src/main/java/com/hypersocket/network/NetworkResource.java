@@ -23,10 +23,12 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.network.handlers.ForwardingResource;
+import com.hypersocket.protocols.NetworkProtocol;
 
 @Entity
-@Table(name="network_resources", uniqueConstraints = {@UniqueConstraint(columnNames={"name"})})
+@Table(name="network_resources")
 public class NetworkResource extends ForwardingResource {
 
 	@Column(name="hostname")
@@ -41,6 +43,12 @@ public class NetworkResource extends ForwardingResource {
 		inverseJoinColumns={@JoinColumn(name="protocol_id")})
 	Set<NetworkProtocol> protocols = new HashSet<NetworkProtocol>();
 
+	@ManyToMany(fetch=FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE})
+	@JoinTable(name="network_resource_launchers", 
+		joinColumns={@JoinColumn(name="resource_id")}, 
+		inverseJoinColumns={@JoinColumn(name="launcher_id")})
+	Set<ApplicationLauncherResource> launchers = new HashSet<ApplicationLauncherResource>();
+	
 	public String getHostname() {
 		return hostname;
 	}
@@ -70,6 +78,14 @@ public class NetworkResource extends ForwardingResource {
 		this.protocols = protocols;
 	}
 	
+	public Set<ApplicationLauncherResource> getLaunchers() {
+		return launchers;
+	}
+
+	public void setLaunchers(Set<ApplicationLauncherResource> launchers) {
+		this.launchers = launchers;
+	}
+
 	public String getProtocolsDesc() {
 		StringBuffer buf = new StringBuffer();
 		for(NetworkProtocol protocol : protocols) {

@@ -3,7 +3,7 @@ package com.hypersocket.launcher.json;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class LauncherResourceUpdate {
+public class ApplicationLauncherResourceUpdate {
 
 	Long id;
 	String name;
@@ -11,7 +11,7 @@ public class LauncherResourceUpdate {
 	String exe;
 	String args;
 	
-	public LauncherResourceUpdate() {
+	public ApplicationLauncherResourceUpdate() {
 		
 	}
 

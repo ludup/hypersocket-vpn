@@ -10,54 +10,45 @@ package com.hypersocket.network;
 import java.util.List;
 import java.util.Set;
 
+import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.network.handlers.ForwardingService;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.realm.Principal;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
-import com.hypersocket.session.Session;
-import com.hypersocket.tables.ColumnSort;
 
-
-public interface NetworkResourceService extends ForwardingService<NetworkResource>, AbstractAssignableResourceService<NetworkResource> {
+public interface NetworkResourceService extends
+		ForwardingService<NetworkResource>,
+		AbstractAssignableResourceService<NetworkResource> {
 
 	static final String RESOURCE_BUNDLE = "NetworkResourceService";
-	
-	List<NetworkResource> getResources(Principal principal) throws AccessDeniedException;
 
-	List<NetworkProtocol> getProtocols();
-
-	NetworkProtocol getProtocolById(Long id) throws ResourceNotFoundException;
-
-	NetworkProtocol updateProtocol(NetworkProtocol protocolById, String name,
-			NetworkTransport valueOf, Integer startPort, Integer endPort) throws ResourceChangeException, AccessDeniedException;
-
-	NetworkProtocol createProtocol(String name, NetworkTransport valueOf,
-			Integer startPort, Integer endPort) throws ResourceCreationException, AccessDeniedException;
-
-	void deleteProtocol(NetworkProtocol protocol) throws ResourceChangeException, AccessDeniedException;
+	List<NetworkResource> getResources(Principal principal)
+			throws AccessDeniedException;
 
 	NetworkResource getResourceById(Long id) throws ResourceNotFoundException;
 
+	void deleteResource(NetworkResource resource)
+			throws ResourceChangeException, AccessDeniedException;
+
+	List<NetworkResource> getResources(Realm realm)
+			throws AccessDeniedException;
+
 	NetworkResource updateResource(NetworkResource resourceById, String name,
-			String hostname, String destinationHostname, Set<NetworkProtocol> protocols, Set<Role> roles) throws ResourceChangeException, AccessDeniedException;
+			String hostname, String destinationHostname,
+			Set<NetworkProtocol> protocols,
+			Set<ApplicationLauncherResource> launchers, Set<Role> roles)
+			throws ResourceChangeException, AccessDeniedException;
 
-	NetworkResource createResource(String name, String hostname, String destinationHostname,
-			Set<NetworkProtocol> protocols, Set<Role> roles, Realm realm) throws ResourceCreationException, AccessDeniedException;
+	NetworkResource createResource(String name, String hostname,
+			String destinationHostname, Set<NetworkProtocol> protocols,
+			Set<ApplicationLauncherResource> launchers, Set<Role> roles,
+			Realm realm) throws ResourceCreationException,
+			AccessDeniedException;
 
-	void deleteResource(NetworkResource resource) throws ResourceChangeException, AccessDeniedException;
-
-	List<NetworkResource> getResources(Realm realm) throws AccessDeniedException;
-
-	long getProtocolCount(String searchPattern) throws AccessDeniedException;
-
-	List<NetworkProtocol> searchProtocols(String searchPattern, int start,
-			int length, ColumnSort[] sorting) throws AccessDeniedException;
-
-	NetworkProtocol verifyPort(NetworkResource resource, Integer port,
-			NetworkTransport transport) throws AccessDeniedException;
 }

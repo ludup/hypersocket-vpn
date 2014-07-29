@@ -17,11 +17,15 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hypersocket.Version;
 import com.hypersocket.client.HypersocketClient;
 import com.hypersocket.client.NetworkResource;
 import com.hypersocket.client.hosts.AbstractSocketRedirector;
 import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
+import com.hypersocket.client.rmi.ApplicationLauncher;
+import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
+import com.hypersocket.client.rmi.NetworkResourceTemplate;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
@@ -29,7 +33,6 @@ import com.hypersocket.client.rmi.ResourceService;
 import com.hypersocket.client.rmi.WebsiteResourceLauncher;
 import com.hypersocket.client.rmi.WebsiteResourceTemplate;
 import com.hypersocket.client.service.ServicePlugin;
-import com.hypersocket.utils.IPAddressValidator;
 
 public class NetworkResourcesPlugin implements ServicePlugin {
 
@@ -94,20 +97,21 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 			public boolean processResource(JSONObject resource) {
 
 				boolean success = false;
-				
+
 				try {
 					String name = (String) resource.get("name");
 					String launchUrl = (String) resource.get("launchUrl");
-					String additionalUrls = (String) resource.get("additionalUrls");
+					String additionalUrls = (String) resource
+							.get("additionalUrls");
 					Long id = (Long) resource.get("id");
-	
+
 					WebsiteResourceTemplate template = new WebsiteResourceTemplate(
-							id, name, launchUrl, additionalUrls.split("\\]\\|\\["));
+							id, name, launchUrl, additionalUrls
+									.split("\\]\\|\\["));
 					websiteResources.add(template);
-	
-					
+
 					if (createURLForwarding(launchUrl, template)) {
-	
+
 						success = true;
 						for (String url : template.getAdditionalUrls()) {
 							if (!createURLForwarding(url, template)) {
@@ -115,18 +119,23 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 								break;
 							}
 						}
-						
+
 						ResourceRealm resourceRealm = resourceService
 								.getResourceRealm(serviceClient.getHost());
-						
+
 						ResourceImpl res = new ResourceImpl(name);
 						res.setLaunchable(true);
-						res.setResourceLauncher(new WebsiteResourceLauncher(template));
+						res.setResourceLauncher(new WebsiteResourceLauncher(
+								template));
 						resourceRealm.addResource(res);
 					}
-				
-				} catch(RemoteException ex) {
-					log.error("Received remote exception whilst processing resources", ex);
+
+				} catch (MalformedURLException ex) {
+					log.error("Failed to parse launch url", ex);
+				} catch (RemoteException ex) {
+					log.error(
+							"Received remote exception whilst processing resources",
+							ex);
 				}
 
 				return success;
@@ -143,14 +152,14 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 			URL url = new URL(forwardedUrl);
 
 			String hostname = url.getHost();
-			
+
 			int port = url.getPort();
 			if (port == -1) {
 				port = url.getDefaultPort();
 			}
 
 			NetworkResource resource = new NetworkResource(template.getId(),
-					hostname, (int) port);
+					hostname, url.getHost(), (int) port, "website");
 			boolean started = startLocalForwarding(resource);
 
 			if (log.isInfoEnabled()) {
@@ -179,7 +188,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 	protected void startNetworkResources() {
 		try {
 			String json = serviceClient.getTransport()
-					.get("myNetworkResources");
+					.get("networkResources/personal");
 
 			int errors = processNetworkResources(json);
 
@@ -244,9 +253,39 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 				try {
 					String hostname = (String) field.get("hostname");
+					String destinationHostname = (String) field
+							.get("destinationHostname");
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
 
+					JSONArray launchers = (JSONArray) field.get("launchers");
+					
+					@SuppressWarnings("unchecked")
+					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers
+							.iterator();
+					
+					Version ourVersion = new Version(System.getProperty("os.version"));
+					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
+					while (it3.hasNext()) {
+						JSONObject launcher = it3.next();
+						
+						String family = (String) launcher.get("osFamily");
+						String version = (String) launcher.get("osVersion");
+						
+						if(System.getProperty("os.name").startsWith(family)) {
+							Version launcherVersion = new Version(version);
+							
+							if(ourVersion.compareTo(launcherVersion) >= 0) {
+								String n = (String) launcher.get("name");
+								String exe = (String) launcher.get("exe");
+								String args = (String) launcher.get("args");
+								
+								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, args));
+							}
+						}
+						
+			
+					}
 					JSONArray protocols = (JSONArray) field.get("protocols");
 
 					@SuppressWarnings("unchecked")
@@ -259,7 +298,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 					ResourceRealm resourceRealm = resourceService
 							.getResourceRealm(serviceClient.getHost());
-					
+
 					while (it2.hasNext()) {
 						JSONObject protocol = it2.next();
 
@@ -276,7 +315,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 						}
 
 						NetworkResourceTemplate template = new NetworkResourceTemplate(
-								name, hostname, protocolName, transport,
+								name, hostname, destinationHostname, protocolName, transport,
 								startPort, endPort);
 						networkResources.add(template);
 
@@ -288,7 +327,8 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 								try {
 									NetworkResource resource = new NetworkResource(
-											id, hostname, (int) port);
+											id, hostname, destinationHostname,
+											(int) port, "tunnel");
 									boolean started = startLocalForwarding(resource);
 
 									if (log.isInfoEnabled()) {
@@ -303,10 +343,12 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 									}
 
 									if (started) {
-										
-										ResourceProtocolImpl proto = new ResourceProtocolImpl(pid, protocolName);
+
+										ResourceProtocolImpl proto = new ResourceProtocolImpl(
+												pid, protocolName);
 										res.addProtocol(proto);
 										template.addLiveResource(resource);
+										
 										success = true;
 									} else {
 										break;
@@ -321,14 +363,31 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 								}
 							}
 						}
-						
-						resourceRealm.addResource(res);
+
+	
+						if(launcherTemplates.size() == 1) {
+							ResourceImpl app = new ResourceImpl(name);
+							app.setLaunchable(true);
+							app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
+									template, launcherTemplates.get(0)));
+							resourceRealm.addResource(app);
+						} else if(launcherTemplates.size() > 1) {
+							for(ApplicationLauncherTemplate t : launcherTemplates) {
+								ResourceImpl app = new ResourceImpl(name + " - " + t.getName());
+								app.setLaunchable(true);
+								app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
+										template, t));
+								resourceRealm.addResource(app);
+							}
+						}
 					}
 
 				} catch (RemoteException ex) {
-					log.error("Received remote exception whilst processing resources", ex);
+					log.error(
+							"Received remote exception whilst processing resources",
+							ex);
 				}
-				
+
 				return success;
 			}
 
@@ -341,11 +400,13 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 		if (log.isInfoEnabled()) {
 			log.info("Stopping Network Resources plugin");
 		}
-		
+
 		try {
 			resourceService.removeResourceRealm(serviceClient.getHost());
 		} catch (RemoteException e) {
-			log.error("Failed to remove resource realm " + serviceClient.getHost(), e);
+			log.error(
+					"Failed to remove resource realm "
+							+ serviceClient.getHost(), e);
 		}
 
 		stopAllForwarding();

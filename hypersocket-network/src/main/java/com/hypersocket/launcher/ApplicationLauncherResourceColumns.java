@@ -2,7 +2,7 @@ package com.hypersocket.launcher;
 
 import com.hypersocket.tables.Column;
 
-public enum LauncherResourceColumns implements Column {
+public enum ApplicationLauncherResourceColumns implements Column {
 
 	NAME;
 	

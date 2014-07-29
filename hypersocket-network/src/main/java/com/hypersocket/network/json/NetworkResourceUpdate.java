@@ -14,6 +14,7 @@ public class NetworkResourceUpdate {
 	String hostname;
 	String destinationHostname;
 	Long[] protocols;
+	Long[] launchers;
 	Long[] roles;
 	
 	public NetworkResourceUpdate() {
@@ -42,6 +43,14 @@ public class NetworkResourceUpdate {
 
 	public void setProtocols(Long[] protocols) {
 		this.protocols = protocols;
+	}
+
+	public Long[] getLaunchers() {
+		return launchers;
+	}
+
+	public void setLaunchers(Long[] launchers) {
+		this.launchers = launchers;
 	}
 
 	public Long[] getRoles() {

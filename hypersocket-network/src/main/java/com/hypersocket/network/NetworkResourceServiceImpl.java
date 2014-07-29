@@ -7,9 +7,6 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
-
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
+import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.events.NetworkResourceCreatedEvent;
@@ -33,21 +31,22 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
-import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
-import com.hypersocket.tables.ColumnSort;
 import com.hypersocket.ui.UserInterfaceContentHandler;
 
 @Service
 public class NetworkResourceServiceImpl extends
 		AbstractAssignableResourceServiceImpl<NetworkResource> implements
 		NetworkResourceService {
+
+	public static final String MENU_NETWORK = "networkResources";
 
 	static Logger log = LoggerFactory
 			.getLogger(NetworkResourceServiceImpl.class);
@@ -69,9 +68,6 @@ public class NetworkResourceServiceImpl extends
 
 	@Autowired
 	EventService eventService;
-
-	@Autowired
-	UserInterfaceContentHandler jQueryUIContentHandler;
 
 	public NetworkResourceServiceImpl() {
 
@@ -95,7 +91,7 @@ public class NetworkResourceServiceImpl extends
 		}
 
 		menuService.registerMenu(new MenuRegistration(
-				NetworkResourceService.RESOURCE_BUNDLE, "networkResources",
+				NetworkResourceService.RESOURCE_BUNDLE, MENU_NETWORK,
 				"fa-sitemap", "networkResources", 100,
 				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
@@ -107,7 +103,7 @@ public class NetworkResourceServiceImpl extends
 				"fa-sitemap", "endpoints", 100, NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE), "networkResources");
+				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
 		menuService.registerMenu(new MenuRegistration(
 				NetworkResourceService.RESOURCE_BUNDLE, "protocols",
@@ -115,7 +111,7 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE), "networkResources");
+				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
 		eventService.registerEvent(NetworkResourceCreatedEvent.class,
 				NetworkResourceService.RESOURCE_BUNDLE);
@@ -138,20 +134,19 @@ public class NetworkResourceServiceImpl extends
 	public void verifyResourceSession(NetworkResource resource,
 			String hostname, int port, NetworkTransport transport,
 			Session session) throws AccessDeniedException {
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("Requested NetworkResource session for resource "
 					+ resource.getName() + " on session " + session.getId());
 		}
 
 		verifyPort(resource, port, transport);
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("Verified NetworkResource, creating resource session for resource "
 					+ resource.getName() + " on session " + session.getId());
 		}
 	}
-	
 
 	public NetworkProtocol verifyPort(NetworkResource resource, Integer port,
 			NetworkTransport transport) throws AccessDeniedException {
@@ -163,141 +158,21 @@ public class NetworkResourceServiceImpl extends
 
 		NetworkProtocol protocol = resource.getNetworkProtocol(port, transport);
 
-		if(protocol==null) {
-			throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
-					RESOURCE_BUNDLE, "error.portNoAuthorized", port,
-					resource.getName()));
-		}
-		
-		return protocol;
-
-	}
-
-	@Override
-	public List<NetworkProtocol> getProtocols() {
-		return resourceRepository.getProtocols();
-	}
-
-	@Override
-	public long getProtocolCount(String searchPattern)
-			throws AccessDeniedException {
-
-		assertPermission(NetworkResourcePermission.READ);
-
-		return resourceRepository.getProtocolCount(searchPattern);
-	}
-
-	@Override
-	public List<NetworkProtocol> searchProtocols(String searchPattern,
-			int start, int length, ColumnSort[] sorting)
-			throws AccessDeniedException {
-
-		assertPermission(NetworkResourcePermission.READ);
-
-		return resourceRepository.searchProtocols(searchPattern, start, length,
-				sorting);
-	}
-
-	@Override
-	public NetworkProtocol getProtocolById(Long id)
-			throws ResourceNotFoundException {
-		NetworkProtocol protocol = resourceRepository.getProtocolById(id);
 		if (protocol == null) {
-			throw new ResourceNotFoundException(RESOURCE_BUNDLE,
-					"error.invalidProtocolId", id);
+			throw new AccessDeniedException(I18N.getResource(
+					getCurrentLocale(), RESOURCE_BUNDLE,
+					"error.portNoAuthorized", port, resource.getName()));
 		}
-		return protocol;
-	}
-
-	@Override
-	public NetworkProtocol updateProtocol(NetworkProtocol protocol,
-			String name, NetworkTransport transport, Integer startPort,
-			Integer endPort) throws ResourceChangeException,
-			AccessDeniedException {
-
-		assertPermission(NetworkResourcePermission.UPDATE);
-
-		NetworkProtocol existing = resourceRepository.getProtocolByName(name);
-		if (existing != null && !existing.equals(protocol)) {
-			throw new ResourceChangeException(RESOURCE_BUNDLE,
-					"error.nameExists", name, transport.toString());
-		}
-
-		protocol.setName(name);
-		protocol.setTransport(transport);
-		protocol.setStartPort(startPort);
-		protocol.setEndPort(endPort);
-
-		resourceRepository.saveProtocol(protocol);
 
 		return protocol;
-
-	}
-
-	@Override
-	public NetworkProtocol createProtocol(String name,
-			NetworkTransport transport, Integer startPort, Integer endPort)
-			throws ResourceCreationException, AccessDeniedException {
-
-		assertPermission(NetworkResourcePermission.CREATE);
-
-		NetworkProtocol existing = resourceRepository.getProtocolByName(name);
-		if (existing != null) {
-			throw new ResourceCreationException(RESOURCE_BUNDLE,
-					"error.nameExists", name, transport.toString());
-		}
-
-		if (endPort != null) {
-			if (endPort < startPort) {
-				throw new ResourceCreationException(RESOURCE_BUNDLE,
-						"error.portEndError");
-			}
-		}
-
-		if (startPort < 1 || startPort > 65535) {
-			throw new ResourceCreationException(RESOURCE_BUNDLE,
-					"error.portNumberError");
-		}
-
-		if (endPort != null && (endPort < 1 || endPort > 65535)) {
-			throw new ResourceCreationException(RESOURCE_BUNDLE,
-					"error.portNumberError");
-		}
-
-		NetworkProtocol protocol = new NetworkProtocol();
-
-		protocol.setName(name);
-		protocol.setTransport(transport);
-		protocol.setStartPort(startPort);
-		protocol.setEndPort(endPort);
-
-		resourceRepository.saveProtocol(protocol);
-
-		return protocol;
-
-	}
-
-	@Override
-	public void deleteProtocol(NetworkProtocol protocol)
-			throws AccessDeniedException, ResourceChangeException {
-
-		assertPermission(NetworkResourcePermission.DELETE);
-
-		List<NetworkResource> resources = resourceRepository
-				.getResourcesByProtocol(protocol);
-		if (resources.size() > 0) {
-			throw new ResourceChangeException(RESOURCE_BUNDLE,
-					"error.protocolInUse", protocol.getName(), resources.size());
-		}
-
-		resourceRepository.deleteProtocol(protocol);
 
 	}
 
 	@Override
 	public NetworkResource updateResource(NetworkResource resource,
 			String name, String hostname, String destinationHostname,
-			Set<NetworkProtocol> protocols, Set<Role> roles)
+			Set<NetworkProtocol> protocols,
+			Set<ApplicationLauncherResource> launchers, Set<Role> roles)
 			throws ResourceChangeException, AccessDeniedException {
 
 		assertPermission(NetworkResourcePermission.UPDATE);
@@ -306,6 +181,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setHostname(hostname);
 		resource.setDestinationHostname(destinationHostname);
 		resource.setProtocols(protocols);
+		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
 		updateResource(resource);
@@ -317,7 +193,8 @@ public class NetworkResourceServiceImpl extends
 	@Override
 	public NetworkResource createResource(String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols,
-			Set<Role> roles, Realm realm) throws ResourceCreationException,
+			Set<ApplicationLauncherResource> launchers, Set<Role> roles,
+			Realm realm) throws ResourceCreationException,
 			AccessDeniedException {
 
 		NetworkResource resource = new NetworkResource();
@@ -327,6 +204,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setDestinationHostname(destinationHostname);
 		resource.setRealm(realm);
 		resource.setProtocols(protocols);
+		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
 		createResource(resource);

@@ -22,13 +22,14 @@ import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
-import com.hypersocket.launcher.LauncherOS;
-import com.hypersocket.launcher.LauncherResource;
-import com.hypersocket.launcher.LauncherResourceColumns;
-import com.hypersocket.launcher.LauncherResourceService;
-import com.hypersocket.launcher.LauncherResourceServiceImpl;
+import com.hypersocket.launcher.ApplicationLauncherOS;
+import com.hypersocket.launcher.ApplicationLauncherResource;
+import com.hypersocket.launcher.ApplicationLauncherResourceColumns;
+import com.hypersocket.launcher.ApplicationLauncherResourceService;
+import com.hypersocket.launcher.ApplicationLauncherResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.properties.PropertyCategory;
+import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
@@ -41,11 +42,11 @@ import com.hypersocket.tables.DataTablesResult;
 import com.hypersocket.tables.json.DataTablesPageProcessor;
 
 @Controller
-public class LauncherResourceController extends ResourceController {
+public class ApplicationLauncherResourceController extends ResourceController {
 
 
 	@Autowired
-	LauncherResourceService resourceService;
+	ApplicationLauncherResourceService resourceService;
 
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/table", method = RequestMethod.GET, produces = { "application/json" })
@@ -65,7 +66,7 @@ public class LauncherResourceController extends ResourceController {
 
 						@Override
 						public Column getColumn(int col) {
-							return LauncherResourceColumns.values()[col];
+							return ApplicationLauncherResourceColumns.values()[col];
 						}
 
 						@Override
@@ -113,7 +114,7 @@ public class LauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/launcher/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public LauncherResource getResource(HttpServletRequest request,
+	public ApplicationLauncherResource getResource(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable("id") Long id)
 			throws AccessDeniedException, UnauthorizedException,
 			ResourceNotFoundException, SessionTimeoutException {
@@ -132,9 +133,9 @@ public class LauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/launcher", method = RequestMethod.POST, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<LauncherResource> createOrUpdateNetworkResource(
+	public ResourceStatus<ApplicationLauncherResource> createOrUpdateNetworkResource(
 			HttpServletRequest request, HttpServletResponse response,
-			@RequestBody LauncherResourceUpdate resource)
+			@RequestBody ApplicationLauncherResourceUpdate resource)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
 
@@ -142,11 +143,11 @@ public class LauncherResourceController extends ResourceController {
 				sessionUtils.getLocale(request), resourceService);
 		try {
 
-			LauncherResource newResource;
+			ApplicationLauncherResource newResource;
 
 			Realm realm = sessionUtils.getCurrentRealm(request);
 
-			LauncherOS os = LauncherOS.values()[resource.getOs()];
+			ApplicationLauncherOS os = ApplicationLauncherOS.values()[resource.getOs()];
 			
 			if (resource.getId() != null) {
 				newResource = resourceService.updateResource(
@@ -163,23 +164,23 @@ public class LauncherResourceController extends ResourceController {
 						resource.getArgs(),
 						os);
 			}
-			return new ResourceStatus<LauncherResource>(newResource,
+			return new ResourceStatus<ApplicationLauncherResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
-							LauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
 							resource.getId() != null ? "resource.updated.info"
 									: "resource.created.info", resource
 									.getName()));
 
 		} catch (ResourceChangeException e) {
-			return new ResourceStatus<LauncherResource>(false,
+			return new ResourceStatus<ApplicationLauncherResource>(false,
 					I18N.getResource(sessionUtils.getLocale(request),
 							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} catch (ResourceCreationException e) {
-			return new ResourceStatus<LauncherResource>(false,
+			return new ResourceStatus<ApplicationLauncherResource>(false,
 					I18N.getResource(sessionUtils.getLocale(request),
 							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<LauncherResource>(false,
+			return new ResourceStatus<ApplicationLauncherResource>(false,
 					I18N.getResource(sessionUtils.getLocale(request),
 							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} finally {
@@ -191,7 +192,7 @@ public class LauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/launcher/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<LauncherResource> deleteResource(
+	public ResourceStatus<ApplicationLauncherResource> deleteResource(
 			HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("id") Long id) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException {
@@ -200,36 +201,54 @@ public class LauncherResourceController extends ResourceController {
 				sessionUtils.getLocale(request), resourceService);
 		try {
 
-			LauncherResource resource = resourceService.getResourceById(id);
+			ApplicationLauncherResource resource = resourceService.getResourceById(id);
 
 			if (resource == null) {
-				return new ResourceStatus<LauncherResource>(false,
+				return new ResourceStatus<ApplicationLauncherResource>(false,
 						I18N.getResource(sessionUtils.getLocale(request),
-								LauncherResourceServiceImpl.RESOURCE_BUNDLE,
+								ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
 								"error.invalidResourceId", id));
 			}
 
 			String preDeletedName = resource.getName();
 			resourceService.deleteResource(resource);
 
-			return new ResourceStatus<LauncherResource>(true, I18N.getResource(
+			return new ResourceStatus<ApplicationLauncherResource>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
-					LauncherResourceServiceImpl.RESOURCE_BUNDLE,
+					ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
 					"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<LauncherResource>(false, e.getMessage());
+			return new ResourceStatus<ApplicationLauncherResource>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/list", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceList<ApplicationLauncherResource> getProtocols(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request), resourceService);
+		try {
+			return new ResourceList<ApplicationLauncherResource>(
+					resourceService.getResources());
+		} finally {
+			clearAuthenticatedContext(resourceService);
 		}
 	}
 	
 	@RequestMapping(value = "launchers/os", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<LauncherOS> getResourcesByCurrentPrincipal(
+	public ResourceList<ApplicationLauncherOS> getResourcesByCurrentPrincipal(
 			HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException {
-		return new ResourceList<LauncherOS>(Arrays.asList(LauncherOS.values()));
+		return new ResourceList<ApplicationLauncherOS>(Arrays.asList(ApplicationLauncherOS.values()));
 	}
 }

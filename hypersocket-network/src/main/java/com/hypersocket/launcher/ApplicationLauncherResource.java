@@ -1,22 +1,14 @@
 package com.hypersocket.launcher;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.hypersocket.resource.RealmResource;
 
 @Entity
 @Table(name="launchers")
-public class LauncherResource extends RealmResource {
+public class ApplicationLauncherResource extends RealmResource {
 
 	@Column(name="exe", length=1024)
 	String exe;
@@ -25,7 +17,7 @@ public class LauncherResource extends RealmResource {
 	String args;
 
 	@Column(name="os")
-	LauncherOS os;
+	ApplicationLauncherOS os;
 	
 	public String getExe() {
 		return exe;
@@ -43,12 +35,20 @@ public class LauncherResource extends RealmResource {
 		this.args = args;
 	}
 
-	public LauncherOS getOs() {
+	public ApplicationLauncherOS getOs() {
 		return os;
 	}
 
-	public void setOs(LauncherOS os) {
+	public void setOs(ApplicationLauncherOS os) {
 		this.os = os;
+	}
+	
+	public String getOsFamily() {
+		return os.getFamily();
+	}
+	
+	public String getOsVersion() {
+		return os.getVersion();
 	}
 	
 	

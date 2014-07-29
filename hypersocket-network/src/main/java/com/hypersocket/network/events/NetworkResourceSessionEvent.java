@@ -1,8 +1,8 @@
 package com.hypersocket.network.events;
 
-import com.hypersocket.network.NetworkProtocol;
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceService;
+import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.resource.ResourceEvent;
 import com.hypersocket.session.Session;
 
