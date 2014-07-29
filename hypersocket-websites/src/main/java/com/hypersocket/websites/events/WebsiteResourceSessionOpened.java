@@ -7,7 +7,7 @@ public class WebsiteResourceSessionOpened extends WebsiteResourceSessionEvent {
 
 	private static final long serialVersionUID = -904225011629709870L;
 
-	public static final String EVENT_RESOURCE_KEY = "websiteResource.sessionOpened";
+	public static final String EVENT_RESOURCE_KEY = "website.sessionOpened";
 	
 	public WebsiteResourceSessionOpened(Object source,
 			boolean success, WebsiteResource resource, Session session) {

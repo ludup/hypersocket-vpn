@@ -8,7 +8,7 @@ public class NetworkProtocolUpdatedEvent extends
 
 	private static final long serialVersionUID = 5470084618146238293L;
 
-	public static final String EVENT_RESOURCE_KEY = "networkProtocol.deleted";
+	public static final String EVENT_RESOURCE_KEY = "networkProtocol.updated";
 
 	public NetworkProtocolUpdatedEvent(Object source,
 			Session session, NetworkProtocol resource) {

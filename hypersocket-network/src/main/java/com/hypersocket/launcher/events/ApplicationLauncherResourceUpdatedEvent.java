@@ -8,7 +8,7 @@ public class ApplicationLauncherResourceUpdatedEvent extends
 
 	private static final long serialVersionUID = -268651453479469122L;
 
-	public static final String EVENT_RESOURCE_KEY = "launcher.deleted";
+	public static final String EVENT_RESOURCE_KEY = "launcher.updated";
 
 	public ApplicationLauncherResourceUpdatedEvent(Object source,
 			Session session, ApplicationLauncherResource resource) {

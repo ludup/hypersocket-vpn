@@ -59,7 +59,7 @@
 				$('#contentWebsites').localize();
 					
 				if(currentMenu.canCreate || currentMenu.canUpdate) {
-					getJSON('roles', null, function(data) {
+					getJSON('roles/list', null, function(data) {
 						$('#tabRoles').multipleSelect({
 							values : data.resources,
 							selectedIsObjectList : true,

@@ -8,7 +8,7 @@ public class WebsiteResourceUpdatedEvent extends
 
 	private static final long serialVersionUID = 3151997741366122070L;
 
-	public static final String EVENT_RESOURCE_KEY = "website.deleted";
+	public static final String EVENT_RESOURCE_KEY = "website.updated";
 
 	public WebsiteResourceUpdatedEvent(Object source,
 			Session session, WebsiteResource resource) {
