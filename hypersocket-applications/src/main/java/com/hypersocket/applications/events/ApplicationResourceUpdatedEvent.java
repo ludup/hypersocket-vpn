@@ -1,7 +1,5 @@
 package com.hypersocket.applications.events;
 
-import java.util.Map;
-
 import com.hypersocket.applications.ApplicationResource;
 import com.hypersocket.session.Session;
 
