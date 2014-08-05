@@ -63,13 +63,13 @@ public class ApplicationResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<ApplicationResource>(
 					resourceService.getResources(sessionUtils
 							.getPrincipal(request)));
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 	}
 
@@ -83,7 +83,7 @@ public class ApplicationResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 
 		try {
 			return processDataTablesRequest(request,
@@ -145,11 +145,11 @@ public class ApplicationResourceController extends ResourceController {
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return resourceService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 
 	}
@@ -165,7 +165,7 @@ public class ApplicationResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
 			ApplicationResource newResource;
@@ -183,8 +183,7 @@ public class ApplicationResourceController extends ResourceController {
 						resource.getName(), roles);
 			} else {
 				newResource = resourceService.createResource(
-						resource.getName(), roles,
-						realm);
+						resource.getName(), roles, realm);
 			}
 			return new ResourceStatus<ApplicationResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
@@ -220,7 +219,7 @@ public class ApplicationResourceController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
 			ApplicationResource resource = resourceService.getResourceById(id);
@@ -235,13 +234,14 @@ public class ApplicationResourceController extends ResourceController {
 			String preDeletedName = resource.getName();
 			resourceService.deleteResource(resource);
 
-			return new ResourceStatus<ApplicationResource>(true, I18N.getResource(
-					sessionUtils.getLocale(request),
-					ApplicationResourceServiceImpl.RESOURCE_BUNDLE,
-					"resource.deleted.info", preDeletedName));
+			return new ResourceStatus<ApplicationResource>(true,
+					I18N.getResource(sessionUtils.getLocale(request),
+							ApplicationResourceServiceImpl.RESOURCE_BUNDLE,
+							"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<ApplicationResource>(false, e.getMessage());
+			return new ResourceStatus<ApplicationResource>(false,
+					e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}

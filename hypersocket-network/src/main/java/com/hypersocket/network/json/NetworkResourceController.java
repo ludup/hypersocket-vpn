@@ -77,13 +77,13 @@ public class NetworkResourceController extends ResourceController {
 			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkResource>(
 					networkService.getResources(sessionUtils
 							.getPrincipal(request)));
 		} finally {
-			clearAuthenticatedContext(networkService);
+			clearAuthenticatedContext();
 		}
 	}
 
@@ -96,13 +96,13 @@ public class NetworkResourceController extends ResourceController {
 			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkResource>(
 					networkService.getResources(sessionUtils
 							.getCurrentRealm(request)));
 		} finally {
-			clearAuthenticatedContext(networkService);
+			clearAuthenticatedContext();
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class NetworkResourceController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 
 		try {
 			return processDataTablesRequest(request,
@@ -169,11 +169,11 @@ public class NetworkResourceController extends ResourceController {
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 		try {
 			return networkService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(networkService);
+			clearAuthenticatedContext();
 		}
 
 	}
@@ -188,7 +188,7 @@ public class NetworkResourceController extends ResourceController {
 			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 		try {
 
 			NetworkResource newResource;
@@ -253,7 +253,7 @@ public class NetworkResourceController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), networkService);
+				sessionUtils.getLocale(request));
 		try {
 
 			NetworkResource resource = networkService.getResourceById(id);

@@ -44,7 +44,6 @@ import com.hypersocket.tables.json.DataTablesPageProcessor;
 @Controller
 public class ApplicationLauncherResourceController extends ResourceController {
 
-
 	@Autowired
 	ApplicationLauncherResourceService resourceService;
 
@@ -58,7 +57,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 
 		try {
 			return processDataTablesRequest(request,
@@ -120,11 +119,11 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return resourceService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 
 	}
@@ -140,32 +139,30 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
 			ApplicationLauncherResource newResource;
 
 			Realm realm = sessionUtils.getCurrentRealm(request);
 
-			ApplicationLauncherOS os = ApplicationLauncherOS.values()[resource.getOs()];
-			
+			ApplicationLauncherOS os = ApplicationLauncherOS.values()[resource
+					.getOs()];
+
 			if (resource.getId() != null) {
 				newResource = resourceService.updateResource(
 						resourceService.getResourceById(resource.getId()),
-						resource.getName(),
-						resource.getExe(),
-						resource.getArgs(),
-						os);
+						resource.getName(), resource.getExe(),
+						resource.getArgs(), os);
 			} else {
 				newResource = resourceService.createResource(
-						resource.getName(),
-						realm,
-						resource.getExe(),
-						resource.getArgs(),
-						os);
+						resource.getName(), realm, resource.getExe(),
+						resource.getArgs(), os);
 			}
-			return new ResourceStatus<ApplicationLauncherResource>(newResource,
-					I18N.getResource(sessionUtils.getLocale(request),
+			return new ResourceStatus<ApplicationLauncherResource>(
+					newResource,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
 							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
 							resource.getId() != null ? "resource.updated.info"
 									: "resource.created.info", resource
@@ -198,14 +195,17 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
-			ApplicationLauncherResource resource = resourceService.getResourceById(id);
+			ApplicationLauncherResource resource = resourceService
+					.getResourceById(id);
 
 			if (resource == null) {
-				return new ResourceStatus<ApplicationLauncherResource>(false,
-						I18N.getResource(sessionUtils.getLocale(request),
+				return new ResourceStatus<ApplicationLauncherResource>(
+						false,
+						I18N.getResource(
+								sessionUtils.getLocale(request),
 								ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
 								"error.invalidResourceId", id));
 			}
@@ -213,42 +213,47 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			String preDeletedName = resource.getName();
 			resourceService.deleteResource(resource);
 
-			return new ResourceStatus<ApplicationLauncherResource>(true, I18N.getResource(
-					sessionUtils.getLocale(request),
-					ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
-					"resource.deleted.info", preDeletedName));
+			return new ResourceStatus<ApplicationLauncherResource>(
+					true,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<ApplicationLauncherResource>(false, e.getMessage());
+			return new ResourceStatus<ApplicationLauncherResource>(false,
+					e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/list", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<ApplicationLauncherResource> getProtocols(
 			HttpServletRequest request, HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<ApplicationLauncherResource>(
 					resourceService.getResources());
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 	}
-	
+
 	@RequestMapping(value = "launchers/os", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<ApplicationLauncherOS> getResourcesByCurrentPrincipal(
 			HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException {
-		return new ResourceList<ApplicationLauncherOS>(Arrays.asList(ApplicationLauncherOS.values()));
+		return new ResourceList<ApplicationLauncherOS>(
+				Arrays.asList(ApplicationLauncherOS.values()));
 	}
 }

@@ -7,6 +7,8 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
+import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
+
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +41,6 @@ import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.session.Session;
-import com.hypersocket.ui.UserInterfaceContentHandler;
 
 @Service
 public class NetworkResourceServiceImpl extends

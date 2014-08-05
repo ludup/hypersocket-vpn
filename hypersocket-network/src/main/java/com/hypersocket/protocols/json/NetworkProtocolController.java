@@ -56,7 +56,7 @@ public class NetworkProtocolController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 
 		try {
 			return processDataTablesRequest(request,
@@ -118,11 +118,11 @@ public class NetworkProtocolController extends ResourceController {
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return resourceService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 
 	}
@@ -138,7 +138,7 @@ public class NetworkProtocolController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
 			NetworkProtocol newResource;
@@ -191,7 +191,7 @@ public class NetworkProtocolController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 
 			NetworkProtocol resource = resourceService.getResourceById(id);
@@ -227,12 +227,12 @@ public class NetworkProtocolController extends ResourceController {
 			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), resourceService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkProtocol>(
 					resourceService.getResources());
 		} finally {
-			clearAuthenticatedContext(resourceService);
+			clearAuthenticatedContext();
 		}
 	}
 }
