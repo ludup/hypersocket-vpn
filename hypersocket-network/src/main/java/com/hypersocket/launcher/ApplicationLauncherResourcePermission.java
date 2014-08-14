@@ -36,4 +36,9 @@ public enum ApplicationLauncherResourcePermission implements PermissionType {
 	public String getResourceKey() {
 		return val;
 	}
+	
+	@Override
+	public boolean isSystem() {
+		return false;
+	}
 }

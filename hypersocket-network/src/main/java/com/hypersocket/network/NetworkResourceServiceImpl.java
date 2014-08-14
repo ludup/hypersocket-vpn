@@ -88,7 +88,7 @@ public class NetworkResourceServiceImpl extends
 				"category.networkResources");
 
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), cat);
+			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(

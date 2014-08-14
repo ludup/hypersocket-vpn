@@ -52,7 +52,7 @@ public class NetworkProtocolServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		for (NetworkProtocolPermission p : NetworkProtocolPermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), cat);
+			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
 		}
 
 		/**
