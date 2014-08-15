@@ -1,7 +1,7 @@
 package com.hypersocket.network.events;
 
 import com.hypersocket.network.NetworkResource;
-import com.hypersocket.network.NetworkResourceService;
+import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.resource.AssignableResourceEvent;
 import com.hypersocket.session.Session;
 
@@ -33,7 +33,7 @@ public class NetworkResourceEvent extends AssignableResourceEvent {
 
 	@Override
 	public String getResourceBundle() {
-		return NetworkResourceService.RESOURCE_BUNDLE;
+		return NetworkResourceServiceImpl.RESOURCE_BUNDLE;
 	}
 
 }

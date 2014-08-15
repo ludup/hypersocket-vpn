@@ -26,8 +26,6 @@ public interface NetworkResourceService extends
 		ForwardingService<NetworkResource>,
 		AbstractAssignableResourceService<NetworkResource> {
 
-	static final String RESOURCE_BUNDLE = "NetworkResourceService";
-
 	List<NetworkResource> getResources(Principal principal)
 			throws AccessDeniedException;
 

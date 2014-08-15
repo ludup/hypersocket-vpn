@@ -35,7 +35,7 @@ import com.hypersocket.launcher.ApplicationLauncherResourceService;
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceColumns;
 import com.hypersocket.network.NetworkResourceService;
-import com.hypersocket.network.NetworkTransport;
+import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
@@ -221,7 +221,7 @@ public class NetworkResourceController extends ResourceController {
 			}
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
-							NetworkResourceService.RESOURCE_BUNDLE, resource
+							NetworkResourceServiceImpl.RESOURCE_BUNDLE, resource
 									.getId() != null ? "resource.updated.info"
 									: "resource.created.info", resource
 									.getName()));
@@ -261,7 +261,7 @@ public class NetworkResourceController extends ResourceController {
 			if (resource == null) {
 				return new ResourceStatus<NetworkResource>(false,
 						I18N.getResource(sessionUtils.getLocale(request),
-								NetworkResourceService.RESOURCE_BUNDLE,
+								NetworkResourceServiceImpl.RESOURCE_BUNDLE,
 								"error.invalidResourceId", id));
 			}
 
@@ -270,7 +270,7 @@ public class NetworkResourceController extends ResourceController {
 
 			return new ResourceStatus<NetworkResource>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
-					NetworkResourceService.RESOURCE_BUNDLE,
+					NetworkResourceServiceImpl.RESOURCE_BUNDLE,
 					"endpoint.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {

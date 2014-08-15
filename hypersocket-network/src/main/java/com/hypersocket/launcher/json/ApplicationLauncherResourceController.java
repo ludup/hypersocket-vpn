@@ -29,7 +29,6 @@ import com.hypersocket.launcher.ApplicationLauncherResourceService;
 import com.hypersocket.launcher.ApplicationLauncherResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.properties.PropertyCategory;
-import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;

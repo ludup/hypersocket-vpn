@@ -7,8 +7,6 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import static com.hypersocket.network.NetworkResourceService.RESOURCE_BUNDLE;
-
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -49,6 +47,8 @@ public class NetworkResourceServiceImpl extends
 
 	public static final String MENU_NETWORK = "networkResources";
 
+	public static final String RESOURCE_BUNDLE = "NetworkResourceService";
+	
 	static Logger log = LoggerFactory
 			.getLogger(NetworkResourceServiceImpl.class);
 
@@ -81,10 +81,10 @@ public class NetworkResourceServiceImpl extends
 			log.debug("Constructing NetworkResourceService");
 		}
 
-		i18nService.registerBundle(NetworkResourceService.RESOURCE_BUNDLE);
+		i18nService.registerBundle(RESOURCE_BUNDLE);
 
 		PermissionCategory cat = permissionService.registerPermissionCategory(
-				NetworkResourceService.RESOURCE_BUNDLE,
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE,
 				"category.networkResources");
 
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
@@ -92,7 +92,7 @@ public class NetworkResourceServiceImpl extends
 		}
 
 		menuService.registerMenu(new MenuRegistration(
-				NetworkResourceService.RESOURCE_BUNDLE, MENU_NETWORK,
+				RESOURCE_BUNDLE, MENU_NETWORK,
 				"fa-sitemap", "networkResources", 100,
 				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
@@ -100,14 +100,14 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE), MenuService.MENU_RESOURCES);
 
 		menuService.registerMenu(new MenuRegistration(
-				NetworkResourceService.RESOURCE_BUNDLE, "endpoints",
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "endpoints",
 				"fa-sitemap", "endpoints", 100, NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
 		menuService.registerMenu(new MenuRegistration(
-				NetworkResourceService.RESOURCE_BUNDLE, "protocols",
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "protocols",
 				"fa-exchange", "protocols", 200,
 				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
@@ -115,16 +115,16 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
 		eventService.registerEvent(NetworkResourceCreatedEvent.class,
-				NetworkResourceService.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
 		eventService.registerEvent(NetworkResourceUpdatedEvent.class,
-				NetworkResourceService.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
 		eventService.registerEvent(NetworkResourceDeletedEvent.class,
-				NetworkResourceService.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
 
 		eventService.registerEvent(NetworkResourceSessionOpened.class,
-				NetworkResourceService.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
 		eventService.registerEvent(NetworkResourceSessionClosed.class,
-				NetworkResourceService.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
 
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
