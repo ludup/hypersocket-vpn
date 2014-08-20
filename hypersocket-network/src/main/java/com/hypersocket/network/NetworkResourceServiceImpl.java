@@ -88,7 +88,7 @@ public class NetworkResourceServiceImpl extends
 				"category.networkResources");
 
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
+			permissionService.registerPermission(p,cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(
@@ -102,14 +102,6 @@ public class NetworkResourceServiceImpl extends
 		menuService.registerMenu(new MenuRegistration(
 				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "endpoints",
 				"fa-sitemap", "endpoints", 100, NetworkResourcePermission.READ,
-				NetworkResourcePermission.CREATE,
-				NetworkResourcePermission.UPDATE,
-				NetworkResourcePermission.DELETE), MENU_NETWORK);
-
-		menuService.registerMenu(new MenuRegistration(
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "protocols",
-				"fa-exchange", "protocols", 200,
-				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
 				NetworkResourcePermission.DELETE), MENU_NETWORK);

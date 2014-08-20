@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
+import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.network.NetworkResourcePermission;
+import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
@@ -52,18 +55,16 @@ public class NetworkProtocolServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		for (NetworkProtocolPermission p : NetworkProtocolPermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
+			permissionService.registerPermission(p,cat);
 		}
-
-		/**
-		 * TODO add your menu item and other initialization.
-		 */
-		// menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
-		// "resources", "fa-globe", "resources", 100,
-		// TemplateResourcePermission.READ, TemplateResourcePermission.CREATE,
-		// TemplateResourcePermission.UPDATE,
-		// TemplateResourcePermission.DELETE),
-		// MenuService.MENU_RESOURCES);
+		
+		menuService.registerMenu(new MenuRegistration(
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "protocols",
+				"fa-exchange", "protocols", 200,
+				NetworkProtocolPermission.READ,
+				NetworkProtocolPermission.CREATE,
+				NetworkProtocolPermission.UPDATE,
+				NetworkProtocolPermission.DELETE), NetworkResourceServiceImpl.MENU_NETWORK);
 
 		/**
 		 * Register the events. All events have to be registerd so the system

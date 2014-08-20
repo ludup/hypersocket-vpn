@@ -20,9 +20,17 @@ public enum NetworkProtocolPermission implements PermissionType {
 	private final String val;
 	
 	private final static String name = "protocol";
+
+	private PermissionType[] implies;
 	
-	private NetworkProtocolPermission(final String val) {
+	private NetworkProtocolPermission(final String val, PermissionType... implies) {
 		this.val = name + "." + val;
+		this.implies = implies;
+	}
+
+	@Override
+	public PermissionType[] impliesPermissions() {
+		return implies;
 	}
 	
 	public String toString() {
@@ -36,6 +44,11 @@ public enum NetworkProtocolPermission implements PermissionType {
 	
 	@Override
 	public boolean isSystem() {
+		return false;
+	}
+
+	@Override
+	public boolean isHidden() {
 		return false;
 	}
 }

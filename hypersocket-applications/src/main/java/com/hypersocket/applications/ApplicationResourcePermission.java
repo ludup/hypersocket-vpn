@@ -21,8 +21,16 @@ public enum ApplicationResourcePermission implements PermissionType {
 
 	private final static String name = "application";
 	
-	private ApplicationResourcePermission(final String val) {
+	private PermissionType[] implies;
+	
+	private ApplicationResourcePermission(final String val, PermissionType... implies) {
 		this.val = name + "." + val;
+		this.implies = implies;
+	}
+
+	@Override
+	public PermissionType[] impliesPermissions() {
+		return implies;
 	}
 	
 	public String toString() {
@@ -36,6 +44,11 @@ public enum ApplicationResourcePermission implements PermissionType {
 	
 	@Override
 	public boolean isSystem() {
+		return false;
+	}
+
+	@Override
+	public boolean isHidden() {
 		return false;
 	}
 }

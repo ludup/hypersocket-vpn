@@ -53,7 +53,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.lauchers");
 
 		for (ApplicationLauncherResourcePermission p : ApplicationLauncherResourcePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
+			permissionService.registerPermission(p,cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,

@@ -71,7 +71,8 @@
 			$('#protocols').multipleSelect({
 				values : data.resources,
 				selectedIsObjectList : true,
-				resourceKey : 'endpoint'
+				resourceKey : 'endpoint',
+				disabled: !currentMenu.canUpdate
 			});
 		});
 	
@@ -79,24 +80,25 @@
 			$('#applications').multipleSelect({
 				values : data.resources,
 				selectedIsObjectList : true,
-				resourceKey : 'endpoint'
+				resourceKey : 'endpoint',
+				disabled: !currentMenu.canUpdate
 			});
 		});
 		
-		if(currentMenu.canCreate || currentMenu.canUpdate) {
-			getJSON('roles/list', null, function(data) {
+		getJSON('roles/list', null, function(data) {
 				$('#roles').multipleSelect({
 					values : data.resources,
 					selectedIsObjectList : true,
-					resourceKey : 'endpoint'
-				});
+					resourceKey : 'endpoint',
+					disabled: !currentMenu.canUpdate
 			});
-		}
+		});
 
 		$('#endpointProperties').propertyPage({
 			url : 'networkResources/template',
 			showButtons : false,
 			useTemplates : true,
+			displayMode: 'create',
 			canUpdate : currentMenu.canUpdate,
 			additionalTabs : [ {
 				id : "tabDetails",
@@ -158,7 +160,7 @@
 							}
 							return true;
 						},
-						clearDialog : function() {
+						clearDialog : function(create) {
 							$('#resourceName').val('');
 							$('#hostname').val('');
 							$('#destinationHostname').val('');
@@ -182,25 +184,31 @@
 							resource.id = $('#resourceId').val();
 							return resource;
 						},
-						displayResource : function(resource) {
+						displayResource : function(resource, readOnly) {
 							$('#resourceName').val(resource.name);
+							$('#resourceName').attr('disabled', readOnly);
 							$('#hostname').val(resource.hostname);
+							$('#hostname').attr('disabled', readOnly);
 							$('#destinationHostname').val(resource.destinationHostname);
+							$('#destinationHostname').attr('disabled', readOnly);
 							$('#resourceId').val(resource.id);
 							$('#protocols').multipleSelect({
 								selected : resource.protocols,
 								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
+								resourceKey : 'endpoint',
+								disabled: readOnly
 							});
 							$('#applications').multipleSelect({
 								selected : resource.launchers,
 								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
+								resourceKey : 'endpoint',
+								disabled: readOnly
 							});
 							$('#roles').multipleSelect({
 								selected : resource.roles,
 								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
+								resourceKey : 'endpoint',
+								disabled: readOnly
 							});
 						},
 						complete : function() {

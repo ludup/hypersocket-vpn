@@ -59,7 +59,7 @@ public class WebsiteResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		for (WebsitePermission p : WebsitePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
+			permissionService.registerPermission(p,cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,

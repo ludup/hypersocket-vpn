@@ -54,7 +54,7 @@ public class ApplicationResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.applications");
 
 		for (ApplicationResourcePermission p : ApplicationResourcePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), p.isSystem(), cat);
+			permissionService.registerPermission(p,cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,

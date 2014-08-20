@@ -8,18 +8,27 @@
 package com.hypersocket.websites;
 
 import com.hypersocket.permissions.PermissionType;
+import com.hypersocket.realm.RolePermission;
 
 public enum WebsitePermission implements PermissionType {
 	
 	CREATE("website.create"),
-	READ("website.read"),
+	READ("website.read", RolePermission.READ),
 	UPDATE("website.update"),
 	DELETE("website.delete");
 	
 	private final String val;
 	
-	private WebsitePermission(final String val) {
+	private PermissionType[] implies;
+	
+	private WebsitePermission(final String val, PermissionType... implies) {
 		this.val = val;
+		this.implies = implies;
+	}
+
+	@Override
+	public PermissionType[] impliesPermissions() {
+		return implies;
 	}
 	
 	public String toString() {
@@ -35,4 +44,10 @@ public enum WebsitePermission implements PermissionType {
 	public boolean isSystem() {
 		return false;
 	}
+
+	@Override
+	public boolean isHidden() {
+		return false;
+	}
+
 }

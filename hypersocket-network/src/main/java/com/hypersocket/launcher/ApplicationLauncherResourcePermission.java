@@ -19,13 +19,21 @@ public enum ApplicationLauncherResourcePermission implements PermissionType {
 	
 	private final String val;
 	
+	
 	/**
 	 * TODO place your resource name in this final static string e.g. applications
 	 */
 	private final static String name = "launcher";
+	private PermissionType[] implies;
 	
-	private ApplicationLauncherResourcePermission(final String val) {
+	private ApplicationLauncherResourcePermission(final String val, PermissionType... implies) {
 		this.val = name + "." + val;
+		this.implies = implies;
+	}
+
+	@Override
+	public PermissionType[] impliesPermissions() {
+		return implies;
 	}
 	
 	public String toString() {
@@ -41,4 +49,10 @@ public enum ApplicationLauncherResourcePermission implements PermissionType {
 	public boolean isSystem() {
 		return false;
 	}
+
+	@Override
+	public boolean isHidden() {
+		return false;
+	}
+
 }
