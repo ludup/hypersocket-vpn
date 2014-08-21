@@ -1,5 +1,7 @@
 package com.hypersocket.protocols;
 
+import java.util.HashMap;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +145,7 @@ public class NetworkProtocolServiceImpl extends
 		resource.setEndPort(endPort);
 		resource.setTransport(transport);
 		
-		updateResource(resource);
+		updateResource(resource, new HashMap<String,String>());
 
 		return resource;
 	}
@@ -159,7 +161,7 @@ public class NetworkProtocolServiceImpl extends
 		resource.setEndPort(endPort);
 		resource.setTransport(transport);
 
-		createResource(resource);
+		createResource(resource, new HashMap<String,String>());
 
 		return resource;
 	}

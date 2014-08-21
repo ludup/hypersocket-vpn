@@ -1,5 +1,7 @@
 package com.hypersocket.launcher;
 
+import java.util.HashMap;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +131,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 		 * 
 		 * Remember to fill in the fire*Event methods to ensure events are fired for all operations.
 		 */
-		updateResource(resource);
+		updateResource(resource, new HashMap<String,String>());
 		
 		return resource;
 	}
@@ -149,7 +151,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 		 * 
 		 * Remember to fill in the fire*Event methods to ensure events are fired for all operations.
 		 */
-		createResource(resource);
+		createResource(resource, new HashMap<String,String>());
 		
 		return resource;
 	}

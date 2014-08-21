@@ -7,6 +7,7 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -177,7 +178,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
-		updateResource(resource);
+		updateResource(resource, new HashMap<String,String>());
 
 		return resource;
 
@@ -200,7 +201,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
-		createResource(resource);
+		createResource(resource, new HashMap<String,String>());
 
 		return resource;
 

@@ -7,6 +7,8 @@
  ******************************************************************************/
 package upgrade;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hypersocket.network.NetworkResourceRepository;
@@ -61,7 +63,7 @@ public class network_0_DOT_0_DOT_1 implements Runnable {
 		protocol.setStartPort(start);
 		protocol.setEndPort(end);
 
-		protocolRepository.saveResource(protocol);
+		protocolRepository.saveResource(protocol, new HashMap<String,String>());
 
 	}
 

@@ -7,24 +7,9 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import java.util.List;
-
-import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
-import com.hypersocket.resource.ResourceChangeException;
 
 public interface NetworkResourceRepository extends
 		AbstractAssignableResourceRepository<NetworkResource> {
 
-	void saveResource(NetworkResource resource);
-
-	NetworkResource getResourceById(Long id);
-
-	void deleteResource(NetworkResource resource) throws ResourceChangeException;
-
-	List<NetworkResource> getResources(Realm realm);
-
-	NetworkResource getResourceByName(String name);
-
-	NetworkResource getResourceByName(String name, boolean deleted);
 }

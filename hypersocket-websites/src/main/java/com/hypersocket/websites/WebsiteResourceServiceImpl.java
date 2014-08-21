@@ -1,6 +1,7 @@
 package com.hypersocket.websites;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -136,7 +137,7 @@ public class WebsiteResourceServiceImpl extends
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		updateResource(website);
+		updateResource(website, new HashMap<String,String>());
 		return website;
 	}
 
@@ -152,7 +153,7 @@ public class WebsiteResourceServiceImpl extends
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		createResource(website);
+		createResource(website, new HashMap<String,String>());
 
 		return website;
 	}
