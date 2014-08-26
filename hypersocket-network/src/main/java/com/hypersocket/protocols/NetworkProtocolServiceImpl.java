@@ -56,6 +56,8 @@ public class NetworkProtocolServiceImpl extends
 		PermissionCategory cat = permissionService.registerPermissionCategory(
 				RESOURCE_BUNDLE, "category.websites");
 
+		repository.loadPropertyTemplates("networkProtocolTemplate.xml");
+		
 		for (NetworkProtocolPermission p : NetworkProtocolPermission.values()) {
 			permissionService.registerPermission(p,cat);
 		}
@@ -73,11 +75,11 @@ public class NetworkProtocolServiceImpl extends
 		 * knows about them.
 		 */
 		eventService.registerEvent(NetworkProtocolCreatedEvent.class,
-				RESOURCE_BUNDLE);
+				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkProtocolUpdatedEvent.class,
-				RESOURCE_BUNDLE);
+				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkProtocolDeletedEvent.class,
-				RESOURCE_BUNDLE);
+				RESOURCE_BUNDLE, this);
 
 	}
 

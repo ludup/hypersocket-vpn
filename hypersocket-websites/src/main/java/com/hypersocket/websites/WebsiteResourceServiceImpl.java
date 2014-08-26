@@ -49,8 +49,8 @@ public class WebsiteResourceServiceImpl extends
 	MenuService menuService;
 
 	@Autowired
-	EventService eventService; 
-	
+	EventService eventService;
+
 	@PostConstruct
 	private void postConstruct() {
 
@@ -60,22 +60,28 @@ public class WebsiteResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		for (WebsitePermission p : WebsitePermission.values()) {
-			permissionService.registerPermission(p,cat);
+			permissionService.registerPermission(p, cat);
 		}
 
+		websiteRepository.loadPropertyTemplates("websiteResourceTemplate.xml");
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
 				"websites", "fa-globe", "websites", 100,
 				WebsitePermission.READ, WebsitePermission.CREATE,
 				WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
-		eventService.registerEvent(WebsiteResourceCreatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(WebsiteResourceUpdatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(WebsiteResourceDeletedEvent.class, RESOURCE_BUNDLE);
-		
-		eventService.registerEvent(WebsiteResourceSessionOpened.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(WebsiteResourceSessionClosed.class, RESOURCE_BUNDLE);
-		
+		eventService.registerEvent(WebsiteResourceCreatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceUpdatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceDeletedEvent.class,
+				RESOURCE_BUNDLE, this);
+
+		eventService.registerEvent(WebsiteResourceSessionOpened.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceSessionClosed.class,
+				RESOURCE_BUNDLE, this);
+
 	}
 
 	@Override
@@ -95,35 +101,41 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
+				getCurrentSession(), resource));
 
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource,
 			Throwable t) {
-		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource, Throwable t) {
-		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource,
 			Throwable t) {
-		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
@@ -137,7 +149,7 @@ public class WebsiteResourceServiceImpl extends
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		updateResource(website, new HashMap<String,String>());
+		updateResource(website, new HashMap<String, String>());
 		return website;
 	}
 
@@ -153,7 +165,7 @@ public class WebsiteResourceServiceImpl extends
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		createResource(website, new HashMap<String,String>());
+		createResource(website, new HashMap<String, String>());
 
 		return website;
 	}
@@ -162,23 +174,23 @@ public class WebsiteResourceServiceImpl extends
 	public void verifyResourceSession(WebsiteResource resource,
 			String hostname, int port, NetworkTransport transport,
 			Session session) throws AccessDeniedException {
-		
-		for(URL url : resource.getUrls()) {
-			if(hostname.equalsIgnoreCase(url.getHost())) {
-				if(url.getPort() > -1) {
-					if(url.getPort() == port) {
+
+		for (URL url : resource.getUrls()) {
+			if (hostname.equalsIgnoreCase(url.getHost())) {
+				if (url.getPort() > -1) {
+					if (url.getPort() == port) {
 						return;
 					}
-				} else if(url.getDefaultPort() == port) {
+				} else if (url.getDefaultPort() == port) {
 					return;
 				}
 			}
 		}
-		
+
 		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
 				RESOURCE_BUNDLE, "error.urlNotAuthorized", hostname, port,
 				resource.getName()));
-		
+
 	}
 
 }

@@ -88,6 +88,8 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourceServiceImpl.RESOURCE_BUNDLE,
 				"category.networkResources");
 
+		resourceRepository.loadPropertyTemplates("networkResourceTemplate.xml");
+		
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
 			permissionService.registerPermission(p,cat);
 		}
@@ -108,16 +110,16 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
 		eventService.registerEvent(NetworkResourceCreatedEvent.class,
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkResourceUpdatedEvent.class,
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkResourceDeletedEvent.class,
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 
 		eventService.registerEvent(NetworkResourceSessionOpened.class,
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkResourceSessionClosed.class,
-				NetworkResourceServiceImpl.RESOURCE_BUNDLE);
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");

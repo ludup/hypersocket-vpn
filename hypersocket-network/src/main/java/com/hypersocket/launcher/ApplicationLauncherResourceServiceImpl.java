@@ -7,10 +7,12 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hypersocket.events.EventPropertyCollector;
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceDeletedEvent;
+import com.hypersocket.launcher.events.ApplicationLauncherResourceEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceUpdatedEvent;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
@@ -54,6 +56,8 @@ public class ApplicationLauncherResourceServiceImpl extends
 		PermissionCategory cat = permissionService.registerPermissionCategory(
 				RESOURCE_BUNDLE, "category.lauchers");
 
+		repository.loadPropertyTemplates("applicationLauncherTemplate.xml");
+		
 		for (ApplicationLauncherResourcePermission p : ApplicationLauncherResourcePermission.values()) {
 			permissionService.registerPermission(p,cat);
 		}
@@ -64,9 +68,9 @@ public class ApplicationLauncherResourceServiceImpl extends
 				ApplicationLauncherResourcePermission.UPDATE, ApplicationLauncherResourcePermission.DELETE),
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		eventService.registerEvent(ApplicationLauncherResourceCreatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(ApplicationLauncherResourceUpdatedEvent.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(ApplicationLauncherResourceDeletedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(ApplicationLauncherResourceCreatedEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherResourceUpdatedEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherResourceDeletedEvent.class, RESOURCE_BUNDLE, this);
 		
 	}
 
