@@ -7,12 +7,10 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hypersocket.events.EventPropertyCollector;
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceDeletedEvent;
-import com.hypersocket.launcher.events.ApplicationLauncherResourceEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherResourceUpdatedEvent;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;

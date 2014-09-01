@@ -37,7 +37,6 @@ import com.hypersocket.network.NetworkResourceColumns;
 import com.hypersocket.network.NetworkResourceService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
-import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.protocols.NetworkProtocol;

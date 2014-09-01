@@ -11,7 +11,6 @@ import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
-import com.hypersocket.network.NetworkResourcePermission;
 import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
