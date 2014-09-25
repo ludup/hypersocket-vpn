@@ -25,13 +25,11 @@ import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
-import com.hypersocket.client.rmi.NetworkResourceTemplate;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
 import com.hypersocket.client.rmi.ResourceService;
-import com.hypersocket.client.rmi.WebsiteResourceLauncher;
-import com.hypersocket.client.rmi.WebsiteResourceTemplate;
+import com.hypersocket.client.rmi.BrowserLauncher;
 import com.hypersocket.client.service.ServicePlugin;
 
 public class NetworkResourcesPlugin implements ServicePlugin {
@@ -125,8 +123,8 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 						ResourceImpl res = new ResourceImpl(name);
 						res.setLaunchable(true);
-						res.setResourceLauncher(new WebsiteResourceLauncher(
-								template));
+						res.setResourceLauncher(new BrowserLauncher(
+								template.getLaunchUrl()));
 						resourceRealm.addResource(res);
 					}
 
@@ -369,14 +367,14 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 							ResourceImpl app = new ResourceImpl(name);
 							app.setLaunchable(true);
 							app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
-									template, launcherTemplates.get(0)));
+									template.getHostname(), launcherTemplates.get(0)));
 							resourceRealm.addResource(app);
 						} else if(launcherTemplates.size() > 1) {
 							for(ApplicationLauncherTemplate t : launcherTemplates) {
 								ResourceImpl app = new ResourceImpl(name + " - " + t.getName());
 								app.setLaunchable(true);
 								app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
-										template, t));
+										template.getHostname(), t));
 								resourceRealm.addResource(app);
 							}
 						}
