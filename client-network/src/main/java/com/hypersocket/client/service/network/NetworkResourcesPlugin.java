@@ -216,6 +216,13 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 			JSONArray fields = (JSONArray) result.get("resources");
 
+			if(fields.size() == 0) {
+				if(log.isInfoEnabled()){
+					log.info("There are no resources to start");
+				}
+				return 0;
+			}
+			
 			int totalResources = 0;
 			int totalErrors = 0;
 
