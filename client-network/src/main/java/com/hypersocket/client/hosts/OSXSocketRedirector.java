@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.hypersocket.client.util.BashSilentSudoCommand;
 import com.hypersocket.client.util.CommandExecutor;
@@ -15,6 +16,11 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 	File redirectNke;
 	
 	public OSXSocketRedirector() throws IOException {
+		
+		File cwd = new File(System.getProperty("user.dir"));
+		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.archivesDir"))) {
+			cwd = new File(System.getProperty("hypersocket.bootstrap.archivesDir"), "x-client-network");
+		}
 		
 		if(Boolean.getBoolean("hypersocket.development")) {
 
@@ -49,7 +55,7 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			redirectCmd = new File("../client-install4j/bin/macosx/RedirectCMD");		
 		} else {
 			
-			redirectNke = new File("bin/macosx/RedirectNKE.kext");
+			redirectNke = new File(cwd, "bin/macosx/RedirectNKE.kext");
 			File tmpNke = File.createTempFile("nke", "tmp2");
 			
 			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
@@ -75,7 +81,7 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			}
 			
 			redirectNke = tmpNke;
-			redirectCmd = new File("bin/macosx/RedirectCMD");		
+			redirectCmd = new File(cwd, "bin/macosx/RedirectCMD");		
 		}
 		
 		

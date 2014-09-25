@@ -21,7 +21,7 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 		String arch = System.getProperty("os.arch");
 		File cwd = new File(System.getProperty("user.dir"));
 		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.archivesDir"))) {
-			cwd = new File(System.getProperty("hypersocket.bootstrap.archivesDir"), "client-network");
+			cwd = new File(System.getProperty("hypersocket.bootstrap.archivesDir"), "x-client-network");
 		}
 		File currentDriverFile = new File(cwd, "bin"
 				+ File.separator
