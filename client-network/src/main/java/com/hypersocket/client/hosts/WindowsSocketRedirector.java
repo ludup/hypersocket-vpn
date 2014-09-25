@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.hypersocket.client.util.CommandExecutor;
 
@@ -18,8 +19,11 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 		
 		String windowsDir = System.getenv("SystemRoot");
 		String arch = System.getProperty("os.arch");
-	
-		File currentDriverFile = new File("bin"
+		File cwd = new File(System.getProperty("user.dir"));
+		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.archivesDir"))) {
+			cwd = new File(System.getProperty("hypersocket.bootstrap.archivesDir"), "client-network");
+		}
+		File currentDriverFile = new File(cwd, "bin"
 				+ File.separator
 				+ "windows"
 				+ File.separator
@@ -27,7 +31,7 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 				+ File.separator
 				+ "ip_redirect_driver.sys");
 		
-		installCommand = new File("bin"
+		installCommand = new File(cwd, "bin"
 				+ File.separator
 				+ "windows"
 				+ File.separator
@@ -35,7 +39,7 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 				+ File.separator
 				+ "installer.exe");
 		
-		redirectCommand = new File("bin"
+		redirectCommand = new File(cwd, "bin"
 				+ File.separator
 				+ "windows"
 				+ File.separator
