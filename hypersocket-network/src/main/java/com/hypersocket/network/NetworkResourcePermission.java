@@ -12,10 +12,10 @@ import com.hypersocket.realm.RolePermission;
 
 public enum NetworkResourcePermission implements PermissionType {
 
-	CREATE("networkResource.create"),
 	READ("networkResource.read", RolePermission.READ),
-	UPDATE("networkResource.update"),
-	DELETE("networkResource.delete");
+	CREATE("networkResource.create", READ),
+	UPDATE("networkResource.update", READ),
+	DELETE("networkResource.delete", READ);
 	
 	private final String val;
 	

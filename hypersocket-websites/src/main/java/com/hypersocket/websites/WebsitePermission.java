@@ -12,10 +12,10 @@ import com.hypersocket.realm.RolePermission;
 
 public enum WebsitePermission implements PermissionType {
 	
-	CREATE("website.create"),
 	READ("website.read", RolePermission.READ),
-	UPDATE("website.update"),
-	DELETE("website.delete");
+	CREATE("website.create", READ),
+	UPDATE("website.update", READ),
+	DELETE("website.delete", READ);
 	
 	private final String val;
 	
