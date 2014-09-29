@@ -18,8 +18,8 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 	public OSXSocketRedirector() throws IOException {
 		
 		File cwd = new File(System.getProperty("user.dir"));
-		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.archivesDir"))) {
-			cwd = new File(System.getProperty("hypersocket.bootstrap.archivesDir"), "x-client-network");
+		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.distDir"))) {
+			cwd = new File(System.getProperty("hypersocket.bootstrap.distDir"), "x-client-network");
 		}
 		
 		if(Boolean.getBoolean("hypersocket.development")) {
