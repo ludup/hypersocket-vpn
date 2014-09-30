@@ -162,7 +162,6 @@ public class WebsiteResourceServiceImpl extends
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
 		website.setAdditionalUrls(additionalUrls);
-		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
 		createResource(website, new HashMap<String, String>());
