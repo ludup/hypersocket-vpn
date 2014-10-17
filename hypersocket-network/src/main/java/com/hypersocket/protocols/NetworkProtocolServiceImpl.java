@@ -161,6 +161,7 @@ public class NetworkProtocolServiceImpl extends
 		resource.setStartPort(startPort);
 		resource.setEndPort(endPort);
 		resource.setTransport(transport);
+		resource.setRealm(realm);
 
 		createResource(resource, new HashMap<String,String>());
 

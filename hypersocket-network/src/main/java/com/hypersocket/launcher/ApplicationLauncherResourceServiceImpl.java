@@ -147,6 +147,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 		resource.setExe(exe);
 		resource.setArgs(args);
 		resource.setOs(os);
+		resource.setRealm(realm);
 		
 		/**
 		 * Set any additional fields on your resource here before calling createResource. 
