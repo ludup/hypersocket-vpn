@@ -62,6 +62,10 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 		startNetworkResources();
 
+		if (log.isInfoEnabled()) {
+			log.info("Starting Websites");
+		}
+		
 		startWebsites();
 
 		return true;
@@ -82,7 +86,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 		} catch (IOException e) {
 			if (log.isErrorEnabled()) {
-				log.error("Could not start network resources", e);
+				log.error("Could not start website resources", e);
 			}
 		}
 	}
@@ -139,7 +143,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 				return success;
 			}
 
-		});
+		}, "websites");
 	}
 
 	private boolean createURLForwarding(String forwardedUrl,
@@ -203,7 +207,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 		}
 	}
 
-	protected int processResourceList(String json, ResourceMapper mapper)
+	protected int processResourceList(String json, ResourceMapper mapper, String resourceName)
 			throws IOException {
 		try {
 			JSONParser parser = new JSONParser();
@@ -218,7 +222,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 			if(fields.size() == 0) {
 				if(log.isInfoEnabled()){
-					log.info("There are no resources to start");
+					log.info("There are no " + resourceName + " to start");
 				}
 				return 0;
 			}
@@ -396,7 +400,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 				return success;
 			}
 
-		});
+		}, "network resources");
 	}
 
 	@Override

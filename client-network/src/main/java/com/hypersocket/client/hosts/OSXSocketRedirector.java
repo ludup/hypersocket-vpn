@@ -24,7 +24,7 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 		
 		if(Boolean.getBoolean("hypersocket.development")) {
 
-			redirectNke = new File("../client-install4j/bin/macosx/RedirectNKE.kext");
+			redirectNke = new File("../x-client-network/bin/macosx/RedirectNKE.kext");
 			File tmpNke = File.createTempFile("nke", "tmp2");
 			
 			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
@@ -52,41 +52,64 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			}
 			
 			redirectNke = tmpNke;
-			redirectCmd = new File("../client-install4j/bin/macosx/RedirectCMD");		
+			redirectCmd = new File("../x-client-network/bin/macosx/RedirectCMD");		
 		} else {
 			
 			redirectNke = new File(cwd, "bin/macosx/RedirectNKE.kext");
-			File tmpNke = File.createTempFile("nke", "tmp2");
+			redirectCmd = new File(cwd, "bin/macosx/RedirectCMD");	
+			File systemNke = new File("/Library/Extensions/RedirectNKE.kext");
 			
-			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
-			
-			CommandExecutor del = new CommandExecutor(
-					"rm",
-					"-rf",
-					tmpNke.getAbsolutePath());
-			
-			del.execute();
-			
-			FileUtils.copyDirectory(redirectNke, tmpNke);
-			tmpNke.deleteOnExit();
-			
-			CommandExecutor chmod = new CommandExecutor(
-					"chown",
-					"-R",
-					"root:wheel",
-					tmpNke.getAbsolutePath());
-			
-			if(chmod.execute()!=0) {
-				throw new IOException("Failed to chown temporary nke to root:wheel");
+			if(!systemNke.exists() || systemNke.lastModified()!=redirectNke.lastModified()) {
+				
+				if(systemNke.exists()) {
+					CommandExecutor del = new CommandExecutor(
+							"rm",
+							"-rf",
+							systemNke.getAbsolutePath());
+					
+					del.execute();
+				}
+				
+				FileUtils.copyDirectory(redirectNke, systemNke);
+				
+				systemNke.setLastModified(redirectNke.lastModified());
+				
+				CommandExecutor chmod = new CommandExecutor(
+						"chown",
+						"-R",
+						"root:wheel",
+						systemNke.getAbsolutePath());
+				
+				if(chmod.execute()!=0) {
+					throw new IOException("Failed to chown system nke to root:wheel");
+				}
+				
+				chmod = new CommandExecutor(
+						"chmod",
+						"-R",
+						"755",
+						systemNke.getAbsolutePath());
+				
+				if(chmod.execute()!=0) {
+					throw new IOException("Failed to chmod system nke to 755");
+				}
+				
+				
 			}
 			
-			redirectNke = tmpNke;
-			redirectCmd = new File(cwd, "bin/macosx/RedirectCMD");		
+			redirectNke = systemNke;
+				
 		}
-		
 		
 		CommandExecutor cmd;
 
+		cmd = new CommandExecutor(
+				"chmod",
+				"700",
+				redirectCmd.getAbsolutePath());
+		
+		cmd.execute();
+		
 		if(Boolean.getBoolean("hypersocket.development")) {
 			cmd = new BashSilentSudoCommand(System.getProperty("sudo.password").toCharArray(),
 					"kextload", 
