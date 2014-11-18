@@ -71,6 +71,9 @@
 					url: 'launchers/os',
 					nameAttr: 'name',
 					valueAttr: 'id',
+					getUrlData: function(data) {
+						return data.resources;
+					},
 					nameIsResourceKey: false,
 					changed: function(os) {
 					}
