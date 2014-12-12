@@ -1,6 +1,6 @@
 package com.hypersocket.launcher;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize(using = ApplicationLauncherOSSerializer.class)
 public enum ApplicationLauncherOS {

@@ -10,8 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hypersocket.network.handlers.ForwardingResource;
 
 @Entity
