@@ -66,7 +66,7 @@
 	$(document).ready(function() {
 				$('#contentLaunchers').localize();
 				
-				$('#osButton').selectButton({
+				var osSelect = $('#osButton').selectButton({
 					id: 'os',
 					url: 'launchers/os',
 					nameAttr: 'name',
@@ -131,8 +131,7 @@
 								$('#resourceName').val('');
 								$('#exe').val('');
 								$('#args').multipleTextInput({ values: []});
-								$('#os').val('0');
-								$('#os').trigger('change');
+								osSelect.setValue(0);
 
 								$('.launcherPropertiesTab').first().trigger('click');
 							},
@@ -142,7 +141,7 @@
 								resource.name = $('#resourceName').val();
 								resource.exe = $('#exe').val();
 								resource.args = fixSplit($('#args').multipleSelectValues());
-								resource.os = $('#os').val();
+								resource.os = osSelect.getValue();
 								return resource;
 							},
 							displayResource : function(resource) {
@@ -151,8 +150,8 @@
 								$('#resourceName').val(resource.name);
 								$('#exe').val(resource.exe);
 								$('#args').multipleTextInput({ values: splitFix(resource.args)});
-								$('#os').val(resource.os.id);
-								$('#os').trigger('change');
+								osSelect.setValue(resource.os.id);
+
 							},
 							complete : function() {
 								loadComplete();
