@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
-import com.hypersocket.launcher.events.ApplicationLauncherResourceCreatedEvent;
-import com.hypersocket.launcher.events.ApplicationLauncherResourceDeletedEvent;
-import com.hypersocket.launcher.events.ApplicationLauncherResourceUpdatedEvent;
+import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
+import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
+import com.hypersocket.launcher.events.ApplicationLauncherEvent;
+import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
@@ -66,9 +67,10 @@ public class ApplicationLauncherResourceServiceImpl extends
 				ApplicationLauncherResourcePermission.UPDATE, ApplicationLauncherResourcePermission.DELETE),
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		eventService.registerEvent(ApplicationLauncherResourceCreatedEvent.class, RESOURCE_BUNDLE, this);
-		eventService.registerEvent(ApplicationLauncherResourceUpdatedEvent.class, RESOURCE_BUNDLE, this);
-		eventService.registerEvent(ApplicationLauncherResourceDeletedEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherCreatedEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherUpdatedEvent.class, RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherDeletedEvent.class, RESOURCE_BUNDLE, this);
 		
 	}
 
@@ -89,34 +91,34 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherResourceCreatedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(ApplicationLauncherResource resource,
 			Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherResourceCreatedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherResourceUpdatedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(ApplicationLauncherResource resource, Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherResourceUpdatedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherResourceDeletedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(ApplicationLauncherResource resource,
 			Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherResourceDeletedEvent(this, resource, t, getCurrentSession()));
+		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override

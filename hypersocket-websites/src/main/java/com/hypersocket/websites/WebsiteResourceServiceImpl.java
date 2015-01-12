@@ -26,6 +26,7 @@ import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.session.Session;
 import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
 import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
+import com.hypersocket.websites.events.WebsiteResourceEvent;
 import com.hypersocket.websites.events.WebsiteResourceSessionClosed;
 import com.hypersocket.websites.events.WebsiteResourceSessionOpened;
 import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
@@ -70,6 +71,8 @@ public class WebsiteResourceServiceImpl extends
 				WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
+		eventService.registerEvent(WebsiteResourceEvent.class,
+				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(WebsiteResourceCreatedEvent.class,
 				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(WebsiteResourceUpdatedEvent.class,

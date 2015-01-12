@@ -1,14 +1,18 @@
 package com.hypersocket.websites.events;
 
-import com.hypersocket.resource.ResourceEvent;
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.hypersocket.resource.ResourceSessionEvent;
 import com.hypersocket.session.Session;
 import com.hypersocket.websites.WebsiteResource;
 import com.hypersocket.websites.WebsiteResourceServiceImpl;
 
-public class WebsiteResourceSessionEvent extends ResourceEvent {
+public class WebsiteResourceSessionEvent extends ResourceSessionEvent {
 
 	private static final long serialVersionUID = -3240036750533492092L;
 
+	public static final String EVENT_RESOURCE_KEY = "websiteSession.event";
+	
 	public static final String ATTR_URL = "attr.url";
 	
 	public WebsiteResourceSessionEvent(Object source, String resourceKey,
@@ -19,7 +23,7 @@ public class WebsiteResourceSessionEvent extends ResourceEvent {
 
 	public WebsiteResourceSessionEvent(Object source, String resourceKey, WebsiteResource resource, Throwable e,
 			Session session) {
-		super(source, resourceKey, resource, e, session);
+		super(source, resourceKey, resource.getName(), e, session);
 		addAttribute(ATTR_URL, resource.getLaunchUrl());
 	}
 
@@ -28,4 +32,7 @@ public class WebsiteResourceSessionEvent extends ResourceEvent {
 		return WebsiteResourceServiceImpl.RESOURCE_BUNDLE;
 	}
 
+	public String[] getResourceKeys() {
+		return ArrayUtils.add(super.getResourceKeys(), EVENT_RESOURCE_KEY);
+	}
 }

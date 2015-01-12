@@ -1,5 +1,7 @@
 package com.hypersocket.websites.events;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.hypersocket.session.Session;
 import com.hypersocket.websites.WebsiteResource;
 
@@ -22,4 +24,7 @@ public class WebsiteResourceCreatedEvent extends
 		super(source, EVENT_RESOURCE_KEY, resource, e, session);
 	}
 
+	public String[] getResourceKeys() {
+		return ArrayUtils.add(super.getResourceKeys(), EVENT_RESOURCE_KEY);
+	}
 }

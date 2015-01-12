@@ -1,11 +1,15 @@
 package com.hypersocket.protocols.events;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.hypersocket.protocols.NetworkProtocol;
-import com.hypersocket.realm.events.RealmResourceEvent;
+import com.hypersocket.realm.events.ResourceEvent;
 import com.hypersocket.session.Session;
 
-public class NetworkProtocolEvent extends RealmResourceEvent {
+public class NetworkProtocolEvent extends ResourceEvent {
 
+	public static final String EVENT_RESOURCE_KEY = "protocol.event";
+	
 	public static final String ATTR_PORTS = "attr.ports";
 	public static final String ATTR_TRANSPORT = "attr.transport";
 	
@@ -27,5 +31,8 @@ public class NetworkProtocolEvent extends RealmResourceEvent {
 		addAttribute(ATTR_PORTS, resource.getPortRange());
 		addAttribute(ATTR_TRANSPORT, resource.getTransport().toString());
 	}
-
+	
+	public String[] getResourceKeys() {
+		return ArrayUtils.add(super.getResourceKeys(), EVENT_RESOURCE_KEY);
+	}
 }

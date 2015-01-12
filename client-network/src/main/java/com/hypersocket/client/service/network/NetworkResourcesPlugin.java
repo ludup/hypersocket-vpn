@@ -25,6 +25,7 @@ import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
+import com.hypersocket.client.rmi.GUICallback;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
@@ -51,7 +52,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 	@Override
 	public boolean start(HypersocketClient<?> serviceClient,
-			ResourceService resourceService) {
+			ResourceService resourceService, GUICallback gui) {
 
 		this.serviceClient = serviceClient;
 		this.resourceService = resourceService;

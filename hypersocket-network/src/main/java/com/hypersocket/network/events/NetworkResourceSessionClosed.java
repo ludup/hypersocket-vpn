@@ -1,5 +1,7 @@
 package com.hypersocket.network.events;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.session.Session;
@@ -21,4 +23,7 @@ public class NetworkResourceSessionClosed extends NetworkResourceSessionEvent {
 		addAttribute(ATTR_BYTES_OUT, String.valueOf(totalBytesIn));
 	}
 
+	public String[] getResourceKeys() {
+		return ArrayUtils.add(super.getResourceKeys(), EVENT_RESOURCE_KEY);
+	}
 }

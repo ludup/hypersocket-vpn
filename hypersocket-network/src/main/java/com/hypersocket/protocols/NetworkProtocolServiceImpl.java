@@ -18,6 +18,7 @@ import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.protocols.events.NetworkProtocolCreatedEvent;
 import com.hypersocket.protocols.events.NetworkProtocolDeletedEvent;
+import com.hypersocket.protocols.events.NetworkProtocolEvent;
 import com.hypersocket.protocols.events.NetworkProtocolUpdatedEvent;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractResourceRepository;
@@ -73,6 +74,8 @@ public class NetworkProtocolServiceImpl extends
 		 * Register the events. All events have to be registerd so the system
 		 * knows about them.
 		 */
+		eventService.registerEvent(NetworkProtocolEvent.class,
+				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkProtocolCreatedEvent.class,
 				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkProtocolUpdatedEvent.class,

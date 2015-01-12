@@ -25,6 +25,7 @@ import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.events.NetworkResourceCreatedEvent;
 import com.hypersocket.network.events.NetworkResourceDeletedEvent;
+import com.hypersocket.network.events.NetworkResourceEvent;
 import com.hypersocket.network.events.NetworkResourceSessionClosed;
 import com.hypersocket.network.events.NetworkResourceSessionOpened;
 import com.hypersocket.network.events.NetworkResourceUpdatedEvent;
@@ -109,6 +110,8 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.UPDATE,
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
 
+		eventService.registerEvent(NetworkResourceEvent.class,
+				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkResourceCreatedEvent.class,
 				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkResourceUpdatedEvent.class,
