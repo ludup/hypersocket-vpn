@@ -9,7 +9,7 @@ public class NetworkResourceEvent extends AssignableResourceEvent {
 
 	private static final long serialVersionUID = 8248391425589891659L;
 
-	public static final String ATTR_RESOURCE_NAME = "attr.resourceName";
+	
 	public static final String ATTR_PROTOCOLS = "attr.protocols";
 	public static final String ATTR_HOSTNAME = "attr.destinationHost";
 	public static final String ATTR_DESTINATION_HOST = "attr.destinationHost";
