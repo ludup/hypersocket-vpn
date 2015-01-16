@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.hypersocket.client.util.CommandExecutor;
+import com.hypersocket.utils.CommandExecutor;
 
 public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 		SocketRedirector {

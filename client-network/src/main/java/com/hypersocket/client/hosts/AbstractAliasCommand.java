@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hypersocket.client.util.BashSilentSudoCommand;
-import com.hypersocket.client.util.CommandExecutor;
+import com.hypersocket.utils.CommandExecutor;
 
 public abstract class AbstractAliasCommand implements AliasCommand {
 
