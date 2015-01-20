@@ -23,6 +23,7 @@ import com.hypersocket.client.NetworkResource;
 import com.hypersocket.client.hosts.AbstractSocketRedirector;
 import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
+import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
 import com.hypersocket.client.rmi.GUICallback;
@@ -126,7 +127,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 						ResourceRealm resourceRealm = resourceService
 								.getResourceRealm(serviceClient.getHost());
 
-						ResourceImpl res = new ResourceImpl(name);
+						ResourceImpl res = new ResourceImpl(name + " - " + I18N.getResource("text.defaultBrowser"));
 						res.setLaunchable(true);
 						res.setResourceLauncher(new BrowserLauncher(
 								template.getLaunchUrl()));
@@ -375,13 +376,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 						}
 
 	
-						if(launcherTemplates.size() == 1) {
-							ResourceImpl app = new ResourceImpl(name);
-							app.setLaunchable(true);
-							app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
-									template.getHostname(), launcherTemplates.get(0)));
-							resourceRealm.addResource(app);
-						} else if(launcherTemplates.size() > 1) {
+						if(launcherTemplates.size() > 0) {
 							for(ApplicationLauncherTemplate t : launcherTemplates) {
 								ResourceImpl app = new ResourceImpl(name + " - " + t.getName());
 								app.setLaunchable(true);
