@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.hypersocket.client.util.BashSilentSudoCommand;
-import com.hypersocket.client.util.CommandExecutor;
+import com.hypersocket.utils.CommandExecutor;
 
 
 public class OSXSocketRedirector extends AbstractSocketRedirector {
@@ -16,9 +17,14 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 	
 	public OSXSocketRedirector() throws IOException {
 		
+		File cwd = new File(System.getProperty("user.dir"));
+		if(StringUtils.isNotBlank(System.getProperty("hypersocket.bootstrap.distDir"))) {
+			cwd = new File(System.getProperty("hypersocket.bootstrap.distDir"), "x-client-network");
+		}
+		
 		if(Boolean.getBoolean("hypersocket.development")) {
 
-			redirectNke = new File("../hypersocket-client/bin/macosx/RedirectNKE.kext");
+			redirectNke = new File("../x-client-network/bin/macosx/RedirectNKE.kext");
 			File tmpNke = File.createTempFile("nke", "tmp2");
 			
 			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
@@ -46,41 +52,64 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			}
 			
 			redirectNke = tmpNke;
-			redirectCmd = new File("../hypersocket-client/bin/macosx/RedirectCMD");		
+			redirectCmd = new File("../x-client-network/bin/macosx/RedirectCMD");		
 		} else {
 			
-			redirectNke = new File("bin/macosx/RedirectNKE.kext");
-			File tmpNke = File.createTempFile("nke", "tmp2");
+			redirectNke = new File(cwd, "bin/macosx/RedirectNKE.kext");
+			redirectCmd = new File(cwd, "bin/macosx/RedirectCMD");	
+			File systemNke = new File("/Library/Extensions/RedirectNKE.kext");
 			
-			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
-			
-			CommandExecutor del = new CommandExecutor(
-					"rm",
-					"-rf",
-					tmpNke.getAbsolutePath());
-			
-			del.execute();
-			
-			FileUtils.copyDirectory(redirectNke, tmpNke);
-			tmpNke.deleteOnExit();
-			
-			CommandExecutor chmod = new CommandExecutor(
-					"chown",
-					"-R",
-					"root:wheel",
-					tmpNke.getAbsolutePath());
-			
-			if(chmod.execute()!=0) {
-				throw new IOException("Failed to chown temporary nke to root:wheel");
+			if(!systemNke.exists() || systemNke.lastModified()!=redirectNke.lastModified()) {
+				
+				if(systemNke.exists()) {
+					CommandExecutor del = new CommandExecutor(
+							"rm",
+							"-rf",
+							systemNke.getAbsolutePath());
+					
+					del.execute();
+				}
+				
+				FileUtils.copyDirectory(redirectNke, systemNke);
+				
+				systemNke.setLastModified(redirectNke.lastModified());
+				
+				CommandExecutor chmod = new CommandExecutor(
+						"chown",
+						"-R",
+						"root:wheel",
+						systemNke.getAbsolutePath());
+				
+				if(chmod.execute()!=0) {
+					throw new IOException("Failed to chown system nke to root:wheel");
+				}
+				
+				chmod = new CommandExecutor(
+						"chmod",
+						"-R",
+						"755",
+						systemNke.getAbsolutePath());
+				
+				if(chmod.execute()!=0) {
+					throw new IOException("Failed to chmod system nke to 755");
+				}
+				
+				
 			}
 			
-			redirectNke = tmpNke;
-			redirectCmd = new File("bin/macosx/RedirectCMD");		
+			redirectNke = systemNke;
+				
 		}
-		
 		
 		CommandExecutor cmd;
 
+		cmd = new CommandExecutor(
+				"chmod",
+				"700",
+				redirectCmd.getAbsolutePath());
+		
+		cmd.execute();
+		
 		if(Boolean.getBoolean("hypersocket.development")) {
 			cmd = new BashSilentSudoCommand(System.getProperty("sudo.password").toCharArray(),
 					"kextload", 

@@ -1,0 +1,162 @@
+<!-- 
+	Replace any Launcher or Launchers with Capitalized name of your resources e.g. Application or Applications
+	Replace any launcher or launchers with lower case name of your resources e.g. application or applications
+ -->
+
+<div id="contentLaunchers">
+	<div class="modal" id="addLauncherForm" tabindex="-1" role="dialog" dialog-for="contentLaunchers">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.name.label"></label>
+							<div class="propertyValue col-xs-9">
+								<input type="text" class="form-control"
+									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
+								<div>
+									<span class="help-block" localize="launcher.name.info"></span>
+								</div>
+							</div>
+						</div>
+						
+						<div id="launcherProperties"></div>
+						<div id="tabProgram" class="dialogTab">
+							<div class="propertyItem form-group">
+								<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
+								<div class="propertyValue col-xs-9">
+									<div id="osButton"></div>
+									<div>
+										<span class="help-block" localize="launcher.os.info"></span>
+									</div>
+								</div>
+							</div>
+							<div class="propertyItem form-group">
+								<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
+								<div class="propertyValue col-xs-9">
+									<input type="text" class="form-control"
+										placeholder="" id="exe" maxlength="" name="exe" value="">
+									<div>
+										<span class="help-block" localize="launcher.exe.info"></span>
+									</div>
+								</div>
+							</div>
+							<div class="propertyItem form-group">
+								<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
+								<div class="propertyValue col-xs-9">
+									<div id="args"></div>
+									<div>
+										<span class="help-block" localize="launcher.args.info"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+					<input type="hidden" id="resourceId" name="resourceId" value="" />
+				</div>
+				<div class="modal-footer"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+				$('#contentLaunchers').localize();
+				
+				var osSelect = $('#osButton').selectButton({
+					id: 'os',
+					url: 'launchers/os',
+					nameAttr: 'name',
+					valueAttr: 'id',
+					getUrlData: function(data) {
+						return data.resources;
+					},
+					nameIsResourceKey: false,
+					changed: function(os) {
+					}
+				});
+
+				$('#args').multipleTextInput({ 
+					values : '',
+					disabled : false, 
+					resourceKey : 'args',
+					allowOrdering: true
+				});
+				
+				$('#launcherProperties').propertyPage({
+					url : 'launchers/template',
+					showButtons : false,
+					useTemplates : true,
+					canUpdate : currentMenu.canUpdate,
+					additionalTabs : [ {
+						id : "tabProgram",
+						name : getResource("tabProgram.label")
+					}]
+				});
+				
+				
+				
+				$('#contentLaunchers').ajaxResourcePage(
+						{
+							id : "Launcher",
+							tableUrl : "launchers/table",
+							title: getResource("launchers.label"),
+							icon: 'fa-rocket',
+							resourceUrl : "launchers/launcher",
+							fields : [ {
+								name : "name"
+							}],
+							resourceKey : "launcher",
+							canCreate: currentMenu.canCreate,
+							canUpdate: currentMenu.canUpdate,
+							canDelete: currentMenu.canDelete,
+							validate : function() {
+
+								if ($('#resourceName').val() == '') {
+									$('#addLauncherForm').resourceDialog(
+											'error', "error.nameRequired");
+									return false;
+								}
+
+								// TODO validate any of your other fields
+								
+								return true;
+							},
+							clearDialog : function() {
+								
+								$('#resourceId').val('');
+								$('#resourceName').val('');
+								$('#exe').val('');
+								$('#args').multipleTextInput({ values: []});
+								osSelect.setValue(0);
+
+								$('.launcherPropertiesTab').first().trigger('click');
+							},
+							createResource : function() {
+								resource = new Object();
+								resource.id = $('#resourceId').val();
+								resource.name = $('#resourceName').val();
+								resource.exe = $('#exe').val();
+								resource.args = fixSplit($('#args').multipleSelectValues());
+								resource.os = osSelect.getValue();
+								return resource;
+							},
+							displayResource : function(resource) {
+								
+								$('#resourceId').val(resource.id);
+								$('#resourceName').val(resource.name);
+								$('#exe').val(resource.exe);
+								$('#args').multipleTextInput({ values: splitFix(resource.args)});
+								osSelect.setValue(resource.os.id);
+
+							},
+							complete : function() {
+								loadComplete();
+							}
+						});
+
+			});
+</script>

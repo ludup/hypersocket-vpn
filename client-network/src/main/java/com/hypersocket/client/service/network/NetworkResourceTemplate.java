@@ -7,26 +7,35 @@
  ******************************************************************************/
 package com.hypersocket.client.service.network;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.hypersocket.client.NetworkResource;
 import com.hypersocket.client.i18n.I18N;
+import com.hypersocket.utils.IPAddressValidator;
 
-public class NetworkResourceTemplate {
+public class NetworkResourceTemplate implements Serializable {
+
+	private static final long serialVersionUID = -4065939088547544167L;
 
 	String name;
 	String hostname;
+	String destinationHostname;
 	String protocol;
 	int startPort;
 	int endPort;
 	String transport;
 	String status;
 	List<NetworkResource> liveResources = new ArrayList<NetworkResource>();
-	
-	NetworkResourceTemplate(String name, String hostname, String protocol, String transport, int startPort, int endPort) {
+
+	public NetworkResourceTemplate(String name, String hostname,
+			String destinationHostname, String protocol, String transport,
+			int startPort, int endPort) {
 		this.name = name;
-		this.hostname = hostname;
+		this.hostname = IPAddressValidator.getInstance().getGuaranteedHostname(
+				hostname);
+		this.destinationHostname = destinationHostname;
 		this.protocol = protocol;
 		this.startPort = startPort;
 		this.endPort = endPort;
@@ -40,9 +49,13 @@ public class NetworkResourceTemplate {
 	public String getHostname() {
 		return hostname;
 	}
-	
+
 	public String getProtocol() {
 		return protocol;
+	}
+
+	public String getDestinationHostname() {
+		return destinationHostname;
 	}
 
 	public int getStartPort() {
@@ -56,12 +69,12 @@ public class NetworkResourceTemplate {
 	public String getTransport() {
 		return transport;
 	}
-	
+
 	public String getStatus() {
-		if(liveResources.size() > 0) {
+		if (liveResources.size() > 0) {
 			StringBuffer buf = new StringBuffer();
-			for(NetworkResource r : liveResources) {
-				if(buf.length() > 0) {
+			for (NetworkResource r : liveResources) {
+				if (buf.length() > 0) {
 					buf.append(",");
 				}
 				buf.append(r.getLocalPort());
@@ -71,7 +84,7 @@ public class NetworkResourceTemplate {
 			return I18N.getResource("status.inactive");
 		}
 	}
-	
+
 	public void addLiveResource(NetworkResource resource) {
 		liveResources.add(resource);
 	}
@@ -79,5 +92,5 @@ public class NetworkResourceTemplate {
 	public List<NetworkResource> getLiveResources() {
 		return liveResources;
 	}
-	
+
 }

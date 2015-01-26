@@ -1,14 +1,19 @@
 package com.hypersocket.websites;
 
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hypersocket.events.EventService;
+import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -18,6 +23,13 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.session.Session;
+import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
+import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
+import com.hypersocket.websites.events.WebsiteResourceEvent;
+import com.hypersocket.websites.events.WebsiteResourceSessionClosed;
+import com.hypersocket.websites.events.WebsiteResourceSessionOpened;
+import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
 
 public class WebsiteResourceServiceImpl extends
 		AbstractAssignableResourceServiceImpl<WebsiteResource> implements
@@ -37,6 +49,9 @@ public class WebsiteResourceServiceImpl extends
 	@Autowired
 	MenuService menuService;
 
+	@Autowired
+	EventService eventService;
+
 	@PostConstruct
 	private void postConstruct() {
 
@@ -46,14 +61,29 @@ public class WebsiteResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		for (WebsitePermission p : WebsitePermission.values()) {
-			permissionService.registerPermission(p.getResourceKey(), cat);
+			permissionService.registerPermission(p, cat);
 		}
 
+		websiteRepository.loadPropertyTemplates("websiteResourceTemplate.xml");
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
 				"websites", "fa-globe", "websites", 100,
 				WebsitePermission.READ, WebsitePermission.CREATE,
 				WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
+
+		eventService.registerEvent(WebsiteResourceEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceCreatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceUpdatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceDeletedEvent.class,
+				RESOURCE_BUNDLE, this);
+
+		eventService.registerEvent(WebsiteResourceSessionOpened.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceSessionClosed.class,
+				RESOURCE_BUNDLE, this);
 
 	}
 
@@ -74,40 +104,41 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
+				getCurrentSession(), resource));
 
 	}
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource, Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource,
 			Throwable t) {
-		// TODO Auto-generated method stub
-
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
@@ -121,7 +152,7 @@ public class WebsiteResourceServiceImpl extends
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		updateResource(website);
+		updateResource(website, new HashMap<String, String>());
 		return website;
 	}
 
@@ -134,12 +165,34 @@ public class WebsiteResourceServiceImpl extends
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
 		website.setAdditionalUrls(additionalUrls);
-		website.getRoles().clear();
 		website.getRoles().addAll(roles);
 
-		createResource(website);
+		createResource(website, new HashMap<String, String>());
 
 		return website;
+	}
+
+	@Override
+	public void verifyResourceSession(WebsiteResource resource,
+			String hostname, int port, NetworkTransport transport,
+			Session session) throws AccessDeniedException {
+
+		for (URL url : resource.getUrls()) {
+			if (hostname.equalsIgnoreCase(url.getHost())) {
+				if (url.getPort() > -1) {
+					if (url.getPort() == port) {
+						return;
+					}
+				} else if (url.getDefaultPort() == port) {
+					return;
+				}
+			}
+		}
+
+		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
+				RESOURCE_BUNDLE, "error.urlNotAuthorized", hostname, port,
+				resource.getName()));
+
 	}
 
 }

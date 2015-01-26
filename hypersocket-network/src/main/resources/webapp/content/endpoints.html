@@ -9,12 +9,10 @@
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-					<div class="dialogError"></div>
-
 					<div class="propertyItem form-group">
 						<label class="col-md-3 control-label" localize="endpoint.resourceName.label"></label>
 						<div class="propertyValue col-md-9">
-							<input type="text" class="form-control propertyInput"
+							<input type="text" class="form-control"
 								placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
 							<div>
 								<span class="help-block" localize="endpoint.resourceName.info"></span>
@@ -27,7 +25,7 @@
 						<div class="propertyItem form-group">
 							<label class="col-md-3 control-label" localize="endpoint.hostname.label"></label>
 							<div class="propertyValue col-md-9">
-								<input type="text" class="form-control propertyInput"
+								<input type="text" class="form-control"
 									placeholder="" id="hostname" maxlength="" name="hostnaame" value="">
 								<div>
 									<span class="help-block" localize="endpoint.hostname.info"></span>
@@ -37,7 +35,7 @@
 						<div class="propertyItem form-group">
 							<label class="col-md-3 control-label" localize="endpoint.destinationHostname.label"></label>
 							<div class="propertyValue col-md-9">
-								<input type="text" class="form-control propertyInput"
+								<input type="text" class="form-control"
 									placeholder="" id="destinationHostname" maxlength="" name="destinationHostname" value="">
 								<div>
 									<span class="help-block" localize="endpoint.destinationHostname.info"></span>
@@ -47,6 +45,9 @@
 					</div>
 					<div id="tabProtocols" class="dialogTab">
 						<div id="protocols"></div>
+					</div>
+					<div id="tabApplications" class="dialogTab">
+						<div id="applications"></div>
 					</div>
 					<div id="tabRoles" class="dialogTab">
 						<div id="roles"></div>
@@ -64,28 +65,38 @@
 	$(document).ready(function() {
 		$('#contentEndpoints').localize();
 	
-		getJSON('networkProtocols', null, function(data) {
+		getJSON('networkProtocols/list', null, function(data) {
 			$('#protocols').multipleSelect({
 				values : data.resources,
 				selectedIsObjectList : true,
-				resourceKey : 'endpoint'
+				resourceKey : 'endpoint',
+				disabled: !currentMenu.canUpdate
 			});
 		});
 	
-		if(currentMenu.canCreate || currentMenu.canUpdate) {
-			getJSON('roles', null, function(data) {
+		getJSON('launchers/list', null, function(data) {
+			$('#applications').multipleSelect({
+				values : data.resources,
+				selectedIsObjectList : true,
+				resourceKey : 'endpoint',
+				disabled: !currentMenu.canUpdate
+			});
+		});
+		
+		getJSON('roles/list', null, function(data) {
 				$('#roles').multipleSelect({
 					values : data.resources,
 					selectedIsObjectList : true,
-					resourceKey : 'endpoint'
-				});
+					resourceKey : 'endpoint',
+					disabled: !currentMenu.canUpdate
 			});
-		}
+		});
 
 		$('#endpointProperties').propertyPage({
-			url : 'template/networkResource',
+			url : 'networkResources/template',
 			showButtons : false,
 			useTemplates : true,
+			displayMode: 'create',
 			canUpdate : currentMenu.canUpdate,
 			additionalTabs : [ {
 				id : "tabDetails",
@@ -94,6 +105,10 @@
 			{
 				id : "tabProtocols",
 				name : getResource("protocols.title")
+			},
+			{
+				id : "tabApplications",
+				name : getResource("launchers.title")
 			},
 			{
 				id : "tabRoles",
@@ -106,8 +121,8 @@
 						id : "EndPoints",
 						title: getResource('endpoints.title'),
 						icon: 'fa-sitemap',
-						tableUrl : "table/networkResources",
-						resourceUrl : "networkResource",
+						tableUrl : "networkResources/table",
+						resourceUrl : "networkResources/networkResource",
 						fields : [ { name: "name" }, 
 						           { name: "protocolsDesc" } ],
 						resourceKey : "endpoint",
@@ -128,12 +143,6 @@
 								return false;
 							}
 							
-							if(isValidIpv4Address($('#hostname').val())
-									|| isValidIpv6Address($('#hostname').val())) { 
-								$('#addResourceForm').resourceDialog('error', "error.hostnameIsIPAddress");
-								return false;
-							}  
-							
 							if(!isValidHostname($('#hostname').val())) { 
 				 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
 				 				return false;
@@ -149,13 +158,16 @@
 							}
 							return true;
 						},
-						clearDialog : function() {
+						clearDialog : function(create) {
 							$('#resourceName').val('');
 							$('#hostname').val('');
 							$('#destinationHostname').val('');
 							$('#protocols').multipleSelect();
+							$('#applications').multipleSelect();
 							$('#roles').multipleSelect();
 							$('#resourceId').val('');
+							
+							$('.endpointPropertiesTab').first().trigger('click');
 						},
 						createResource : function() {
 							resource = new Object();
@@ -164,30 +176,40 @@
 							resource.destinationHostname = $('#destinationHostname').val();
 							resource.protocols = $('#protocols')
 									.multipleSelectValues();
+							resource.launchers = $('#applications')
+									.multipleSelectValues();
 							resource.roles = $('#roles').multipleSelectValues();
 							resource.id = $('#resourceId').val();
 							return resource;
 						},
-						displayResource : function(resource) {
+						displayResource : function(resource, readOnly) {
 							$('#resourceName').val(resource.name);
+							$('#resourceName').attr('disabled', readOnly);
 							$('#hostname').val(resource.hostname);
+							$('#hostname').attr('disabled', readOnly);
 							$('#destinationHostname').val(resource.destinationHostname);
+							$('#destinationHostname').attr('disabled', readOnly);
 							$('#resourceId').val(resource.id);
 							$('#protocols').multipleSelect({
 								selected : resource.protocols,
 								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
+								resourceKey : 'endpoint',
+								disabled: readOnly
+							});
+							$('#applications').multipleSelect({
+								selected : resource.launchers,
+								selectedIsObjectList : true,
+								resourceKey : 'endpoint',
+								disabled: readOnly
 							});
 							$('#roles').multipleSelect({
 								selected : resource.roles,
 								selectedIsObjectList : true,
-								resourceKey : 'endpoint'
+								resourceKey : 'endpoint',
+								disabled: readOnly
 							});
 						},
 						complete : function() {
-
-							$('#resourceTabs').tabs();
-
 							loadComplete();
 						}
 					});

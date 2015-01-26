@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hypersocket</groupId>
 	<artifactId>hypersocket-vpn</artifactId>
-	<version>0.1.3</version>
+	<version>0.2.0</version>
 	<packaging>pom</packaging>
 	<name>Hypersocket - VPN Server</name>
 
@@ -41,6 +41,7 @@
 	</dependencies>
 
 	<build>
+		<directory>target</directory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -64,18 +65,18 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>com.nervepoint</groupId>
-				<artifactId>google-translate-v2-java-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>translate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>com.nervepoint</groupId> -->
+<!-- 				<artifactId>google-translate-v2-java-maven-plugin</artifactId> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<phase>process-resources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>translate</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -97,27 +98,26 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 				</plugin>
-				<plugin>
-					<groupId>com.nervepoint</groupId>
-					<artifactId>google-translate-v2-java-maven-plugin</artifactId>
-					<version>0.0.3</version>
-
-					<configuration>
-						<apikey>${googleAPIKey}</apikey>
-						<cacheTag>alpha</cacheTag>
-						<sourceDirectory>${basedir}/src/main/resources/i18n</sourceDirectory>
-						<targetDirectory>${basedir}/target/classes/i18n</targetDirectory>
-						<languages>da,nl,fi,fr,de,it,no,pl,ru,sv,es,ja</languages>
-						<failOnMissingSourceDir>false</failOnMissingSourceDir>
-					</configuration>
-					<executions>
-						<execution>
-							<goals>
-								<goal>translate</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+<!-- 				<plugin> -->
+<!-- 					<groupId>com.nervepoint</groupId> -->
+<!-- 					<artifactId>google-translate-v2-java-maven-plugin</artifactId> -->
+<!-- 					<version>0.0.3</version> -->
+<!-- 					<configuration> -->
+<!-- 						<apikey>${googleAPIKey}</apikey> -->
+<!-- 						<cacheTag>alpha</cacheTag> -->
+<!-- 						<sourceDirectory>${basedir}/src/main/resources/i18n</sourceDirectory> -->
+<!-- 						<targetDirectory>${basedir}/target/classes/i18n</targetDirectory> -->
+<!-- 						<languages>da,nl,fi,fr,de,it,no,pl,ru,sv,es,ja</languages> -->
+<!-- 						<failOnMissingSourceDir>false</failOnMissingSourceDir> -->
+<!-- 					</configuration> -->
+<!-- 					<executions> -->
+<!-- 						<execution> -->
+<!-- 							<goals> -->
+<!-- 								<goal>translate</goal> -->
+<!-- 							</goals> -->
+<!-- 						</execution> -->
+<!-- 					</executions> -->
+<!-- 				</plugin> -->
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>

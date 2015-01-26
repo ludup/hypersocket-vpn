@@ -8,12 +8,10 @@
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-					<div class="dialogError"></div>
-
 						<div class="propertyItem form-group">
 							<label class="col-md-3 control-label" localize="website.name.label"></label>
 							<div class="propertyValue col-md-9">
-								<input type="text" class="form-control propertyInput"
+								<input type="text" class="form-control"
 									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
 								<div>
 									<span class="help-block" localize="website.name.info"></span>
@@ -26,7 +24,7 @@
 							<div class="propertyItem form-group">
 								<label class="col-md-3 control-label" localize="website.url.label"></label>
 								<div class="propertyValue col-md-9">
-									<input type="text" class="form-control propertyInput"
+									<input type="text" class="form-control"
 										placeholder="" id="url" maxlength="" name="url" value="">
 									<div>
 										<span class="help-block" localize="website.url.info"></span>
@@ -59,7 +57,7 @@
 				$('#contentWebsites').localize();
 					
 				if(currentMenu.canCreate || currentMenu.canUpdate) {
-					getJSON('roles', null, function(data) {
+					getJSON('roles/list', null, function(data) {
 						$('#tabRoles').multipleSelect({
 							values : data.resources,
 							selectedIsObjectList : true,

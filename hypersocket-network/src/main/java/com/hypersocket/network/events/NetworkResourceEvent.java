@@ -1,7 +1,7 @@
 package com.hypersocket.network.events;
 
 import com.hypersocket.network.NetworkResource;
-import com.hypersocket.network.NetworkResourceService;
+import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.resource.AssignableResourceEvent;
 import com.hypersocket.session.Session;
 
@@ -9,7 +9,7 @@ public class NetworkResourceEvent extends AssignableResourceEvent {
 
 	private static final long serialVersionUID = 8248391425589891659L;
 
-	public static final String ATTR_RESOURCE_NAME = "attr.resourceName";
+	
 	public static final String ATTR_PROTOCOLS = "attr.protocols";
 	public static final String ATTR_HOSTNAME = "attr.destinationHost";
 	public static final String ATTR_DESTINATION_HOST = "attr.destinationHost";
@@ -33,7 +33,7 @@ public class NetworkResourceEvent extends AssignableResourceEvent {
 
 	@Override
 	public String getResourceBundle() {
-		return NetworkResourceService.RESOURCE_BUNDLE;
+		return NetworkResourceServiceImpl.RESOURCE_BUNDLE;
 	}
 
 }

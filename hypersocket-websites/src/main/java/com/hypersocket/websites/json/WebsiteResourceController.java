@@ -57,13 +57,13 @@ public class WebsiteResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<WebsiteResource>(
 					websiteService.getResources(sessionUtils
 							.getPrincipal(request)));
 		} finally {
-			clearAuthenticatedContext(websiteService);
+			clearAuthenticatedContext();
 		}
 	}
 
@@ -77,7 +77,7 @@ public class WebsiteResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request));
 
 		try {
 			return processDataTablesRequest(request,
@@ -139,11 +139,11 @@ public class WebsiteResourceController extends ResourceController {
 			ResourceNotFoundException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request));
 		try {
 			return websiteService.getResourceById(id);
 		} finally {
-			clearAuthenticatedContext(websiteService);
+			clearAuthenticatedContext();
 		}
 
 	}
@@ -159,7 +159,7 @@ public class WebsiteResourceController extends ResourceController {
 			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request));
 		try {
 
 			WebsiteResource newResource;
@@ -168,7 +168,7 @@ public class WebsiteResourceController extends ResourceController {
 
 			Set<Role> roles = new HashSet<Role>();
 			for (Long id : resource.getRoles()) {
-				roles.add(permissionService.getRoleById(id, realm));
+				roles.add(permissionRepository.getRoleById(id));
 			}
 
 			if (resource.getId() != null) {
@@ -215,7 +215,7 @@ public class WebsiteResourceController extends ResourceController {
 			UnauthorizedException, SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request), websiteService);
+				sessionUtils.getLocale(request));
 		try {
 
 			WebsiteResource resource = websiteService.getResourceById(id);

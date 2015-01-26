@@ -8,18 +8,27 @@
 package com.hypersocket.network;
 
 import com.hypersocket.permissions.PermissionType;
+import com.hypersocket.realm.RolePermission;
 
 public enum NetworkResourcePermission implements PermissionType {
 
-	CREATE("networkResource.create"),
-	READ("networkResource.read"),
-	UPDATE("networkResource.update"),
-	DELETE("networkResource.delete");
+	READ("networkResource.read", RolePermission.READ),
+	CREATE("networkResource.create", READ),
+	UPDATE("networkResource.update", READ),
+	DELETE("networkResource.delete", READ);
 	
 	private final String val;
 	
-	private NetworkResourcePermission(final String val) {
+	private PermissionType[] implies;
+	
+	private NetworkResourcePermission(final String val, PermissionType... implies) {
 		this.val = val;
+		this.implies = implies;
+	}
+
+	@Override
+	public PermissionType[] impliesPermissions() {
+		return implies;
 	}
 	
 	public String toString() {
@@ -29,5 +38,15 @@ public enum NetworkResourcePermission implements PermissionType {
 	@Override
 	public String getResourceKey() {
 		return val;
+	}
+	
+	@Override
+	public boolean isSystem() {
+		return false;
+	}
+
+	@Override
+	public boolean isHidden() {
+		return false;
 	}
 }

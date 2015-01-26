@@ -7,16 +7,22 @@
  ******************************************************************************/
 package upgrade;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.hypersocket.network.NetworkProtocol;
 import com.hypersocket.network.NetworkResourceRepository;
 import com.hypersocket.network.NetworkTransport;
+import com.hypersocket.protocols.NetworkProtocol;
+import com.hypersocket.protocols.NetworkProtocolRepository;
 
 public class network_0_DOT_0_DOT_1 implements Runnable {
 
 	@Autowired
 	NetworkResourceRepository networkRepository;
+	
+	@Autowired
+	NetworkProtocolRepository protocolRepository;
 	
 	@Override
 	public void run() {
@@ -57,7 +63,7 @@ public class network_0_DOT_0_DOT_1 implements Runnable {
 		protocol.setStartPort(start);
 		protocol.setEndPort(end);
 
-		networkRepository.saveProtocol(protocol);
+		protocolRepository.saveResource(protocol, new HashMap<String,String>());
 
 	}
 
