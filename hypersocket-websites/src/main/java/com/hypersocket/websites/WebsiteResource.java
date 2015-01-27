@@ -54,6 +54,9 @@ public class WebsiteResource extends ForwardingResource {
 	
 	private URL createURL(String url) {
 		try {
+			if(!url.startsWith("http")) {
+				url = "http://" + url;
+			}
 			return new URL(url);
 		} catch (MalformedURLException e) {
 			throw new IllegalStateException(e);
