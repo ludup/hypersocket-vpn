@@ -177,8 +177,8 @@ public class HostsFileManager {
 
 	private void loadFile(boolean processHypersocketEntries) throws IOException {
 		// Load and remove any aliases that might be left in the file
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				new FileInputStream(hostsFile)));
+		FileInputStream in = new FileInputStream(hostsFile);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
 		content.clear();
 		
@@ -193,7 +193,13 @@ public class HostsFileManager {
 			}
 
 		} finally {
-			reader.close();
+			try {
+				reader.close();
+			} catch(IOException ex){ }
+			
+			try {
+				in.close();
+			} catch(IOException ex){ }
 		}
 	}
 
