@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hypersocket.browser.BrowserLaunchable;
 import com.hypersocket.network.handlers.ForwardingResource;
 
 @Entity
