@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.SystemUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -232,7 +233,12 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers
 							.iterator();
 					
-					Version ourVersion = new Version(System.getProperty("os.version"));
+					// For now, ignore version if on Linux, os.version is not that useful for us
+					Version ourVersion = null;
+					if(!SystemUtils.IS_OS_LINUX) {
+						ourVersion = new Version(System.getProperty("os.version"));
+					}
+					
 					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
 					while (it3.hasNext()) {
 						JSONObject launcher = it3.next();
@@ -242,8 +248,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						
 						if(System.getProperty("os.name").startsWith(family)) {
 							Version launcherVersion = new Version(version);
-							
-							if(ourVersion.compareTo(launcherVersion) >= 0) {
+							if(ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
 								String n = (String) launcher.get("name");
 								String exe = (String) launcher.get("exe");
 								String args = (String) launcher.get("args");
@@ -251,8 +256,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, args));
 							}
 						}
-						
-			
 					}
 					JSONArray protocols = (JSONArray) field.get("protocols");
 

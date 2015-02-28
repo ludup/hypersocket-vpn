@@ -2,6 +2,7 @@ package com.hypersocket.client.hosts;
 
 import java.io.IOException;
 
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,13 +103,12 @@ public abstract class AbstractSocketRedirector implements SocketRedirector {
 	protected abstract String[] getStopArguments(String sourceAddr, int sourcePort, String destAddr, int destPort);
 
 	public static SocketRedirector getSystemRedirector() throws IOException {
-		
 		String osName = System.getProperty("os.name");
-		if (osName.startsWith("Mac")) {
+		if (SystemUtils.IS_OS_MAC_OSX) {
 			systemRedirector = new OSXSocketRedirector();
-		} else if (osName.startsWith("Linux")) {
+		} else if (SystemUtils.IS_OS_LINUX) {
 			systemRedirector = new LinuxSocketRedirector();
-		} else if (osName.startsWith("Windows")) {
+		} else if (SystemUtils.IS_OS_WINDOWS) {
 			systemRedirector = new WindowsSocketRedirector();
 		} else {
 			throw new IOException("Unsupported operating system " + osName);
