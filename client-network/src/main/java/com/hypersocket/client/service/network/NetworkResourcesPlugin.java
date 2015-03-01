@@ -456,7 +456,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				log.error("Failed to stop local forwarding redirect", e);
 			} finally {
 				localForwards.remove(key);
-				resourceForwards.remove(resource.getId());
+				resourceForwards.remove(resource.getId() + "/" + resource.getPort());
 			}
 		}
 	}
