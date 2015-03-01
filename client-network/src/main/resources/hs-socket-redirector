@@ -41,12 +41,18 @@ option=D
 if [ "$1" == "--add" ]; then
 	shift
 	option=I
+elif [ "$1" == "--clear" ]; then
+	shift
+	option=C
 fi
 
-# Delete all previous rules
-iptables-save | grep -v "${COMMENT}" | iptables-restore
 
 # Add the new rule
 if [ "${option}" = I ]; then
+	apply_rules $* D
 	apply_rules $* ${option}
+elif [ "${option}" = C ]; then
+	iptables-save | grep -v "${COMMENT}" | iptables-restore
+elif [ "${option}" = D ]; then
+	apply_rules $* D
 fi
