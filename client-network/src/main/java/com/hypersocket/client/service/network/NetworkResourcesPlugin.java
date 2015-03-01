@@ -42,7 +42,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	List<WebsiteResourceTemplate> websiteResources = new ArrayList<WebsiteResourceTemplate>();
 
 	Map<String, NetworkResource> localForwards = new HashMap<String, NetworkResource>();
-
+	Map<String, String> resourceForwards = new HashMap<String, String>();
+	
 	HypersocketClient<?> serviceClient;
 	HostsFileManager mgr;
 	SocketRedirector redirector;
@@ -300,29 +301,43 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 									NetworkResource resource = new NetworkResource(
 											id, hostname, destinationHostname,
 											(int) port, "tunnel");
-									boolean started = startLocalForwarding(resource);
-
-									if (log.isInfoEnabled()) {
-										log.info("Local forwarding to "
-												+ hostname
-												+ ":"
-												+ (started ? resource
-														.getLocalPort()
-														: resource.getPort())
-												+ (started ? " succeeded"
-														: " failed"));
-									}
-
-									if (started) {
-
-										ResourceProtocolImpl proto = new ResourceProtocolImpl(
-												pid, protocolName);
-										res.addProtocol(proto);
-										template.addLiveResource(resource);
-										
-										success = true;
+									
+									if(resourceForwards.containsKey(resource.getId())) {
+										if (log.isInfoEnabled()) {
+											log.info("Skipping forward for resource id " + resource.getId()
+													+ " because there is already an active forward");
+										}
+										continue;
 									} else {
-										break;
+										
+										if (log.isInfoEnabled()) {
+											log.info("Starting forward for resource id " + resource.getId());
+										}
+										
+										boolean started = startLocalForwarding(resource);
+	
+										if (log.isInfoEnabled()) {
+											log.info("Local forwarding to "
+													+ hostname
+													+ ":"
+													+ (started ? resource
+															.getLocalPort()
+															: resource.getPort())
+													+ (started ? " succeeded"
+															: " failed"));
+										}
+	
+										if (started) {
+	
+											ResourceProtocolImpl proto = new ResourceProtocolImpl(
+													pid, protocolName);
+											res.addProtocol(proto);
+											template.addLiveResource(resource);
+											
+											success = true;
+										} else {
+											break;
+										}
 									}
 
 								} catch (Exception e) {
@@ -406,6 +421,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				resource.setLocalInterface("127.0.0.1");
 
 				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
+				resourceForwards.put(resource.getId() + "/" + resource.getPort(), "127.0.0.1" + ":" + actualPort);
 				return true;
 			} catch (Exception e) {
 				log.error("Failed to redirect local forwarding", e);
@@ -419,18 +435,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	public void stopAllForwarding() {
 
-		for (NetworkResource resource : localForwards.values()) {
-			stopLocalForwarding(resource, false);
+		List<NetworkResource> tmp = new ArrayList<NetworkResource>(localForwards.values());
+		for (NetworkResource resource : tmp) {
+			stopLocalForwarding(resource);
 		}
-
-		localForwards.clear();
+		
 	}
 
-	public void stopLocalForwarding(NetworkResource resource) {
-		stopLocalForwarding(resource, true);
-	}
-
-	private void stopLocalForwarding(NetworkResource resource, boolean remove) {
+	private void stopLocalForwarding(NetworkResource resource) {
 		String key = resource.getLocalInterface() + ":"
 				+ resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
@@ -443,9 +455,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			} catch (Exception e) {
 				log.error("Failed to stop local forwarding redirect", e);
 			} finally {
-				if (remove) {
-					localForwards.remove(key);
-				}
+				localForwards.remove(key);
+				resourceForwards.remove(resource.getId());
 			}
 		}
 	}
