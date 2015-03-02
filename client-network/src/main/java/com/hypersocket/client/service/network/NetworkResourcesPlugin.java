@@ -171,8 +171,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				log.info("Local forwarding to "
 						+ hostname
 						+ ":"
-						+ (started ? resource.getLocalPort() : resource
-								.getPort())
+						+ resource.getPort()
 						+ (started ? " succeeded" : " failed"));
 			}
 
@@ -320,9 +319,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 											log.info("Local forwarding to "
 													+ hostname
 													+ ":"
-													+ (started ? resource
-															.getLocalPort()
-															: resource.getPort())
+													+ resource.getPort()
 													+ (started ? " succeeded"
 															: " failed"));
 										}
