@@ -143,17 +143,21 @@
 								return false;
 							}
 							
-							if(!isValidHostname($('#hostname').val())) { 
-				 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
-				 				return false;
-				 			}  
+							if(!isReplacementVariable($('#hostname').val())) {
+								if(!isValidHostname($('#hostname').val())) { 
+					 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
+					 				return false;
+					 			} 
+							}
 
 							if($('#destinationHostname').val().length > 0) {
-								if(!isValidHostname($('#destinationHostname').val()) 
-										&& !isValidIpv4Address($('#destinationHostname').val()) 
-										&& !isValidIpv6Address($('#destinationHostname').val())) {
-									$('#addResourceForm').resourceDialog('error', "error.destinationInvalid");
-					 				return false;
+								if(!isReplacementVariable($('#destinationHostname').val())) {
+									if(!isValidHostname($('#destinationHostname').val()) 
+											&& !isValidIpv4Address($('#destinationHostname').val()) 
+											&& !isValidIpv6Address($('#destinationHostname').val())) {
+										$('#addResourceForm').resourceDialog('error', "error.destinationInvalid");
+						 				return false;
+									}
 								}
 							}
 							return true;
