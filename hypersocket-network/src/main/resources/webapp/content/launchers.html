@@ -38,8 +38,7 @@
 							<div class="propertyItem form-group">
 								<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
 								<div class="propertyValue col-xs-9">
-									<input type="text" class="form-control"
-										placeholder="" id="exe" maxlength="" name="exe" value="">
+									<div id="exe"></div>
 									<div>
 										<span class="help-block" localize="launcher.exe.info"></span>
 									</div>
@@ -79,11 +78,16 @@
 					}
 				});
 
+				var exeInput = $('#exe').textInput({
+					variables: [ 'hostname', 'username']
+				});
+				
 				$('#args').multipleTextInput({ 
 					values : '',
 					disabled : false, 
 					resourceKey : 'args',
-					allowOrdering: true
+					allowOrdering: true,
+					variables: [ 'hostname', 'username']
 				});
 				
 				$('#launcherProperties').propertyPage({
@@ -129,7 +133,7 @@
 								
 								$('#resourceId').val('');
 								$('#resourceName').val('');
-								$('#exe').val('');
+								exeInput.setValue('');
 								$('#args').multipleTextInput({ values: []});
 								osSelect.setValue(0);
 
@@ -139,7 +143,7 @@
 								resource = new Object();
 								resource.id = $('#resourceId').val();
 								resource.name = $('#resourceName').val();
-								resource.exe = $('#exe').val();
+								resource.exe = exeInput.getValue();
 								resource.args = fixSplit($('#args').multipleSelectValues());
 								resource.os = osSelect.getValue();
 								return resource;
@@ -148,7 +152,7 @@
 								
 								$('#resourceId').val(resource.id);
 								$('#resourceName').val(resource.name);
-								$('#exe').val(resource.exe);
+								exeInput.setValue(resource.exe);
 								$('#args').multipleTextInput({ values: splitFix(resource.args)});
 								osSelect.setValue(resource.os.id);
 
