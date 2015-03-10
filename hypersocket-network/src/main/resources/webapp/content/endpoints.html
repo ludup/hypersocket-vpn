@@ -25,8 +25,7 @@
 						<div class="propertyItem form-group">
 							<label class="col-md-3 control-label" localize="endpoint.hostname.label"></label>
 							<div class="propertyValue col-md-9">
-								<input type="text" class="form-control"
-									placeholder="" id="hostname" maxlength="" name="hostnaame" value="">
+								<div id="hostname"></div>
 								<div>
 									<span class="help-block" localize="endpoint.hostname.info"></span>
 								</div>
@@ -35,8 +34,7 @@
 						<div class="propertyItem form-group">
 							<label class="col-md-3 control-label" localize="endpoint.destinationHostname.label"></label>
 							<div class="propertyValue col-md-9">
-								<input type="text" class="form-control"
-									placeholder="" id="destinationHostname" maxlength="" name="destinationHostname" value="">
+								<div id="destinationHostname"></div>
 								<div>
 									<span class="help-block" localize="endpoint.destinationHostname.info"></span>
 								</div>
@@ -92,6 +90,22 @@
 			});
 		});
 
+		var destinationHostname = $('#destinationHostname').textInput({
+			id: 'destination',
+			url: 'realms/realm/userVariables/' + $(document).data('session').currentRealm.id,
+			getUrlData: function(data) {
+				return data.resources;
+			}
+		});
+		
+		var hostnameInput = $('#hostname').textInput({
+			id: 'hostnameInput',
+			url: 'realms/realm/userVariables/' + $(document).data('session').currentRealm.id,
+			getUrlData: function(data) {
+				return data.resources;
+			}
+		});
+			
 		$('#endpointProperties').propertyPage({
 			url : 'networkResources/template',
 			showButtons : false,
@@ -137,24 +151,24 @@
 								return false;
 							}
 
-							if ($('#hostname').val() == '') {
+							if (hostnameInput.getValue() == '') {
 								$('#addResourceForm').resourceDialog('error',
 										"error.hostnameRequired");
 								return false;
 							}
 							
-							if(!isReplacementVariable($('#hostname').val())) {
-								if(!isValidHostname($('#hostname').val())) { 
+							if(!isReplacementVariable(hostnameInput.getValue())) {
+								if(!isValidHostname(hostnameInput.getValue())) { 
 					 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
 					 				return false;
 					 			} 
 							}
 
-							if($('#destinationHostname').val().length > 0) {
-								if(!isReplacementVariable($('#destinationHostname').val())) {
-									if(!isValidHostname($('#destinationHostname').val()) 
-											&& !isValidIpv4Address($('#destinationHostname').val()) 
-											&& !isValidIpv6Address($('#destinationHostname').val())) {
+							if(destinationHostname.getValue().length > 0) {
+								if(!isReplacementVariable(destinationHostname.getValue())) {
+									if(!isValidHostname(destinationHostname.getValue()) 
+											&& !isValidIpv4Address(destinationHostname.getValue()) 
+											&& !isValidIpv6Address(destinationHostname.getValue())) {
 										$('#addResourceForm').resourceDialog('error', "error.destinationInvalid");
 						 				return false;
 									}
@@ -164,8 +178,8 @@
 						},
 						clearDialog : function(create) {
 							$('#resourceName').val('');
-							$('#hostname').val('');
-							$('#destinationHostname').val('');
+							hostnameInput.setValue('');
+							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
 							$('#applications').multipleSelect();
 							$('#roles').multipleSelect();
@@ -176,8 +190,8 @@
 						createResource : function() {
 							resource = new Object();
 							resource.name = $('#resourceName').val();
-							resource.hostname = $('#hostname').val();
-							resource.destinationHostname = $('#destinationHostname').val();
+							resource.hostname = hostnameInput.getValue();
+							resource.destinationHostname = destinationHostname.getValue();
 							resource.protocols = $('#protocols')
 									.multipleSelectValues();
 							resource.launchers = $('#applications')
@@ -189,10 +203,15 @@
 						displayResource : function(resource, readOnly) {
 							$('#resourceName').val(resource.name);
 							$('#resourceName').attr('disabled', readOnly);
-							$('#hostname').val(resource.hostname);
-							$('#hostname').attr('disabled', readOnly);
-							$('#destinationHostname').val(resource.destinationHostname);
-							$('#destinationHostname').attr('disabled', readOnly);
+							hostnameInput.setValue(resource.hostname);
+							destinationHostname.setValue(resource.destinationHostname);
+							if(readOnly) {
+								hostnameInput.disable();
+								destinationHostname.disable();
+							} else {
+								hostnameInput.enable();
+								destinationHostname.enable();
+							}
 							$('#resourceId').val(resource.id);
 							$('#protocols').multipleSelect({
 								selected : resource.protocols,

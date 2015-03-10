@@ -213,6 +213,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	protected int processNetworkResources(String json) throws IOException {
 
+		final Map<String,String> variables = serviceClient.getUserVariables();
+		
 		return processResourceList(json, new ResourceMapper() {
 
 			@Override
@@ -220,10 +222,11 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 				boolean success = false;
 
+				
 				try {
-					String hostname = (String) field.get("hostname");
-					String destinationHostname = (String) field
-							.get("destinationHostname");
+					String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
+					String destinationHostname = serviceClient.processReplacements((String) field
+							.get("destinationHostname"), variables);
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
 
