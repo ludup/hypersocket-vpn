@@ -233,7 +233,7 @@ public class WebsiteResourceController extends ResourceController {
 			return new ResourceStatus<WebsiteResource>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
 					WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
-					"endpoint.deleted.info", preDeletedName));
+					"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
 			return new ResourceStatus<WebsiteResource>(false, e.getMessage());

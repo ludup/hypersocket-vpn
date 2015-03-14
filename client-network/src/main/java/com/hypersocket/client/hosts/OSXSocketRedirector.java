@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.hypersocket.Version;
 import com.hypersocket.client.util.BashSilentSudoCommand;
 import com.hypersocket.utils.CommandExecutor;
 
@@ -22,9 +23,20 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			cwd = new File(System.getProperty("hypersocket.bootstrap.distDir"), "x-client-network");
 		}
 		
+		Version v = new Version(System.getProperty("os.version"));
+		Version yosemite = new Version("10.10");
+		
+		String kextName = "RedirectNKE.kext";
+		String redirectName = "RedirectCMD";
+		
+		if(v.compareTo(yosemite) < 0) {
+			kextName = "unsigned/RedirectNKE.kext";
+			redirectName = "unsigned/RedirectCMD";
+		}
+		
 		if(Boolean.getBoolean("hypersocket.development")) {
 
-			redirectNke = new File("../x-client-network/bin/macosx/RedirectNKE.kext");
+			redirectNke = new File("../x-client-network/bin/macosx/" + kextName);
 			File tmpNke = File.createTempFile("nke", "tmp2");
 			
 			tmpNke = new File(tmpNke.getParentFile(), "RedirectNKE.kext");
@@ -52,11 +64,11 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 			}
 			
 			redirectNke = tmpNke;
-			redirectCmd = new File("../x-client-network/bin/macosx/RedirectCMD");		
+			redirectCmd = new File("../x-client-network/bin/macosx/" + redirectName);		
 		} else {
 			
-			redirectNke = new File(cwd, "bin/macosx/RedirectNKE.kext");
-			redirectCmd = new File(cwd, "bin/macosx/RedirectCMD");	
+			redirectNke = new File(cwd, "bin/macosx/" + kextName);
+			redirectCmd = new File(cwd, "bin/macosx/" + redirectName);	
 			File systemNke = new File("/Library/Extensions/RedirectNKE.kext");
 			
 			if(!systemNke.exists() || systemNke.lastModified()!=redirectNke.lastModified()) {
@@ -148,6 +160,5 @@ public class OSXSocketRedirector extends AbstractSocketRedirector {
 	protected String[] getLoggingArguments(boolean enabled) {
 		return new String[] { "log", enabled ? "on" : "off" };
 	}
-
 
 }

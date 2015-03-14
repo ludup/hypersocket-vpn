@@ -10,10 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.SystemUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +25,16 @@ import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
+import com.hypersocket.client.rmi.BrowserLauncher;
 import com.hypersocket.client.rmi.GUICallback;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
 import com.hypersocket.client.rmi.ResourceService;
-import com.hypersocket.client.rmi.BrowserLauncher;
-import com.hypersocket.client.service.ServicePlugin;
+import com.hypersocket.client.service.AbstractServicePlugin;
+import com.hypersocket.client.service.ResourceMapper;
 
-public class NetworkResourcesPlugin implements ServicePlugin {
+public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	static Logger log = LoggerFactory.getLogger(NetworkResourcesPlugin.class);
 
@@ -42,7 +42,8 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 	List<WebsiteResourceTemplate> websiteResources = new ArrayList<WebsiteResourceTemplate>();
 
 	Map<String, NetworkResource> localForwards = new HashMap<String, NetworkResource>();
-
+	Map<String, String> resourceForwards = new HashMap<String, String>();
+	
 	HypersocketClient<?> serviceClient;
 	HostsFileManager mgr;
 	SocketRedirector redirector;
@@ -170,8 +171,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 				log.info("Local forwarding to "
 						+ hostname
 						+ ":"
-						+ (started ? resource.getLocalPort() : resource
-								.getPort())
+						+ resource.getPort()
 						+ (started ? " succeeded" : " failed"));
 			}
 
@@ -209,52 +209,12 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 		}
 	}
 
-	protected int processResourceList(String json, ResourceMapper mapper, String resourceName)
-			throws IOException {
-		try {
-			JSONParser parser = new JSONParser();
-
-			JSONObject result = (JSONObject) parser.parse(json);
-
-			if (log.isDebugEnabled()) {
-				log.debug(result.toJSONString());
-			}
-
-			JSONArray fields = (JSONArray) result.get("resources");
-
-			if(fields.size() == 0) {
-				if(log.isInfoEnabled()){
-					log.info("There are no " + resourceName + " to start");
-				}
-				return 0;
-			}
-			
-			int totalResources = 0;
-			int totalErrors = 0;
-
-			@SuppressWarnings("unchecked")
-			Iterator<JSONObject> it = (Iterator<JSONObject>) fields.iterator();
-			while (it.hasNext()) {
-				if (!mapper.processResource(it.next())) {
-					totalErrors++;
-				}
-				totalResources++;
-			}
-
-			if (totalErrors == totalResources) {
-				// We could not start any resources
-				throw new IOException("No resources could be started!");
-			}
-
-			return totalErrors;
-
-		} catch (ParseException e) {
-			throw new IOException("Failed to parse network resources json", e);
-		}
-	}
+	
 
 	protected int processNetworkResources(String json) throws IOException {
 
+		final Map<String,String> variables = serviceClient.getUserVariables();
+		
 		return processResourceList(json, new ResourceMapper() {
 
 			@Override
@@ -262,10 +222,11 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 				boolean success = false;
 
+				
 				try {
-					String hostname = (String) field.get("hostname");
-					String destinationHostname = (String) field
-							.get("destinationHostname");
+					String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
+					String destinationHostname = serviceClient.processReplacements((String) field
+							.get("destinationHostname"), variables);
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
 
@@ -275,7 +236,12 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers
 							.iterator();
 					
-					Version ourVersion = new Version(System.getProperty("os.version"));
+					// For now, ignore version if on Linux, os.version is not that useful for us
+					Version ourVersion = null;
+					if(!SystemUtils.IS_OS_LINUX) {
+						ourVersion = new Version(System.getProperty("os.version"));
+					}
+					
 					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
 					while (it3.hasNext()) {
 						JSONObject launcher = it3.next();
@@ -285,8 +251,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 						
 						if(System.getProperty("os.name").startsWith(family)) {
 							Version launcherVersion = new Version(version);
-							
-							if(ourVersion.compareTo(launcherVersion) >= 0) {
+							if(ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
 								String n = (String) launcher.get("name");
 								String exe = (String) launcher.get("exe");
 								String args = (String) launcher.get("args");
@@ -294,8 +259,6 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, args));
 							}
 						}
-						
-			
 					}
 					JSONArray protocols = (JSONArray) field.get("protocols");
 
@@ -340,29 +303,41 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 									NetworkResource resource = new NetworkResource(
 											id, hostname, destinationHostname,
 											(int) port, "tunnel");
-									boolean started = startLocalForwarding(resource);
-
-									if (log.isInfoEnabled()) {
-										log.info("Local forwarding to "
-												+ hostname
-												+ ":"
-												+ (started ? resource
-														.getLocalPort()
-														: resource.getPort())
-												+ (started ? " succeeded"
-														: " failed"));
-									}
-
-									if (started) {
-
-										ResourceProtocolImpl proto = new ResourceProtocolImpl(
-												pid, protocolName);
-										res.addProtocol(proto);
-										template.addLiveResource(resource);
-										
-										success = true;
+									
+									if(resourceForwards.containsKey(resource.getId())) {
+										if (log.isInfoEnabled()) {
+											log.info("Skipping forward for resource id " + resource.getId()
+													+ " because there is already an active forward");
+										}
+										continue;
 									} else {
-										break;
+										
+										if (log.isInfoEnabled()) {
+											log.info("Starting forward for resource id " + resource.getId());
+										}
+										
+										boolean started = startLocalForwarding(resource);
+	
+										if (log.isInfoEnabled()) {
+											log.info("Local forwarding to "
+													+ hostname
+													+ ":"
+													+ resource.getPort()
+													+ (started ? " succeeded"
+															: " failed"));
+										}
+	
+										if (started) {
+	
+											ResourceProtocolImpl proto = new ResourceProtocolImpl(
+													pid, protocolName);
+											res.addProtocol(proto);
+											template.addLiveResource(resource);
+											
+											success = true;
+										} else {
+											break;
+										}
 									}
 
 								} catch (Exception e) {
@@ -446,6 +421,7 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 				resource.setLocalInterface("127.0.0.1");
 
 				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
+				resourceForwards.put(resource.getId() + "/" + resource.getPort(), "127.0.0.1" + ":" + actualPort);
 				return true;
 			} catch (Exception e) {
 				log.error("Failed to redirect local forwarding", e);
@@ -459,18 +435,14 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 
 	public void stopAllForwarding() {
 
-		for (NetworkResource resource : localForwards.values()) {
-			stopLocalForwarding(resource, false);
+		List<NetworkResource> tmp = new ArrayList<NetworkResource>(localForwards.values());
+		for (NetworkResource resource : tmp) {
+			stopLocalForwarding(resource);
 		}
-
-		localForwards.clear();
+		
 	}
 
-	public void stopLocalForwarding(NetworkResource resource) {
-		stopLocalForwarding(resource, true);
-	}
-
-	private void stopLocalForwarding(NetworkResource resource, boolean remove) {
+	private void stopLocalForwarding(NetworkResource resource) {
 		String key = resource.getLocalInterface() + ":"
 				+ resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
@@ -483,9 +455,8 @@ public class NetworkResourcesPlugin implements ServicePlugin {
 			} catch (Exception e) {
 				log.error("Failed to stop local forwarding redirect", e);
 			} finally {
-				if (remove) {
-					localForwards.remove(key);
-				}
+				localForwards.remove(key);
+				resourceForwards.remove(resource.getId() + "/" + resource.getPort());
 			}
 		}
 	}
