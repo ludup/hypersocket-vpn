@@ -188,18 +188,8 @@ public class WebsiteResourceController extends ResourceController {
 									: "resource.created.info", resource
 									.getName()));
 
-		} catch (ResourceChangeException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceCreationException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<WebsiteResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+		} catch (ResourceException e) {
+			return new ResourceStatus<WebsiteResource>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}

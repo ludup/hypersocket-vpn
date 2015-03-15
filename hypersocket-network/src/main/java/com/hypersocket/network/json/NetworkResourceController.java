@@ -222,18 +222,8 @@ public class NetworkResourceController extends ResourceController {
 									: "resource.created.info", resource
 									.getName()));
 
-		} catch (ResourceChangeException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceCreationException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+		} catch (ResourceException e) {
+			return new ResourceStatus<NetworkResource>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
