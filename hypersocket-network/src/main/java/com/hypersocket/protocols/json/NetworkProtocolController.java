@@ -29,8 +29,6 @@ import com.hypersocket.protocols.NetworkProtocolColumns;
 import com.hypersocket.protocols.NetworkProtocolService;
 import com.hypersocket.protocols.NetworkProtocolServiceImpl;
 import com.hypersocket.realm.Realm;
-import com.hypersocket.resource.ResourceChangeException;
-import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
