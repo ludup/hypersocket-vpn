@@ -42,8 +42,6 @@ import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.protocols.NetworkProtocolService;
 import com.hypersocket.realm.Realm;
-import com.hypersocket.resource.ResourceChangeException;
-import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
@@ -222,18 +220,8 @@ public class NetworkResourceController extends ResourceController {
 									: "resource.created.info", resource
 									.getName()));
 
-		} catch (ResourceChangeException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceCreationException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
-		} catch (ResourceNotFoundException e) {
-			return new ResourceStatus<NetworkResource>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+		} catch (ResourceException e) {
+			return new ResourceStatus<NetworkResource>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
