@@ -55,6 +55,7 @@ public class network_0_DOT_0_DOT_1 implements Runnable {
 //		createProtocol("IPP", NetworkTransport.BOTH, 631, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	void createProtocol(String name, NetworkTransport transport, Integer start,
 			Integer end) {
 		NetworkProtocol protocol = new NetworkProtocol();
