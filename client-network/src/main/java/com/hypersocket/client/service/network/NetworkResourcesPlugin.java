@@ -418,7 +418,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				redirector.startRedirecting(alias, resource.getPort(),
 						"127.0.0.1", actualPort);
 				resource.setLocalPort(actualPort);
-				resource.setLocalInterface("127.0.0.1");
+				resource.setAliasInterface(alias);
 
 				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
 				resourceForwards.put(resource.getId() + "/" + resource.getPort(), "127.0.0.1" + ":" + actualPort);
@@ -443,14 +443,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	}
 
 	private void stopLocalForwarding(NetworkResource resource) {
-		String key = resource.getLocalInterface() + ":"
+		String key = "127.0.0.1" + ":"
 				+ resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
 			serviceClient.getTransport().stopLocalForwarding(
-					resource.getLocalInterface(), resource.getLocalPort());
+					"127.0.0.1", resource.getLocalPort());
 			try {
-				redirector.stopRedirecting(resource.getLocalInterface(),
-						resource.getPort(), resource.getLocalInterface(),
+				redirector.stopRedirecting(resource.getAliasInterface(),
+						resource.getPort(), "127.0.0.1",
 						resource.getLocalPort());
 			} catch (Exception e) {
 				log.error("Failed to stop local forwarding redirect", e);
