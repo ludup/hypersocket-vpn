@@ -123,12 +123,14 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Override
 	public ApplicationLauncherResource updateResource(ApplicationLauncherResource resource,
-			String name, String exe, String args, ApplicationLauncherOS os) throws ResourceChangeException, AccessDeniedException {
+			String name, String exe, String args, ApplicationLauncherOS os, String startupScript, String shutdownScript) throws ResourceChangeException, AccessDeniedException {
 		
 		resource.setName(name);
 		resource.setExe(exe);
 		resource.setArgs(args);
 		resource.setOs(os);
+		resource.setStartupScript(startupScript);
+		resource.setShutdownScript(shutdownScript);
 		
 		/**
 		 * Set any additional fields on your resource here before calling updateResource. 
@@ -142,13 +144,15 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Override
 	public ApplicationLauncherResource createResource(String name,
-			Realm realm, String exe, String args, ApplicationLauncherOS os) throws ResourceCreationException, AccessDeniedException {
+			Realm realm, String exe, String args, ApplicationLauncherOS os, String startupScript, String shutdownScript) throws ResourceCreationException, AccessDeniedException {
 		
 		ApplicationLauncherResource resource = new ApplicationLauncherResource();
 		resource.setName(name);
 		resource.setExe(exe);
 		resource.setArgs(args);
 		resource.setOs(os);
+		resource.setStartupScript(startupScript);
+		resource.setShutdownScript(shutdownScript);
 		resource.setRealm(realm);
 		
 		/**

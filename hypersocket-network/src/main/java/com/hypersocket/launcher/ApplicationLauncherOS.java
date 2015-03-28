@@ -13,7 +13,8 @@ public enum ApplicationLauncherOS {
 	MACOSX_LION(5, "10.7", "Mac OS X Lion", "Mac OS X"),
 	MACOSX_MOUNTAIN_LION(6, "10.8", "Mac OS X Mountain Lion", "Mac OS X"),
 	MACOSX_MAVERICKS(7, "10.9", "Mac OS X Mavericks", "Mac OS X"),
-	MACOSX_YOSEMITE(8, "10.10", "Mac OS X Yosemite", "Mac OS X");
+	MACOSX_YOSEMITE(8, "10.10", "Mac OS X Yosemite", "Mac OS X"),
+	LINUX(9, "1.0", "Linux", "Linux");
 	
 	private final int val;
 	private final String version;
