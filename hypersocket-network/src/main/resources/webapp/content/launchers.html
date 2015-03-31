@@ -99,7 +99,7 @@
 				});
 
 				var exeInput = $('#exe').textInput({
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
 				$('#args').multipleTextInput({ 
@@ -107,7 +107,7 @@
 					disabled : false, 
 					resourceKey : 'args',
 					allowOrdering: true,
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
 				$('#launcherProperties').propertyPage({
@@ -126,12 +126,12 @@
 				
 				var startupScript = $('#startupScript').textInput({
 					inputType: 'textarea',
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 
 				var shutdownScript = $('#shutdownScript').textInput({
 					inputType: 'textarea',
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
 				$('#contentLaunchers').ajaxResourcePage(
