@@ -10,6 +10,8 @@ public class ApplicationLauncherResourceUpdate {
 	int os;
 	String exe;
 	String args;
+	String startupScript;
+	String shutdownScript;
 	
 	public ApplicationLauncherResourceUpdate() {
 		
@@ -53,6 +55,22 @@ public class ApplicationLauncherResourceUpdate {
 
 	public void setOs(int os) {
 		this.os = os;
+	}
+
+	public String getStartupScript() {
+		return startupScript;
+	}
+
+	public void setStartupScript(String startupScript) {
+		this.startupScript = startupScript;
+	}
+
+	public String getShutdownScript() {
+		return shutdownScript;
+	}
+
+	public void setShutdownScript(String shutdownScript) {
+		this.shutdownScript = shutdownScript;
 	}
 	
 	

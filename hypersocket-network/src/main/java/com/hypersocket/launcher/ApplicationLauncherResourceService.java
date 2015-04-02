@@ -16,11 +16,12 @@ public interface ApplicationLauncherResourceService extends
 	 */
 
 	ApplicationLauncherResource updateResource(ApplicationLauncherResource resourceById, String name,
-			String exe, String args, ApplicationLauncherOS os)
+			String exe, String args, ApplicationLauncherOS os, String startupScript, String shutdownScript)
 			throws ResourceChangeException, AccessDeniedException;
 
-	ApplicationLauncherResource createResource(String name, Realm realm, String exe,
-			String args, ApplicationLauncherOS os) throws ResourceCreationException,
-			AccessDeniedException;
+	ApplicationLauncherResource createResource(String name, Realm realm,
+			String exe, String args, ApplicationLauncherOS os,
+			String startupScript, String shutdownScript)
+			throws ResourceCreationException, AccessDeniedException;
 
 }

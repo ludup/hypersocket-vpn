@@ -150,11 +150,13 @@ public class ApplicationLauncherResourceController extends ResourceController {
 				newResource = resourceService.updateResource(
 						resourceService.getResourceById(resource.getId()),
 						resource.getName(), resource.getExe(),
-						resource.getArgs(), os);
+						resource.getArgs(), os, resource.getStartupScript(),
+						resource.getShutdownScript());
 			} else {
 				newResource = resourceService.createResource(
 						resource.getName(), realm, resource.getExe(),
-						resource.getArgs(), os);
+						resource.getArgs(), os, resource.getStartupScript(),
+						resource.getShutdownScript());
 			}
 			return new ResourceStatus<ApplicationLauncherResource>(
 					newResource,

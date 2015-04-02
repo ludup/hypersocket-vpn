@@ -54,6 +54,26 @@
 								</div>
 							</div>
 						</div>
+						<div id="tabScripts" class="dialogTab">
+							<div class="propertyItem form-group">
+								<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
+								<div class="propertyValue col-xs-9">
+									<div id="startupScript"></div>
+									<div>
+										<span class="help-block" localize="launcher.startup.info"></span>
+									</div>
+								</div>
+							</div>
+							<div class="propertyItem form-group">
+								<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
+								<div class="propertyValue col-xs-9">
+									<div id="shutdownScript"></div>
+									<div>
+										<span class="help-block" localize="launcher.shutdown.info"></span>
+									</div>
+								</div>
+							</div>
+						</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>
 				<div class="modal-footer"></div>
@@ -79,7 +99,7 @@
 				});
 
 				var exeInput = $('#exe').textInput({
-					variables: [ 'hostname', 'username']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
 				$('#args').multipleTextInput({ 
@@ -87,7 +107,7 @@
 					disabled : false, 
 					resourceKey : 'args',
 					allowOrdering: true,
-					variables: [ 'hostname', 'username']
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
 				$('#launcherProperties').propertyPage({
@@ -98,10 +118,21 @@
 					additionalTabs : [ {
 						id : "tabProgram",
 						name : getResource("tabProgram.label")
+					}, {
+						id : "tabScripts",
+						name : getResource("tabScripts.label")
 					}]
 				});
 				
-				
+				var startupScript = $('#startupScript').textInput({
+					inputType: 'textarea',
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
+				});
+
+				var shutdownScript = $('#shutdownScript').textInput({
+					inputType: 'textarea',
+					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
+				});
 				
 				$('#contentLaunchers').ajaxResourcePage(
 						{
@@ -136,7 +167,9 @@
 								exeInput.setValue('');
 								$('#args').multipleTextInput({ values: []});
 								osSelect.setValue(0);
-
+								startupScript.setValue("");
+								shutdownScript.setValue("");
+								
 								$('.launcherPropertiesTab').first().trigger('click');
 							},
 							createResource : function() {
@@ -146,6 +179,9 @@
 								resource.exe = exeInput.getValue();
 								resource.args = fixSplit($('#args').multipleSelectValues());
 								resource.os = osSelect.getValue();
+								resource.startupScript = startupScript.getValue();
+								resource.shutdownScript = shutdownScript.getValue();
+								
 								return resource;
 							},
 							displayResource : function(resource) {
@@ -155,7 +191,9 @@
 								exeInput.setValue(resource.exe);
 								$('#args').multipleTextInput({ values: splitFix(resource.args)});
 								osSelect.setValue(resource.os.id);
-
+								startupScript.setValue(resource.startupScript);
+								shutdownScript.setValue(resource.shutdownScript);
+								
 							},
 							complete : function() {
 								loadComplete();
