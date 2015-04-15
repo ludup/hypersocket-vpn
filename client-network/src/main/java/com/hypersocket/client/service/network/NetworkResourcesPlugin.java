@@ -257,7 +257,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								String args = (String) launcher.get("args");
 								String startupScript = (String) launcher.get("startupScript");
 								String shutdownScript = (String) launcher.get("shutdownScript");
-								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, startupScript, shutdownScript, args));
+								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, startupScript, shutdownScript, variables, args));
 							}
 						}
 					}
