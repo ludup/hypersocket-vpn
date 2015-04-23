@@ -109,6 +109,14 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
+		
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
+				"myNetworks", "fa-sitemap", "myNetworkResources", 200) {
+			public boolean canRead() {
+				return resourceRepository
+						.getAssignableResourceCount(realmService.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
+			}
+		}, MenuService.MENU_MY_RESOURCES);
 
 		eventService.registerEvent(NetworkResourceEvent.class,
 				NetworkResourceServiceImpl.RESOURCE_BUNDLE, this);

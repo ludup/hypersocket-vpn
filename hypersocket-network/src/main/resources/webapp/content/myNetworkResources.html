@@ -1,0 +1,36 @@
+<div id="tabNetworks">
+
+</div>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabNetworks').localize();
+		
+		$('#tabNetworks').ajaxResourcePage(
+				{
+					id : "myNetworks",
+					tableUrl : "networkResources/personalTable",
+					title: getResource("endpoints.title"),
+					icon: 'fa-sitemap',
+					resourceUrl : "mount",
+					fields : [ {
+						name : "name"
+					},
+					{
+						name : "hostname"
+					},
+					{
+						name : "protocolsDesc",
+					}],
+					resourceKey : "endpoint",
+					canCreate: false,
+					canUpdate: false,
+					canDelete: false,
+					complete : function() {
+						loadComplete();
+					}
+				});
+
+	});
+	
+</script>
