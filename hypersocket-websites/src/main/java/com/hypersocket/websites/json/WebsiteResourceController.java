@@ -1,5 +1,6 @@
 package com.hypersocket.websites.json;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,7 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.realm.Realm;
+import com.hypersocket.resource.ResourceColumns;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
@@ -60,6 +62,50 @@ public class WebsiteResourceController extends ResourceController {
 			return new ResourceList<WebsiteResource>(
 					websiteService.getResources(sessionUtils
 							.getPrincipal(request)));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "websites/personal", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult personalWebsites(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return processDataTablesRequest(request,
+					new DataTablesPageProcessor() {
+
+						@Override
+						public Column getColumn(int col) {
+							return ResourceColumns.values()[col];
+						}
+
+						@Override
+						public Collection<?> getPage(String searchPattern,
+								int start, int length, ColumnSort[] sorting)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return websiteService.searchPersonalResources(
+									sessionUtils.getPrincipal(request),
+									searchPattern, start, length, sorting);
+						}
+
+						@Override
+						public Long getTotalCount(String searchPattern)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return websiteService.getPersonalResourceCount(
+									sessionUtils.getPrincipal(request),
+									searchPattern);
+						}
+					});
 		} finally {
 			clearAuthenticatedContext();
 		}
