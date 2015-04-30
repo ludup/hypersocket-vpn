@@ -19,6 +19,7 @@ import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.realm.Realm;
+import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
@@ -52,6 +53,9 @@ public class WebsiteResourceServiceImpl extends
 	@Autowired
 	EventService eventService;
 
+	@Autowired
+	RealmService realmService;
+
 	@PostConstruct
 	private void postConstruct() {
 
@@ -71,8 +75,16 @@ public class WebsiteResourceServiceImpl extends
 				WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
-		eventService.registerEvent(WebsiteResourceEvent.class,
-				RESOURCE_BUNDLE, this);
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
+				"myWebsites", "fa-globe", "myWebsites", 200) {
+			public boolean canRead() {
+				return websiteRepository.getAssignableResourceCount(realmService
+						.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
+			}
+		}, MenuService.MENU_MY_RESOURCES);
+
+		eventService.registerEvent(WebsiteResourceEvent.class, RESOURCE_BUNDLE,
+				this);
 		eventService.registerEvent(WebsiteResourceCreatedEvent.class,
 				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(WebsiteResourceUpdatedEvent.class,

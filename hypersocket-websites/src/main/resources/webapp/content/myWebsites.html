@@ -1,0 +1,33 @@
+<div id="tabWebsites">
+
+</div>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$('#tabWebsites').localize();
+		
+		$('#tabWebsites').ajaxResourcePage(
+				{
+					id : "myWebsites",
+					tableUrl : "websites/personal",
+					title: getResource("websites.title"),
+					icon: 'fa-globe',
+					resourceUrl : "websites/website",
+					fields : [ {
+						name : "name"
+					},
+					{
+						name : "launchUrl"	
+					}],
+					resourceKey : "website",
+					canCreate: false,
+					canUpdate: false,
+					canDelete: false,
+					complete : function() {
+						loadComplete();
+					}
+				});
+
+	});
+	
+</script>
