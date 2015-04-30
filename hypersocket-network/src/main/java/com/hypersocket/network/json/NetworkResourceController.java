@@ -7,6 +7,7 @@
  ******************************************************************************/
 package com.hypersocket.network.json;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.protocols.NetworkProtocolService;
 import com.hypersocket.realm.Realm;
+import com.hypersocket.resource.ResourceColumns;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
@@ -57,8 +59,8 @@ public class NetworkResourceController extends ResourceController {
 	NetworkResourceService networkService;
 
 	@Autowired
-	NetworkProtocolService protocolService; 
-	
+	NetworkProtocolService protocolService;
+
 	@Autowired
 	ApplicationLauncherResourceService launcherService;
 
@@ -68,7 +70,8 @@ public class NetworkResourceController extends ResourceController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<NetworkResource> getResourcesByCurrentPrincipal(
 			HttpServletRequest request, HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
@@ -82,12 +85,57 @@ public class NetworkResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
+	@RequestMapping(value = "networkResources/personalTable", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult personalNetworks(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return processDataTablesRequest(request,
+					new DataTablesPageProcessor() {
+
+						@Override
+						public Column getColumn(int col) {
+							return ResourceColumns.values()[col];
+						}
+
+						@Override
+						public Collection<?> getPage(String searchPattern,
+								int start, int length, ColumnSort[] sorting)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return networkService.searchPersonalResources(
+									sessionUtils.getPrincipal(request),
+									searchPattern, start, length, sorting);
+						}
+
+						@Override
+						public Long getTotalCount(String searchPattern)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return networkService.getPersonalResourceCount(
+									sessionUtils.getPrincipal(request),
+									searchPattern);
+						}
+					});
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
 	@RequestMapping(value = "networkResources/list", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceList<NetworkResource> getResources(
 			HttpServletRequest request, HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
@@ -99,14 +147,15 @@ public class NetworkResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "networkResources/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public DataTablesResult tableNetworkResources(final HttpServletRequest request,
-			HttpServletResponse response) throws AccessDeniedException,
-			UnauthorizedException, SessionTimeoutException {
+	public DataTablesResult tableNetworkResources(
+			final HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
@@ -121,14 +170,22 @@ public class NetworkResourceController extends ResourceController {
 						}
 
 						@Override
-						public List<?> getPage(String searchPattern, int start, int length,
-								ColumnSort[] sorting) throws UnauthorizedException, AccessDeniedException {
-							return networkService.searchResources(sessionUtils.getCurrentRealm(request), searchPattern, start, length, sorting);
+						public List<?> getPage(String searchPattern, int start,
+								int length, ColumnSort[] sorting)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return networkService.searchResources(
+									sessionUtils.getCurrentRealm(request),
+									searchPattern, start, length, sorting);
 						}
-						
+
 						@Override
-						public Long getTotalCount(String searchPattern) throws UnauthorizedException, AccessDeniedException {
-							return networkService.getResourceCount(sessionUtils.getCurrentRealm(request), searchPattern);
+						public Long getTotalCount(String searchPattern)
+								throws UnauthorizedException,
+								AccessDeniedException {
+							return networkService.getResourceCount(
+									sessionUtils.getCurrentRealm(request),
+									searchPattern);
 						}
 					});
 		} finally {
@@ -140,9 +197,9 @@ public class NetworkResourceController extends ResourceController {
 	@RequestMapping(value = "networkResources/template", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<PropertyCategory> getResourceTemplate(HttpServletRequest request)
-			throws AccessDeniedException, UnauthorizedException,
-			SessionTimeoutException {
+	public ResourceList<PropertyCategory> getResourceTemplate(
+			HttpServletRequest request) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
 
@@ -150,9 +207,9 @@ public class NetworkResourceController extends ResourceController {
 			return new ResourceList<PropertyCategory>();
 		} finally {
 			clearAuthenticatedContext();
-		}	
+		}
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "networkResources/networkResource/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
@@ -179,7 +236,8 @@ public class NetworkResourceController extends ResourceController {
 	public ResourceStatus<NetworkResource> createOrUpdateNetworkResource(
 			HttpServletRequest request, HttpServletResponse response,
 			@RequestBody NetworkResourceUpdate resource)
-			throws AccessDeniedException, UnauthorizedException, SessionTimeoutException {
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
@@ -193,12 +251,12 @@ public class NetworkResourceController extends ResourceController {
 			for (Long id : resource.getProtocols()) {
 				protocols.add(protocolService.getResourceById(id));
 			}
-			
+
 			Set<ApplicationLauncherResource> launchers = new HashSet<ApplicationLauncherResource>();
-			for(Long id : resource.getLaunchers()) {
+			for (Long id : resource.getLaunchers()) {
 				launchers.add(launcherService.getResourceById(id));
 			}
-			
+
 			Set<Role> roles = new HashSet<Role>();
 			for (Long id : resource.getRoles()) {
 				roles.add(permissionRepository.getRoleById(id));
@@ -207,16 +265,19 @@ public class NetworkResourceController extends ResourceController {
 			if (resource.getId() != null) {
 				newResource = networkService.updateResource(
 						networkService.getResourceById(resource.getId()),
-						resource.getName(), resource.getHostname(), resource.getDestinationHostname(), protocols,
+						resource.getName(), resource.getHostname(),
+						resource.getDestinationHostname(), protocols,
 						launchers, roles);
 			} else {
 				newResource = networkService.createResource(resource.getName(),
-						resource.getHostname(), resource.getDestinationHostname(), protocols, launchers, roles, realm);
+						resource.getHostname(),
+						resource.getDestinationHostname(), protocols,
+						launchers, roles, realm);
 			}
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
-							NetworkResourceServiceImpl.RESOURCE_BUNDLE, resource
-									.getId() != null ? "resource.updated.info"
+							NetworkResourceServiceImpl.RESOURCE_BUNDLE,
+							resource.getId() != null ? "resource.updated.info"
 									: "resource.created.info", resource
 									.getName()));
 
