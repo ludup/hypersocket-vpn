@@ -13,6 +13,7 @@ import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
+import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
@@ -32,6 +33,8 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	public static final String RESOURCE_BUNDLE = "LauncherService";
 
+	public static final String APPLICATION_LAUNCHER_ACTIONS = "applicationLauncherActions";
+
 	@Autowired
 	ApplicationLauncherResourceRepository repository;
 
@@ -46,7 +49,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Autowired
 	EventService eventService;
-	
+
 	@PostConstruct
 	private void postConstruct() {
 
@@ -56,22 +59,37 @@ public class ApplicationLauncherResourceServiceImpl extends
 				RESOURCE_BUNDLE, "category.lauchers");
 
 		repository.loadPropertyTemplates("applicationLauncherTemplate.xml");
-		
-		for (ApplicationLauncherResourcePermission p : ApplicationLauncherResourcePermission.values()) {
-			permissionService.registerPermission(p,cat);
+
+		for (ApplicationLauncherResourcePermission p : ApplicationLauncherResourcePermission
+				.values()) {
+			permissionService.registerPermission(p, cat);
 		}
 
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
 				"launchers", "fa-desktop", "launchers", 9999,
-				ApplicationLauncherResourcePermission.READ, ApplicationLauncherResourcePermission.CREATE,
-				ApplicationLauncherResourcePermission.UPDATE, ApplicationLauncherResourcePermission.DELETE),
+				ApplicationLauncherResourcePermission.READ,
+				ApplicationLauncherResourcePermission.CREATE,
+				ApplicationLauncherResourcePermission.UPDATE,
+				ApplicationLauncherResourcePermission.DELETE),
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		eventService.registerEvent(ApplicationLauncherEvent.class, RESOURCE_BUNDLE, this);
-		eventService.registerEvent(ApplicationLauncherCreatedEvent.class, RESOURCE_BUNDLE, this);
-		eventService.registerEvent(ApplicationLauncherUpdatedEvent.class, RESOURCE_BUNDLE, this);
-		eventService.registerEvent(ApplicationLauncherDeletedEvent.class, RESOURCE_BUNDLE, this);
-		
+		menuService.registerExtendableTable(APPLICATION_LAUNCHER_ACTIONS);
+
+		menuService.registerTableAction(APPLICATION_LAUNCHER_ACTIONS,
+				new AbstractTableAction("exportTemplate", "fa-paper-plane-o",
+						"exportApplicationTemplate",
+						ApplicationLauncherResourcePermission.UPDATE, 0, null,
+						"showExportAction"));
+
+		eventService.registerEvent(ApplicationLauncherEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherCreatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherUpdatedEvent.class,
+				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(ApplicationLauncherDeletedEvent.class,
+				RESOURCE_BUNDLE, this);
+
 	}
 
 	@Override
@@ -90,62 +108,78 @@ public class ApplicationLauncherResourceServiceImpl extends
 	}
 
 	@Override
-	protected void fireResourceCreationEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this, getCurrentSession(), resource));
+	protected void fireResourceCreationEvent(
+			ApplicationLauncherResource resource) {
+		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
-	protected void fireResourceCreationEvent(ApplicationLauncherResource resource,
-			Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this, resource, t, getCurrentSession()));
+	protected void fireResourceCreationEvent(
+			ApplicationLauncherResource resource, Throwable t) {
+		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this, getCurrentSession(), resource));
+		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
-	protected void fireResourceUpdateEvent(ApplicationLauncherResource resource, Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this, resource, t, getCurrentSession()));
+	protected void fireResourceUpdateEvent(
+			ApplicationLauncherResource resource, Throwable t) {
+		eventService.publishEvent(new ApplicationLauncherUpdatedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
-	protected void fireResourceDeletionEvent(ApplicationLauncherResource resource) {
-		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this, getCurrentSession(), resource));
+	protected void fireResourceDeletionEvent(
+			ApplicationLauncherResource resource) {
+		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this,
+				getCurrentSession(), resource));
 	}
 
 	@Override
-	protected void fireResourceDeletionEvent(ApplicationLauncherResource resource,
-			Throwable t) {
-		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this, resource, t, getCurrentSession()));
+	protected void fireResourceDeletionEvent(
+			ApplicationLauncherResource resource, Throwable t) {
+		eventService.publishEvent(new ApplicationLauncherDeletedEvent(this,
+				resource, t, getCurrentSession()));
 	}
 
 	@Override
-	public ApplicationLauncherResource updateResource(ApplicationLauncherResource resource,
-			String name, String exe, String args, ApplicationLauncherOS os, String startupScript, String shutdownScript) throws ResourceChangeException, AccessDeniedException {
-		
+	public ApplicationLauncherResource updateResource(
+			ApplicationLauncherResource resource, String name, String exe,
+			String args, ApplicationLauncherOS os, String startupScript,
+			String shutdownScript) throws ResourceChangeException,
+			AccessDeniedException {
+
 		resource.setName(name);
 		resource.setExe(exe);
 		resource.setArgs(args);
 		resource.setOs(os);
 		resource.setStartupScript(startupScript);
 		resource.setShutdownScript(shutdownScript);
-		
+
 		/**
-		 * Set any additional fields on your resource here before calling updateResource. 
+		 * Set any additional fields on your resource here before calling
+		 * updateResource.
 		 * 
-		 * Remember to fill in the fire*Event methods to ensure events are fired for all operations.
+		 * Remember to fill in the fire*Event methods to ensure events are fired
+		 * for all operations.
 		 */
-		updateResource(resource, new HashMap<String,String>());
-		
+		updateResource(resource, new HashMap<String, String>());
+
 		return resource;
 	}
 
 	@Override
-	public ApplicationLauncherResource createResource(String name,
-			Realm realm, String exe, String args, ApplicationLauncherOS os, String startupScript, String shutdownScript) throws ResourceCreationException, AccessDeniedException {
-		
+	public ApplicationLauncherResource createResource(String name, Realm realm,
+			String exe, String args, ApplicationLauncherOS os,
+			String startupScript, String shutdownScript)
+			throws ResourceCreationException, AccessDeniedException {
+
 		ApplicationLauncherResource resource = new ApplicationLauncherResource();
 		resource.setName(name);
 		resource.setExe(exe);
@@ -154,14 +188,16 @@ public class ApplicationLauncherResourceServiceImpl extends
 		resource.setStartupScript(startupScript);
 		resource.setShutdownScript(shutdownScript);
 		resource.setRealm(realm);
-		
+
 		/**
-		 * Set any additional fields on your resource here before calling createResource. 
+		 * Set any additional fields on your resource here before calling
+		 * createResource.
 		 * 
-		 * Remember to fill in the fire*Event methods to ensure events are fired for all operations.
+		 * Remember to fill in the fire*Event methods to ensure events are fired
+		 * for all operations.
 		 */
-		createResource(resource, new HashMap<String,String>());
-		
+		createResource(resource, new HashMap<String, String>());
+
 		return resource;
 	}
 

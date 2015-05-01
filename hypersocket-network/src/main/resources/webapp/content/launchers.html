@@ -13,8 +13,8 @@
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.name.label"></label>
+					<div class="propertyItem form-group">
+						<label class="col-xs-3 control-label" localize="launcher.name.label"></label>
 							<div class="propertyValue col-xs-9">
 								<input type="text" class="form-control"
 									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
@@ -22,68 +22,157 @@
 									<span class="help-block" localize="launcher.name.info"></span>
 								</div>
 							</div>
-						</div>
-						
-						<div id="launcherProperties"></div>
-						<div id="tabProgram" class="dialogTab">
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="osButton"></div>
-									<div>
-										<span class="help-block" localize="launcher.os.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="exe"></div>
-									<div>
-										<span class="help-block" localize="launcher.exe.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="args"></div>
-									<div>
-										<span class="help-block" localize="launcher.args.info"></span>
-									</div>
+					</div>
+					<div id="launcherProperties"></div>
+					<div id="tabProgram" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="osButton"></div>
+								<div>
+									<span class="help-block" localize="launcher.os.info"></span>
 								</div>
 							</div>
 						</div>
-						<div id="tabScripts" class="dialogTab">
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="startupScript"></div>
-									<div>
-										<span class="help-block" localize="launcher.startup.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="shutdownScript"></div>
-									<div>
-										<span class="help-block" localize="launcher.shutdown.info"></span>
-									</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="exe"></div>
+								<div>
+									<span class="help-block" localize="launcher.exe.info"></span>
 								</div>
 							</div>
 						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="args"></div>
+								<div>
+									<span class="help-block" localize="launcher.args.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="tabScripts" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="startupScript"></div>
+								<div>
+									<span class="help-block" localize="launcher.startup.info"></span>
+								</div>
+							</div>
+						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="shutdownScript"></div>
+								<div>
+									<span class="help-block" localize="launcher.shutdown.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
-				</div>
+				</div>	
 				<div class="modal-footer"></div>
 			</div>
 		</div>
 	</div>
 </div>
+<div id="searchLaunchers">
+	<div class="modal" id="searchLaunchersForm" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" localize="text.searchTemplates"></h4>
+				</div>
+				<div class="modal-body">
+					<div id="searchDialog" class="searchDialog">
+						<div id="searchHeader" class="row">
+							<div class="col-xs-6"></div>
+							<label class="col-xs-2" localize="text.search"></label>
+							<input class="col-xs-4" type="text" id="searchInput">
+						</div>
+						<div id="searchResults" class="row">
+						
+						</div>
+						<div id="pages">
+						
+						</div>
+					</div>
+					<div id="templateInfo" class="searchDialog">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="ssoPlugin.templateName.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="templateName"></div>
+								<div>
+									<span class="help-block" localize="ssoPlugin.templateName.info"></span>
+								</div>
+							</div>
+						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="ssoPlugin.usernameAttribute.label"></label>
+							<div class="col-xs-9">
+								<div class="propertyValue col-xs-4" style="padding-left: 0px;">
+									<div id="usernameAttribute"></div>
+	
+								</div>
+								<div class="propertyValue col-xs-8">
+									<div id="usernameInput"></div>
+								</div>
+								<div>
+									<span class="help-block" localize="ssoPlugin.usernameAttribute.info"></span>
+							</div>
+							</div>
+							
+						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="ssoPlugin.passwordAttribute.label"></label>
+							<div class="col-xs-9">
+								<div class="propertyValue col-xs-4" style="padding-left: 0px;">
+									<div id="passwordAttribute"></div>
+	
+								</div>
+								<div class="propertyValue col-xs-8">
+									<div id="passwordInput"></div>
+								</div>
+								<div>
+									<span class="help-block" localize="ssoPlugin.passwordAttribute.info"></span>
+								</div>
+							</div>
+						</div>
+						<div id="categoryDiv" class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="ssoPlugin.categoryName.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="categoryName"></div>
+								<div>
+									<span class="help-block" localize="ssoPlugin.categoryName.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="templateVariables" class="searchDialog">
+					
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="addTemplate" class="btn btn-primary"><i class="fa fa-save"></i>Next</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="additionalActions"></div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		
 				$('#contentLaunchers').localize();
+				$('#searchLaunchers').localize();
+		
+				var page = 0;
 				
 				var osSelect = $('#osButton').selectButton({
 					id: 'os',
@@ -134,71 +223,108 @@
 					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
-				$('#contentLaunchers').ajaxResourcePage(
-						{
-							id : "Launcher",
-							tableUrl : "launchers/table",
-							title: getResource("launchers.label"),
-							icon: 'fa-rocket',
-							resourceUrl : "launchers/launcher",
-							fields : [ {
-								name : "name"
-							}],
-							resourceKey : "launcher",
-							canCreate: currentMenu.canCreate,
-							canUpdate: currentMenu.canUpdate,
-							canDelete: currentMenu.canDelete,
-							validate : function() {
+				getJSON('menus/tableActions/applicationLauncherActions', null, function(data) {
+					
+					var actions = new Array();
+					if(data.resources.length > 0) {
+						$.each(data.resources, function(idx, action) {
+							var div = action.resourceKey + 'Div';
+							$('#additionalActions').append('<div id="' + div + '"></div>');
+							$('#' + div).load('content/' + action.url + '.html');
 
-								if ($('#resourceName').val() == '') {
-									$('#addLauncherForm').resourceDialog(
-											'error', "error.nameRequired");
-									return false;
-								}
-
-								// TODO validate any of your other fields
-								
-								return true;
-							},
-							clearDialog : function() {
-								
-								$('#resourceId').val('');
-								$('#resourceName').val('');
-								exeInput.setValue('');
-								$('#args').multipleTextInput({ values: []});
-								osSelect.setValue(0);
-								startupScript.setValue("");
-								shutdownScript.setValue("");
-								
-								$('.launcherPropertiesTab').first().trigger('click');
-							},
-							createResource : function() {
-								resource = new Object();
-								resource.id = $('#resourceId').val();
-								resource.name = $('#resourceName').val();
-								resource.exe = exeInput.getValue();
-								resource.args = fixSplit($('#args').multipleSelectValues());
-								resource.os = osSelect.getValue();
-								resource.startupScript = startupScript.getValue();
-								resource.shutdownScript = shutdownScript.getValue();
-								
-								return resource;
-							},
-							displayResource : function(resource) {
-								
-								$('#resourceId').val(resource.id);
-								$('#resourceName').val(resource.name);
-								exeInput.setValue(resource.exe);
-								$('#args').multipleTextInput({ values: splitFix(resource.args)});
-								osSelect.setValue(resource.os.id);
-								startupScript.setValue(resource.startupScript);
-								shutdownScript.setValue(resource.shutdownScript);
-								
-							},
-							complete : function() {
-								loadComplete();
-							}
+							actions.push({
+								resourceKey : action.resourceKey,
+								iconClass : action.iconClass,
+								action : function(resource, callback) {
+									if($('#' + action.resourceKey).data('action')) {
+										$('#' + action.resourceKey).data('action')(resource, callback);
+									}
+								},
+								enabled : true,
+								enableFunction: action.enableFunction,
+								displayFunction: action.displayFunction
+							});
 						});
-
+					}
+				
+					$('#contentLaunchers').ajaxResourcePage(
+							{
+								id : "Launcher",
+								tableUrl : "launchers/table",
+								title: getResource("launchers.label"),
+								icon: 'fa-rocket',
+								resourceUrl : "launchers/launcher",
+								fields : [ {
+									name : "name"
+								}],
+								resourceKey : "launcher",
+								canCreate: currentMenu.canCreate,
+								canUpdate: currentMenu.canUpdate,
+								canDelete: currentMenu.canDelete,
+								additionalActionsDropdown: true,
+								additionalActions: actions,
+								additionalButtons: [ { 
+									resourceKey: 'applicationSearchOnline',
+									buttonClass: 'btn-primary',
+									icon: 'fa-search',
+									action: function(callback) {
+										page = 0;
+										debugger;
+										$('#templateInfo').hide();
+										$('#searchDialog').show();
+									}
+								}],
+								validate : function() {
+	
+									if ($('#resourceName').val() == '') {
+										$('#addLauncherForm').resourceDialog(
+												'error', "error.nameRequired");
+										return false;
+									}
+	
+									// TODO validate any of your other fields
+									
+									return true;
+								},
+								clearDialog : function() {
+									
+									$('#resourceId').val('');
+									$('#resourceName').val('');
+									exeInput.setValue('');
+									$('#args').multipleTextInput({ values: []});
+									osSelect.setValue(0);
+									startupScript.setValue("");
+									shutdownScript.setValue("");
+									
+									$('.launcherPropertiesTab').first().trigger('click');
+								},
+								createResource : function() {
+									resource = new Object();
+									resource.id = $('#resourceId').val();
+									resource.name = $('#resourceName').val();
+									resource.exe = exeInput.getValue();
+									resource.args = fixSplit($('#args').multipleSelectValues());
+									resource.os = osSelect.getValue();
+									resource.startupScript = startupScript.getValue();
+									resource.shutdownScript = shutdownScript.getValue();
+									
+									return resource;
+								},
+								displayResource : function(resource) {
+									
+									$('#resourceId').val(resource.id);
+									$('#resourceName').val(resource.name);
+									exeInput.setValue(resource.exe);
+									$('#args').multipleTextInput({ values: splitFix(resource.args)});
+									osSelect.setValue(resource.os.id);
+									startupScript.setValue(resource.startupScript);
+									shutdownScript.setValue(resource.shutdownScript);
+									
+								},
+								complete : function() {
+									loadComplete();
+								}
+							});
+			    });
 			});
 </script>
