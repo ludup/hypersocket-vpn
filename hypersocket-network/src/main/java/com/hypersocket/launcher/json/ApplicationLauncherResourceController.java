@@ -1,5 +1,6 @@
 package com.hypersocket.launcher.json;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -123,6 +124,48 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/search", method = { RequestMethod.GET,
+			RequestMethod.POST }, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult search(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException,
+			NumberFormatException, IOException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return resourceService.searchTemplates(
+					request.getParameter("sSearch"),
+					Integer.parseInt(request.getParameter("iDisplayStart")),
+					Integer.parseInt(request.getParameter("iDisplayLength")));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/image/{uuid}", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseStatus(value = HttpStatus.OK)
+	public void downloadTemplateImage(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable String uuid)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException, IOException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+
+			resourceService.downloadTemplateImage(uuid, request, response);
+
+		} finally {
+			clearAuthenticatedContext();
+		}
 	}
 
 	@AuthenticationRequired

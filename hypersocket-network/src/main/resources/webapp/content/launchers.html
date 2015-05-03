@@ -167,6 +167,45 @@
 </div>
 <div id="additionalActions"></div>
 <script type="text/javascript">
+	function populateResults(results) {
+		var count = 0;
+		$('#searchResults').empty();
+		var currentElement = $('#searchResults').append('<div class="row"></div>');
+		$.each(results, function(idx, obj) {
+			debugger;
+			if(count > 0 && ((count % 5) == 0)) {
+				currentElement = $('#searchResults').append('<div class="row"></div>');
+			}
+			currentElement.append('<div id="template' + obj.id + '" class="col-xs-2 template"><a href="#"><div class="row"><img width="100px" src="'
+					+ basePath
+					+ '/api/launchers/image/' 
+					+ obj.templateLogo 
+					+ '"></div><div class="row"><span>' 
+					+ obj.name
+					+ '</span></div></a></div>');
+			$('#template' + obj.id).data('template', obj);
+			count++;
+		});
+	
+		if(count < 10) {
+			for(var i=count;i<10;i++) {
+				if(count > 0 && ((count % 5) == 0)) {
+					currentElement = $('#searchResults').append('<div class="row"></div>');
+				}
+				currentElement.append('<div class="col-xs-2 template"></div>');
+				count++;
+			}
+		}
+	
+		$('.template a').off('click');
+		$('.template a').on('click', function(e) {
+			e.preventDefault();
+			$('.selectedTemplate').removeClass('selectedTemplate');
+			$(this).parent().addClass('selectedTemplate');
+			$('#addTemplate').attr('disabled', false);
+		});
+	}
+
 	$(document).ready(function() {
 		
 				$('#contentLaunchers').localize();
@@ -268,10 +307,68 @@
 									buttonClass: 'btn-primary',
 									icon: 'fa-search',
 									action: function(callback) {
-										page = 0;
-										debugger;
 										$('#templateInfo').hide();
+										$('#templateVariables').hide();
 										$('#searchDialog').show();
+										$('#searchResults').empty();
+										$('#pages').empty();
+										$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
+										$('#addTemplate').children('i').addClass('fa-save');
+										$('#pages').append('<div id="searchPages"></div>');
+										
+										var iDisplayStart = 0;
+										var params = new Array();
+										params['sSearch'] = $('#searchInput').val();
+										params['iDisplayStart'] = iDisplayStart;
+										params['iDisplayLength'] = 10;
+										
+										$('#addTemplate').attr('disabled', true);
+										$('#addTemplate').off('click');
+										
+										$('#searchInput').change(function() {
+											getJSON('launchers/search?iDisplayStart=0&iDisplayLength=10&sSearch=' + $('#searchInput').val(), params, function(data) {
+												
+												$('#pages').empty();
+												$('#pages').append('<div id="searchPages"></div>');
+												$('#searchResults').empty();
+												
+												if(data.aaData.length > 0) {
+												
+													populateResults(data.aaData);
+													
+													// init bootpag
+											        $('#searchPages').bootpag({
+											            total: data.iTotalRecords <= 10 ? 1 : (data.iTotalRecords / 10) + (data.iTotalRecords % 10 != 0 ? 1 : 0),
+											            page: 1,
+											            maxVisible: 10
+											        }).on("page", function(event, num){
+														if(num) {
+												        	getJSON('launchers/search?iDisplayStart=' + ((num-1) * 10) + '&iDisplayLength=10&sSearch=' + $('#searchInput').val(), params, function(data) {
+												        		populateResults(data.aaData);
+															});
+														}
+											        	
+											        });
+												} else {
+													$('#searchResults').append('<p style="width:100%; text-align: center; padding-top:50px;">' + getResource('info.noResults').format($('#searchInput').val()));
+												}
+												
+											}, function(xmlRequest) {
+												log('Failed to get online templates: ' + xmlRequest.status);
+												showError('error.failedToSearchTemplates');
+											});	
+										});
+										
+										$('#searchInput').trigger('change');
+										$('#searchLaunchersForm').modal({
+											  backdrop: 'static',
+											  keyboard: false
+										});
+										$('#searchLaunchersForm').off('hidden.bs.modal');
+										$('#searchLaunchersForm').on('hidden.bs.modal', function () {
+												 removeMessage();
+										});
+										$('#searchLaunchersForm').modal('show');
 									}
 								}],
 								validate : function() {

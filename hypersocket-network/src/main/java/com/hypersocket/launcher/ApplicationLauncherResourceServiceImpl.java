@@ -1,13 +1,19 @@
 package com.hypersocket.launcher;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hypersocket.events.EventService;
+import com.hypersocket.http.HttpUtils;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
@@ -16,6 +22,7 @@ import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
 import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
+import com.hypersocket.netty.HttpRequestDispatcherHandler;
 import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
@@ -25,6 +32,7 @@ import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.tables.DataTablesResult;
 
 @Service
 public class ApplicationLauncherResourceServiceImpl extends
@@ -199,6 +207,49 @@ public class ApplicationLauncherResourceServiceImpl extends
 		createResource(resource, new HashMap<String, String>());
 
 		return resource;
+	}
+
+	@Override
+	public DataTablesResult searchTemplates(String search, int iDisplayStart,
+			int iDisplayLength) throws IOException, AccessDeniedException {
+
+		assertPermission(ApplicationLauncherResourcePermission.CREATE);
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("sSearch", search);
+		params.put("iDisplayStart", String.valueOf(iDisplayStart));
+		params.put("iDisplayLength", String.valueOf(iDisplayLength));
+		params.put("sEcho", "0");
+		params.put("iSortingCols", "1");
+		params.put("iSortCol_0", "0");
+		params.put("sSortDir_0", "asc");
+
+		String json = HttpUtils
+				.doHttpPost(
+						System.getProperty("hypersocket.templateServerUrl",
+								"https://templates.hypersocket.com/hypersocket/api/templates")
+								+ "/"
+								+ (Boolean
+										.getBoolean("hypersocketLauncher.enablePrivate") ? "table"
+										: "table/2"), params, true);
+
+		ObjectMapper mapper = new ObjectMapper();
+
+		return mapper.readValue(json, DataTablesResult.class);
+	}
+
+	@Override
+	public void downloadTemplateImage(String uuid, HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+
+		request.setAttribute(
+				HttpRequestDispatcherHandler.CONTENT_INPUTSTREAM,
+				HttpUtils.doHttpGet(
+						System.getProperty(
+								"hypersocket.templateServerImageUrl",
+								"https://templates.hypersocket.com/hypersocket/api/templates/image/")
+								+ uuid, true));
+
 	}
 
 }
