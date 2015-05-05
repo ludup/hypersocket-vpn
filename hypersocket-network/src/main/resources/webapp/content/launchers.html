@@ -98,57 +98,8 @@
 						
 						</div>
 					</div>
-					<div id="templateInfo" class="searchDialog">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="ssoPlugin.templateName.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="templateName"></div>
-								<div>
-									<span class="help-block" localize="ssoPlugin.templateName.info"></span>
-								</div>
-							</div>
-						</div>
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="ssoPlugin.usernameAttribute.label"></label>
-							<div class="col-xs-9">
-								<div class="propertyValue col-xs-4" style="padding-left: 0px;">
-									<div id="usernameAttribute"></div>
+					<div id="templateName"></div>
 	
-								</div>
-								<div class="propertyValue col-xs-8">
-									<div id="usernameInput"></div>
-								</div>
-								<div>
-									<span class="help-block" localize="ssoPlugin.usernameAttribute.info"></span>
-							</div>
-							</div>
-							
-						</div>
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="ssoPlugin.passwordAttribute.label"></label>
-							<div class="col-xs-9">
-								<div class="propertyValue col-xs-4" style="padding-left: 0px;">
-									<div id="passwordAttribute"></div>
-	
-								</div>
-								<div class="propertyValue col-xs-8">
-									<div id="passwordInput"></div>
-								</div>
-								<div>
-									<span class="help-block" localize="ssoPlugin.passwordAttribute.info"></span>
-								</div>
-							</div>
-						</div>
-						<div id="categoryDiv" class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="ssoPlugin.categoryName.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="categoryName"></div>
-								<div>
-									<span class="help-block" localize="ssoPlugin.categoryName.info"></span>
-								</div>
-							</div>
-						</div>
-					</div>
 					<div id="templateVariables" class="searchDialog">
 					
 					</div>
@@ -167,7 +118,6 @@
 		$('#searchResults').empty();
 		var currentElement = $('#searchResults').append('<div class="row"></div>');
 		$.each(results, function(idx, obj) {
-			debugger;
 			if(count > 0 && ((count % 5) == 0)) {
 				currentElement = $('#searchResults').append('<div class="row"></div>');
 			}
@@ -206,57 +156,13 @@
 				$('#contentLaunchers').localize();
 				$('#searchLaunchers').localize();
 				
-				$('#templateInfo').hide();
+				
 				
 				var templateName = $('#templateName').textInput();
+				$('#templateName').hide();
 				var categoryName = $('#categoryName').textInput();
 		
 				var page = 0;
-				
-				var usernameAttribute = $('#usernameAttribute').selectButton({
-					options:  [{ name: "option.fixed", value: 'fixed'}, { name: "option.admin", value: 'admin'}, { name: "option.user", value: 'user'}],
-					value: 'admin',
-					nameIsResourceKey: true,
-					changed: function(widget) {
-						if(widget.getValue() == 'fixed') {
-							$('#usernameInput').show();
-							if(!$('#passwordInput').is(':visible')) {
-								$('#categoryDiv').show();
-							} else {
-								$('#categoryDiv').hide();
-							}
-						} else {
-							$('#usernameInput').hide();
-							$('#categoryDiv').show();
-						}
-					}
-				});
-				
-				var passwordAttribute = $('#passwordAttribute').selectButton({
-					options: [{ name: "option.fixed", value: 'fixed'}, { name: "option.admin", value: 'admin'}, { name: "option.user", value: 'user'}],
-					value: 'admin',
-					nameIsResourceKey: true,
-					changed: function(widget) {
-						if(widget.getValue() == 'fixed') {
-							$('#passwordInput').show();
-							if(!$('#usernameInput').is(':visible')) {
-								$('#categoryDiv').show();
-							} else {
-								$('#categoryDiv').hide();
-							}
-						} else {
-							$('#passwordInput').hide();
-							$('#categoryDiv').show();
-						}
-					}
-				});
-				
-				var usernameInput = $('#usernameInput').textInput();
-				var passwordInput = $('#passwordInput').textInput({ inputType: 'password'});
-				
-				$('#usernameInput').hide();
-				$('#passwordInput').hide();
-				
 				
 				var osSelect = $('#osButton').selectButton({
 					id: 'os',
@@ -352,7 +258,7 @@
 									buttonClass: 'btn-primary',
 									icon: 'fa-search',
 									action: function(callback) {
-										$('#templateInfo').hide();
+										$('#searchInput').val('');
 										$('#templateVariables').hide();
 										$('#searchDialog').show();
 										$('#searchResults').empty();
@@ -369,11 +275,10 @@
 										
 										$('#addTemplate').attr('disabled', true);
 										$('#addTemplate').off('click');
-										
+										page = 0;
 										$('#addTemplate').on('click', function(e) {
 											removeMessage();
 											var template = $('.selectedTemplate').data('template');
-											
 											switch(page) {
 												case 0:
 												{
@@ -381,35 +286,8 @@
 													if(templateName.getValue().trim()=='') {
 														templateName.setValue(template.name);
 													}
-													$('#templateInfo').show();
-													page = 1;
-													break;
-												}
-												case 1:
-												{
-													if(templateName.getValue().trim()=='') {
-														showError('error.pleaseProvideAllDetails');
-														return;
-													}
-													if($('#usernameInput').is(':visible') && usernameInput.getValue().trim()=='') {
-														showError('error.pleaseProvideAllDetails');
-														return;
-													}
-												
-													if($('#passwordInput').is(':visible') && passwordInput.getValue().trim()=='') {
-														showError('error.pleaseProvideAllDetails');
-														return;
-													}
-												
-													if($('#categoryDiv').is(':visible') && categoryName.getValue().trim()=='') {
-														showError('error.pleaseProvideAllDetails');
-														return;
-													}
-												
-													page = 2;
 													var variables = splitFix(template.variables);
 													if(variables.length > 0) {
-														$('#templateInfo').hide();
 														$('#templateVariables').empty();
 														$('#templateVariables').append('<div class="row"><p style="text-align: center; margin-bottom: 20px"><strong>' + getResource('info.additionalDetails') + '</strong></p></div>')
 														$.each(variables, function(idx, obj) {
@@ -428,14 +306,15 @@
 															$('#variable' + id).textInput();
 														
 														});
+														page = 1;
 														$('#templateVariables').show();
 													} else {
-														page = 3;
+														page = 2;
 														$('#addTemplate').trigger('click');
 													}
 													break;
 												}
-												case 2:
+												case 1:
 												{
 													var valid = true;
 													$('.variable').each(function(idx) {
@@ -449,39 +328,21 @@
 														return;
 													}
 												
-													page = 3;
+													page = 2;
 													$('#addTemplate').trigger('click');
 													break;
 												}
-												case 3:
+												case 2:
 												{
 													$('#addTemplate').children('i').removeClass('fa-save');
 													$('#addTemplate').children('i').addClass('fa-spin fa-spinner');
 									
 													var data = template.script;
 		 											
-									            	var createUsernameAttribute = usernameAttribute.getValue() != 'fixed';
-													var createPasswordAttribute = passwordAttribute.getValue() != 'fixed';
-													var userProvidesUsername = usernameAttribute.getValue() == 'user';
-													var userProvidesPassword = passwordAttribute.getValue() == 'user';
-													var attributeCategory = categoryName.getValue();
 													var name = templateName.getValue();
 
 													data = replaceAll(data,'${templateName}', name);
 																									
-													data = replaceAll(data,'${attributeCategory}', attributeCategory);
-													data = replaceAll(data,'${createUsernameAttribute}', createUsernameAttribute);
-													data = replaceAll(data,'${createPasswordAttribute}', createPasswordAttribute);
-													data = replaceAll(data,'${userProvidesUsername}', userProvidesUsername);
-													data = replaceAll(data,'${userProvidesPassword}', userProvidesPassword);  
-													
-													if(usernameAttribute.getValue() == 'fixed') {
-														data = replaceAll(data,'${principalName}', usernameInput.getValue());
-													}
-													if(passwordAttribute.getValue() == 'fixed') {
-														data = replaceAll(data,'${password}', passwordInput.getValue());
-													}
-
 													$('.variable').each(function(idx) {
 														var variable = $(this).data('variable');
 														data = replaceAll(data, '${' + variable + '}', $(this).widget().getValue());
@@ -498,11 +359,8 @@
 																showInformation(getResource('info.createdResource').format(data.resource.name));
 															});
 														} else {
-															page = 0;
-															$('#addTemplate').trigger('click');
 															showError(data.message);
 														}   
-														
 													});
 		 											break;	
 												}

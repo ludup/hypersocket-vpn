@@ -315,7 +315,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 							}
 						} catch (ScriptException e) {
 							log.error(
-									"Failed to create browser credential from template",
+									"Failed to create application launcher from template",
 									e);
 							if (e.getCause() instanceof ResourceCreationException) {
 								throw new TransactionException(
