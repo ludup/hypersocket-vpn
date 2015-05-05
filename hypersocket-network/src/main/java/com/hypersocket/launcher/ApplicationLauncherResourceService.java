@@ -10,6 +10,7 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.tables.DataTablesResult;
 
 public interface ApplicationLauncherResourceService extends
@@ -28,8 +29,11 @@ public interface ApplicationLauncherResourceService extends
 
 	DataTablesResult searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException;
-	
+
 	void downloadTemplateImage(String uuid, HttpServletRequest request,
 			HttpServletResponse response) throws IOException;
+
+	ApplicationLauncherResource createFromTemplate(String script)
+			throws AccessDeniedException, ResourceException;
 
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -144,6 +145,37 @@ public class ApplicationLauncherResourceController extends ResourceController {
 					request.getParameter("sSearch"),
 					Integer.parseInt(request.getParameter("iDisplayStart")),
 					Integer.parseInt(request.getParameter("iDisplayLength")));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/script", method = RequestMethod.POST, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<ApplicationLauncherResource> createFromScript(
+			HttpServletRequest request, HttpServletResponse response,
+			@RequestParam String script) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+
+			ApplicationLauncherResource newResource = resourceService
+					.createFromTemplate(script);
+
+			return new ResourceStatus<ApplicationLauncherResource>(
+					newResource,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							"resource.created.info", newResource.getName()));
+
+		} catch (ResourceException e) {
+			return new ResourceStatus<ApplicationLauncherResource>(false,
+					e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}

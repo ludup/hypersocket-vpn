@@ -5,13 +5,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.ehcache.transaction.TransactionException;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hypersocket.attributes.AttributeService;
 import com.hypersocket.events.EventService;
 import com.hypersocket.http.HttpUtils;
 import com.hypersocket.i18n.I18NService;
@@ -28,16 +38,22 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.realm.Realm;
+import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.tables.DataTablesResult;
+import com.hypersocket.transactions.TransactionService;
 
 @Service
 public class ApplicationLauncherResourceServiceImpl extends
 		AbstractResourceServiceImpl<ApplicationLauncherResource> implements
 		ApplicationLauncherResourceService {
+
+	static Logger log = Logger
+			.getLogger(ApplicationLauncherResourceServiceImpl.class);
 
 	public static final String RESOURCE_BUNDLE = "LauncherService";
 
@@ -57,6 +73,15 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Autowired
 	EventService eventService;
+
+	@Autowired
+	RealmService realmService;
+
+	@Autowired
+	AttributeService attributeService;
+
+	@Autowired
+	TransactionService transactionService;
 
 	@PostConstruct
 	private void postConstruct() {
@@ -249,6 +274,65 @@ public class ApplicationLauncherResourceServiceImpl extends
 								"hypersocket.templateServerImageUrl",
 								"https://templates.hypersocket.com/hypersocket/api/templates/image/")
 								+ uuid, true));
+
+	}
+
+	@Override
+	public ApplicationLauncherResource createFromTemplate(final String script)
+			throws ResourceException, AccessDeniedException {
+
+		assertPermission(ApplicationLauncherResourcePermission.CREATE);
+
+		ApplicationLauncherResource result = transactionService
+				.doInTransaction(new TransactionCallback<ApplicationLauncherResource>() {
+
+					@Override
+					public ApplicationLauncherResource doInTransaction(
+							TransactionStatus status) {
+
+						ScriptEngineManager manager = new ScriptEngineManager();
+						ScriptEngine engine = manager
+								.getEngineByName("beanshell");
+
+						Bindings bindings = engine.createBindings();
+						bindings.put("realmService", realmService);
+						bindings.put("templateService",
+								ApplicationLauncherResourceServiceImpl.this);
+						bindings.put("attributeService", attributeService);
+						bindings.put("log", log);
+
+						try {
+							Object result = engine.eval(script, bindings);
+							if (result instanceof ApplicationLauncherResource) {
+								return (ApplicationLauncherResource) result;
+							} else {
+								throw new TransactionException(
+										"Transaction failed",
+										new ResourceCreationException(
+												RESOURCE_BUNDLE,
+												"error.templateFailed",
+												"Script returned invalid object"));
+							}
+						} catch (ScriptException e) {
+							log.error(
+									"Failed to create browser credential from template",
+									e);
+							if (e.getCause() instanceof ResourceCreationException) {
+								throw new TransactionException(
+										"Transaction failed", e.getCause());
+							}
+							throw new TransactionException(
+									"Transaction failed",
+									new ResourceCreationException(
+											RESOURCE_BUNDLE,
+											"error.templateFailed", e
+													.getMessage()));
+						}
+					}
+
+				});
+
+		return result;
 
 	}
 
