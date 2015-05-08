@@ -3,10 +3,10 @@ package com.hypersocket.launcher.events;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.hypersocket.launcher.ApplicationLauncherResource;
+import com.hypersocket.realm.events.ResourceEvent;
 import com.hypersocket.session.Session;
-import com.hypersocket.session.events.SessionEvent;
 
-public class ApplicationLauncherEvent extends SessionEvent {
+public class ApplicationLauncherEvent extends ResourceEvent {
 
 	public static final String EVENT_RESOURCE_KEY = "launcher.event";
 	
@@ -14,12 +14,12 @@ public class ApplicationLauncherEvent extends SessionEvent {
 
 	public ApplicationLauncherEvent(Object source, String resourceKey,
 			Session session, ApplicationLauncherResource resource) {
-		super(source, resourceKey, true, session);
+		super(source, resourceKey, true, session, resource);
 	}
 
 	public ApplicationLauncherEvent(Object source, String resourceKey,
 			ApplicationLauncherResource resource, Throwable e, Session session) {
-		super(source, resourceKey, e, session);
+		super(source, resourceKey, e, session, resource);
 	}
 	
 	public String[] getResourceKeys() {
