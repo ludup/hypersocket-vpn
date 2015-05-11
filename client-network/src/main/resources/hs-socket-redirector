@@ -49,7 +49,7 @@ fi
 
 # Add the new rule
 if [ "${option}" = I ]; then
-	apply_rules $* D
+	apply_rules $* D >/dev/null 2>&1
 	apply_rules $* ${option}
 elif [ "${option}" = C ]; then
 	iptables-save | grep -v "${COMMENT}" | iptables-restore
