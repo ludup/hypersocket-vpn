@@ -399,7 +399,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		return "Network Resources";
 	}
 
-	public boolean startLocalForwarding(NetworkResource resource)
+	public synchronized boolean startLocalForwarding(NetworkResource resource)
 			throws IOException {
 
 		if (mgr == null) {
@@ -434,7 +434,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	}
 
-	public void stopAllForwarding() {
+	public synchronized void stopAllForwarding() {
 
 		List<NetworkResource> tmp = new ArrayList<NetworkResource>(localForwards.values());
 		for (NetworkResource resource : tmp) {
@@ -442,8 +442,17 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		}
 		
 	}
+	
+	private boolean isHostnameInUse(String hostname) {
+		for(NetworkResource resource : localForwards.values()) {
+			if(resource.getHostname().equals(hostname)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-	private void stopLocalForwarding(NetworkResource resource) {
+	private synchronized void stopLocalForwarding(NetworkResource resource) {
 		String key = "127.0.0.1" + ":"
 				+ resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
@@ -458,6 +467,13 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			} finally {
 				localForwards.remove(key);
 				resourceForwards.remove(resource.getId() + "/" + resource.getPort());
+				
+				if(!isHostnameInUse(resource.getHostname())) {
+					try {
+						mgr.removeHostname(resource.getHostname());
+					} catch (IOException e) {
+					}
+				}
 			}
 		}
 	}
