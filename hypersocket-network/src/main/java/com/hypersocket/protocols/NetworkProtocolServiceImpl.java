@@ -53,6 +53,10 @@ public class NetworkProtocolServiceImpl extends
 	@Autowired
 	RealmService realmService; 
 	
+	public NetworkProtocolServiceImpl() {
+		super("networkProtocol");
+	}
+	
 	@PostConstruct
 	private void postConstruct() {
 
@@ -160,7 +164,11 @@ public class NetworkProtocolServiceImpl extends
 	public Class<NetworkProtocolPermission> getPermissionType() {
 		return NetworkProtocolPermission.class;
 	}
-
+	
+	protected Class<NetworkProtocol> getResourceClass() {
+		return NetworkProtocol.class;
+	}
+	
 	@Override
 	protected void fireResourceCreationEvent(NetworkProtocol resource) {
 		eventService.publishEvent(new NetworkProtocolCreatedEvent(this,

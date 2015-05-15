@@ -47,6 +47,10 @@ public class ApplicationLauncherResourceServiceImpl extends
 	@Autowired
 	EventService eventService;
 	
+	public ApplicationLauncherResourceServiceImpl() {
+		super("applicationLauncher");
+	}
+	
 	@PostConstruct
 	private void postConstruct() {
 
@@ -89,6 +93,10 @@ public class ApplicationLauncherResourceServiceImpl extends
 		return ApplicationLauncherResourcePermission.class;
 	}
 
+	protected Class<ApplicationLauncherResource> getResourceClass() {
+		return ApplicationLauncherResource.class;
+	}
+	
 	@Override
 	protected void fireResourceCreationEvent(ApplicationLauncherResource resource) {
 		eventService.publishEvent(new ApplicationLauncherCreatedEvent(this, getCurrentSession(), resource));
