@@ -3,12 +3,16 @@ package com.hypersocket.protocols;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.resource.RealmResource;
 
 @Entity
 @Table(name="network_protocols")
+@JsonIgnoreProperties({"createDate", "modifiedDate","portRange"})
 public class NetworkProtocol extends RealmResource {
 
 	@Column(name="transport", nullable=false)
@@ -28,7 +32,7 @@ public class NetworkProtocol extends RealmResource {
 		this.transport = transport;
 	}
 
-	
+	@XmlTransient
 	public String getPortRange() {
 		if(startPort != endPort && endPort != null) {
 			return String.valueOf(startPort) + "-" + String.valueOf(endPort);
