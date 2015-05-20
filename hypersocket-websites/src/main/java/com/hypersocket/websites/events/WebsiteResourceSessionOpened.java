@@ -18,8 +18,8 @@ public class WebsiteResourceSessionOpened extends WebsiteResourceSessionEvent {
 	}
 
 	public WebsiteResourceSessionOpened(Object source,
-			Throwable e, WebsiteResource resource, Session session) {
-		super(source, EVENT_RESOURCE_KEY, resource, e, session);
+			Throwable e, WebsiteResource resource, Session session,String hostname) {
+		super(source, EVENT_RESOURCE_KEY, resource, e, session,hostname);
 	}
 
 	public String[] getResourceKeys() {
