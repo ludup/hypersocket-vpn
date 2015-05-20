@@ -4,10 +4,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.hypersocket.resource.RealmResource;
 
 @Entity
 @Table(name="launchers")
+@JsonDeserialize(using = ApplicationLauncherResourceDeserializer.class)
 public class ApplicationLauncherResource extends RealmResource {
 
 	@Column(name="exe", length=1024)

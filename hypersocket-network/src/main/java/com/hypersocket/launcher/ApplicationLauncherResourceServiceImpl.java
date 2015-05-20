@@ -36,12 +36,13 @@ import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceExportException;
 import com.hypersocket.resource.ResourceNotFoundException;
+import com.hypersocket.utils.HypersocketUtils;
 
 @Service
 public class ApplicationLauncherResourceServiceImpl extends
 		AbstractResourceServiceImpl<ApplicationLauncherResource> implements
 		ApplicationLauncherResourceService {
-	
+
 	static Logger log = LoggerFactory
 			.getLogger(ApplicationLauncherResourceServiceImpl.class);
 
@@ -237,15 +238,20 @@ public class ApplicationLauncherResourceServiceImpl extends
 		List<ApplicationLauncherResource> list = getResources();
 		return exportResources(list);
 	}
-	
+
 	@Override
-	public Collection<ApplicationLauncherResource> uploadLaunchers(MultipartFile jsonFile) throws ResourceException,
-	AccessDeniedException{
-		try{
-			String json=IOUtils.toString(jsonFile.getInputStream());
+	public Collection<ApplicationLauncherResource> uploadLaunchers(
+			MultipartFile jsonFile) throws ResourceException,
+			AccessDeniedException {
+		try {
+			String json = IOUtils.toString(jsonFile.getInputStream());
+			if (!HypersocketUtils.isValidJSON(json)) {
+				throw new ResourceException(RESOURCE_BUNDLE,
+						"error.incorrectJSON");
+			}
 			return importResources(json, getCurrentRealm());
-		}catch(IOException e){
-			log.error("Error in upload Applicatin Launchers",e);
+		} catch (IOException e) {
+			log.error("Error in upload Applicatin Launchers", e);
 			return null;
 		}
 	}

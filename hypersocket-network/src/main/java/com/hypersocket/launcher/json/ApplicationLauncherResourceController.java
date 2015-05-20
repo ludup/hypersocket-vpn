@@ -1,6 +1,7 @@
 package com.hypersocket.launcher.json;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -276,16 +277,15 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		}
 
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/exportAllLaunchers", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public String exportLauncher(HttpServletRequest request,
-			HttpServletResponse response)
-			throws AccessDeniedException, UnauthorizedException,
-			SessionTimeoutException, ResourceNotFoundException,
-			ResourceExportException {
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException,
+			ResourceNotFoundException, ResourceExportException {
 
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
@@ -302,7 +302,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		}
 
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "template/launchers/import", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
@@ -319,7 +319,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 	}
-	
+
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/uploadLaunchers", method = { RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
@@ -336,18 +336,25 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		} catch (Exception e) {
 		}
 		try {
-			resourceService.uploadLaunchers(jsonFile);
-			return new ResourceStatus<ApplicationLauncherResource>(true,I18N.getResource(
-					sessionUtils.getLocale(request),
-					ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE, "launcher.import.success"));
+			Collection<ApplicationLauncherResource> collects = resourceService
+					.uploadLaunchers(jsonFile);
+			return new ResourceStatus<ApplicationLauncherResource>(
+					true,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							"launcher.import.success", collects.size()));
 		} catch (ResourceException e) {
 			return new ResourceStatus<ApplicationLauncherResource>(false,
 					I18N.getResource(sessionUtils.getLocale(request),
-								e.getBundle(), e.getResourceKey(), e.getArgs()));
+							e.getBundle(), e.getResourceKey(), e.getArgs()));
 		} catch (Exception e) {
-			return new ResourceStatus<ApplicationLauncherResource>(false,I18N.getResource(
-					sessionUtils.getLocale(request),
-					ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE, "launcher.import.failure"));
+			return new ResourceStatus<ApplicationLauncherResource>(
+					false,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							"launcher.import.failure"));
 		} finally {
 			clearAuthenticatedContext();
 		}
