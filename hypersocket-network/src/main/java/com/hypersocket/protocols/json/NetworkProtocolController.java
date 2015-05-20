@@ -1,5 +1,6 @@
 package com.hypersocket.protocols.json;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +24,6 @@ import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
-import com.hypersocket.launcher.ApplicationLauncherResource;
-import com.hypersocket.launcher.ApplicationLauncherResourceServiceImpl;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.properties.PropertyCategory;
@@ -302,7 +301,7 @@ public class NetworkProtocolController extends ResourceController {
 	@RequestMapping(value = "networkProtocols/importProtocols", method = { RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<ApplicationLauncherResource> uploadLauncher(
+	public ResourceStatus<NetworkProtocol> uploadLauncher(
 			HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "file") MultipartFile jsonFile)
 			throws AccessDeniedException, UnauthorizedException,
@@ -314,24 +313,21 @@ public class NetworkProtocolController extends ResourceController {
 		} catch (Exception e) {
 		}
 		try {
-			resourceService.uploadProtocols(jsonFile);
-			return new ResourceStatus<ApplicationLauncherResource>(
-					true,
-					I18N.getResource(
-							sessionUtils.getLocale(request),
-							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
-							"protocol.import.success"));
+			Collection<NetworkProtocol> collects = resourceService
+					.uploadProtocols(jsonFile);
+			return new ResourceStatus<NetworkProtocol>(true, I18N.getResource(
+					sessionUtils.getLocale(request),
+					NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
+					"protocol.import.success", collects.size()));
 		} catch (ResourceException e) {
-			return new ResourceStatus<ApplicationLauncherResource>(false,
-					I18N.getResource(sessionUtils.getLocale(request),
-							e.getBundle(), e.getResourceKey(), e.getArgs()));
+			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
+					sessionUtils.getLocale(request), e.getBundle(),
+					e.getResourceKey(), e.getArgs()));
 		} catch (Exception e) {
-			return new ResourceStatus<ApplicationLauncherResource>(
-					false,
-					I18N.getResource(
-							sessionUtils.getLocale(request),
-							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
-							"protocol.import.failure"));
+			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
+					sessionUtils.getLocale(request),
+					NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
+					"protocol.import.failure"));
 		} finally {
 			clearAuthenticatedContext();
 		}
