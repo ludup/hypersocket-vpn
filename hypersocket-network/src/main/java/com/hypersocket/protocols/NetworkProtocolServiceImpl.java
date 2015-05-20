@@ -39,6 +39,7 @@ import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceExportException;
 import com.hypersocket.resource.ResourceNotFoundException;
+import com.hypersocket.utils.HypersocketUtils;
 
 @Service
 public class NetworkProtocolServiceImpl extends
@@ -283,6 +284,10 @@ public class NetworkProtocolServiceImpl extends
 			throws ResourceException, AccessDeniedException {
 		try {
 			String json = IOUtils.toString(jsonFile.getInputStream());
+			if(!HypersocketUtils.isValidJSON(json)){
+				throw new ResourceException(RESOURCE_BUNDLE,
+						"error.incorrectJSON");
+			}
 			return importResources(json, getCurrentRealm());
 		} catch (IOException e) {
 			log.error("Error in upload Protocols", e);
