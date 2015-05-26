@@ -22,9 +22,9 @@ public class WebsiteResourceSessionEvent extends ResourceSessionEvent {
 	}
 
 	public WebsiteResourceSessionEvent(Object source, String resourceKey, WebsiteResource resource, Throwable e,
-			Session session) {
+			Session session,String hostname) {
 		super(source, resourceKey, resource.getName(), e, session);
-		addAttribute(ATTR_URL, resource.getLaunchUrl());
+		addAttribute(ATTR_URL, hostname);
 	}
 
 	@Override

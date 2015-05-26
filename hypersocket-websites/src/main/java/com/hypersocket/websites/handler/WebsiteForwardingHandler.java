@@ -27,7 +27,7 @@ public class WebsiteForwardingHandler extends
 
 	@Autowired
 	HypersocketServer server;
-	
+
 	public WebsiteForwardingHandler() {
 		super("website");
 	}
@@ -36,7 +36,7 @@ public class WebsiteForwardingHandler extends
 	private void postConstruct() {
 		server.registerWebsocketpHandler(this);
 	}
-	
+
 	@Override
 	protected ForwardingService<WebsiteResource> getService() {
 		return websiteService;
@@ -54,7 +54,7 @@ public class WebsiteForwardingHandler extends
 			Session session, WebsiteResource resource, String hostname,
 			Integer port) {
 		eventService.publishEvent(new WebsiteResourceSessionOpened(this, cause,
-				resource, session));
+				resource, session, hostname));
 	}
 
 	@Override
