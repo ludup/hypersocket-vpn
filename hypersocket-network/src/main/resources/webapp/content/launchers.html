@@ -1,8 +1,3 @@
-<!-- 
-	Replace any Launcher or Launchers with Capitalized name of your resources e.g. Application or Applications
-	Replace any launcher or launchers with lower case name of your resources e.g. application or applications
- -->
-
 <div id="contentLaunchers">
 	<div class="modal" id="addLauncherForm" tabindex="-1" role="dialog" dialog-for="contentLaunchers">
 		<div class="modal-dialog modal-lg">
@@ -13,8 +8,8 @@
 					<h4 class="modal-title"></h4>
 				</div>
 				<div class="modal-body">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.name.label"></label>
+					<div class="propertyItem form-group">
+						<label class="col-xs-3 control-label" localize="launcher.name.label"></label>
 							<div class="propertyValue col-xs-9">
 								<input type="text" class="form-control"
 									placeholder="" id="resourceName" maxlength="" name="resourceName" value="">
@@ -22,68 +17,152 @@
 									<span class="help-block" localize="launcher.name.info"></span>
 								</div>
 							</div>
-						</div>
-						
-						<div id="launcherProperties"></div>
-						<div id="tabProgram" class="dialogTab">
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="osButton"></div>
-									<div>
-										<span class="help-block" localize="launcher.os.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="exe"></div>
-									<div>
-										<span class="help-block" localize="launcher.exe.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="args"></div>
-									<div>
-										<span class="help-block" localize="launcher.args.info"></span>
-									</div>
+					</div>
+					<div id="launcherProperties"></div>
+					<div id="tabProgram" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="osButton"></div>
+								<div>
+									<span class="help-block" localize="launcher.os.info"></span>
 								</div>
 							</div>
 						</div>
-						<div id="tabScripts" class="dialogTab">
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="startupScript"></div>
-									<div>
-										<span class="help-block" localize="launcher.startup.info"></span>
-									</div>
-								</div>
-							</div>
-							<div class="propertyItem form-group">
-								<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
-								<div class="propertyValue col-xs-9">
-									<div id="shutdownScript"></div>
-									<div>
-										<span class="help-block" localize="launcher.shutdown.info"></span>
-									</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="exe"></div>
+								<div>
+									<span class="help-block" localize="launcher.exe.info"></span>
 								</div>
 							</div>
 						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="args"></div>
+								<div>
+									<span class="help-block" localize="launcher.args.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="tabScripts" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="startupScript"></div>
+								<div>
+									<span class="help-block" localize="launcher.startup.info"></span>
+								</div>
+							</div>
+						</div>
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="shutdownScript"></div>
+								<div>
+									<span class="help-block" localize="launcher.shutdown.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
-				</div>
+				</div>	
 				<div class="modal-footer"></div>
 			</div>
 		</div>
 	</div>
 </div>
+<div id="searchLaunchers">
+	<div class="modal" id="searchLaunchersForm" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h4 class="modal-title" localize="text.searchTemplates"></h4>
+				</div>
+				<div class="modal-body">
+					<div id="searchDialog" class="searchDialog">
+						<div id="searchHeader" class="row">
+							<div class="col-xs-6"></div>
+							<label class="col-xs-2" localize="text.search"></label>
+							<input class="col-xs-4" type="text" id="searchInput">
+						</div>
+						<div id="searchResults" class="row">
+						
+						</div>
+						<div id="pages">
+						
+						</div>
+					</div>
+					<div id="templateName"></div>
+	
+					<div id="templateVariables" class="searchDialog">
+					
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="addTemplate" class="btn btn-primary"><i class="fa fa-save"></i>Next</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="additionalActions"></div>
 <script type="text/javascript">
+	function populateResults(results) {
+		var count = 0;
+		$('#searchResults').empty();
+		var currentElement = $('#searchResults').append('<div class="row"></div>');
+		$.each(results, function(idx, obj) {
+			if(count > 0 && ((count % 5) == 0)) {
+				currentElement = $('#searchResults').append('<div class="row"></div>');
+			}
+			currentElement.append('<div id="template' + obj.id + '" class="col-xs-2 template"><a href="#"><div class="row"><img width="100px" src="'
+					+ basePath
+					+ '/api/launchers/image/' 
+					+ obj.templateLogo 
+					+ '"></div><div class="row"><span>' 
+					+ obj.name
+					+ '</span></div></a></div>');
+			$('#template' + obj.id).data('template', obj);
+			count++;
+		});
+	
+		if(count < 10) {
+			for(var i=count;i<10;i++) {
+				if(count > 0 && ((count % 5) == 0)) {
+					currentElement = $('#searchResults').append('<div class="row"></div>');
+				}
+				currentElement.append('<div class="col-xs-2 template"></div>');
+				count++;
+			}
+		}
+	
+		$('.template a').off('click');
+		$('.template a').on('click', function(e) {
+			e.preventDefault();
+			$('.selectedTemplate').removeClass('selectedTemplate');
+			$(this).parent().addClass('selectedTemplate');
+			$('#addTemplate').attr('disabled', false);
+		});
+	}
+
 	$(document).ready(function() {
+		
 				$('#contentLaunchers').localize();
+				$('#searchLaunchers').localize();
+				
+				
+				
+				var templateName = $('#templateName').textInput();
+				$('#templateName').hide();
+				var categoryName = $('#categoryName').textInput();
+		
+				var page = 0;
 				
 				var osSelect = $('#osButton').selectButton({
 					id: 'os',
@@ -134,71 +213,240 @@
 					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
-				$('#contentLaunchers').ajaxResourcePage(
-						{
-							id : "Launcher",
-							tableUrl : "launchers/table",
-							title: getResource("launchers.label"),
-							icon: 'fa-rocket',
-							resourceUrl : "launchers/launcher",
-							fields : [ {
-								name : "name"
-							}],
-							resourceKey : "launcher",
-							canCreate: currentMenu.canCreate,
-							canUpdate: currentMenu.canUpdate,
-							canDelete: currentMenu.canDelete,
-							validate : function() {
 
-								if ($('#resourceName').val() == '') {
-									$('#addLauncherForm').resourceDialog(
-											'error', "error.nameRequired");
-									return false;
+				
+					$('#contentLaunchers').ajaxResourcePage(
+							{
+								id : "Launcher",
+								tableUrl : "launchers/table",
+								title: getResource("launchers.label"),
+								icon: 'fa-rocket',
+								resourceUrl : "launchers/launcher",
+								fields : [ {
+									name : "name"
+								}],
+								resourceKey : "launcher",
+								canCreate: currentMenu.canCreate,
+								canUpdate: currentMenu.canUpdate,
+								canDelete: currentMenu.canDelete,
+								additionalActionsDropdown: true,
+								additionalButtons: [ { 
+									resourceKey: 'applicationSearchOnline',
+									buttonClass: 'btn-primary',
+									icon: 'fa-search',
+									action: function(callback) {
+										$('#searchInput').val('');
+										$('#templateVariables').hide();
+										$('#searchDialog').show();
+										$('#searchResults').empty();
+										$('#pages').empty();
+										$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
+										$('#addTemplate').children('i').addClass('fa-save');
+										$('#pages').append('<div id="searchPages"></div>');
+										
+										var iDisplayStart = 0;
+										var params = new Array();
+										params['sSearch'] = $('#searchInput').val();
+										params['iDisplayStart'] = iDisplayStart;
+										params['iDisplayLength'] = 10;
+										
+										$('#addTemplate').attr('disabled', true);
+										$('#addTemplate').off('click');
+										page = 0;
+										$('#addTemplate').on('click', function(e) {
+											removeMessage();
+											var template = $('.selectedTemplate').data('template');
+											switch(page) {
+												case 0:
+												{
+													$('#searchDialog').hide();
+													if(templateName.getValue().trim()=='') {
+														templateName.setValue(template.name);
+													}
+													var variables = splitFix(template.variables);
+													if(variables.length > 0) {
+														$('#templateVariables').empty();
+														$('#templateVariables').append('<div class="row"><p style="text-align: center; margin-bottom: 20px"><strong>' + getResource('info.additionalDetails') + '</strong></p></div>')
+														$.each(variables, function(idx, obj) {
+															var items = obj.split('=');
+															var label = decodeURIComponent(items[0]);
+															var info = decodeURIComponent(items[1]);
+															info = replaceAll(info, '<', "&lt;")
+															info = replaceAll(info, '>', '&gt;');
+															var id = label.replace(/\s/g, "");
+															var variable = id.substring(0,1).toLowerCase() + id.substring(1);
+															$('#templateVariables').append('<div class="propertyItem form-group">'
+																	+ '<label class="col-xs-3 control-label">' + label + '</label>'
+																	+ '<div class="propertyValue col-xs-9"><div id="variable' + id + '" data-variable="' + variable + '" + class="variable"></div><div>'
+																	+ '<span class="help-block">' + info + '</span></div></div></div>');
+														
+															$('#variable' + id).textInput();
+														
+														});
+														page = 1;
+														$('#templateVariables').show();
+													} else {
+														page = 2;
+														$('#addTemplate').trigger('click');
+													}
+													break;
+												}
+												case 1:
+												{
+													var valid = true;
+													$('.variable').each(function(idx) {
+														if($(this).widget().getValue().trim()=='') {
+															valid = false;
+														}
+													});
+													
+													if(!valid) {
+														showError('error.pleaseProvideAllDetails');
+														return;
+													}
+												
+													page = 2;
+													$('#addTemplate').trigger('click');
+													break;
+												}
+												case 2:
+												{
+													$('#addTemplate').children('i').removeClass('fa-save');
+													$('#addTemplate').children('i').addClass('fa-spin fa-spinner');
+									
+													var data = template.script;
+		 											
+													var name = templateName.getValue();
+
+													data = replaceAll(data,'${templateName}', name);
+																									
+													$('.variable').each(function(idx) {
+														var variable = $(this).data('variable');
+														data = replaceAll(data, '${' + variable + '}', $(this).widget().getValue());
+														data = replaceAll(data, encodeURIComponent('${' + variable + '}'), encodeURIComponent($(this).widget().getValue()));
+													});
+													
+													$.post(basePath + '/api/launchers/script', { script: data }, function(data) {
+														$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
+														$('#addTemplate').children('i').addClass('fa-save');
+														if(data.success) {
+															loadResources(function() {
+																$('#contentLaunchers').ajaxResourcePageInsert(data.resource);
+																$('#searchLaunchersForm').modal('hide');
+																showInformation(getResource('info.createdResource').format(data.resource.name));
+															});
+														} else {
+															showError(data.message);
+														}   
+													});
+		 											break;	
+												}
+																					
+												default:
+													{
+														alert('Invaild page!');
+													}
+
+											}
+										});
+										
+										$('#searchInput').change(function() {
+											getJSON('launchers/search?iDisplayStart=0&iDisplayLength=10&sSearch=' + $('#searchInput').val(), params, function(data) {
+												
+												$('#pages').empty();
+												$('#pages').append('<div id="searchPages"></div>');
+												$('#searchResults').empty();
+												
+												if(data.aaData.length > 0) {
+												
+													populateResults(data.aaData);
+													
+													// init bootpag
+											        $('#searchPages').bootpag({
+											            total: data.iTotalRecords <= 10 ? 1 : (data.iTotalRecords / 10) + (data.iTotalRecords % 10 != 0 ? 1 : 0),
+											            page: 1,
+											            maxVisible: 10
+											        }).on("page", function(event, num){
+														if(num) {
+												        	getJSON('launchers/search?iDisplayStart=' + ((num-1) * 10) + '&iDisplayLength=10&sSearch=' + $('#searchInput').val(), params, function(data) {
+												        		populateResults(data.aaData);
+															});
+														}
+											        	
+											        });
+												} else {
+													$('#searchResults').append('<p style="width:100%; text-align: center; padding-top:50px;">' + getResource('info.applicationsNoResults').format($('#searchInput').val()));
+												}
+												
+											}, function(xmlRequest) {
+												log('Failed to get online templates: ' + xmlRequest.status);
+												showError('error.failedToSearchTemplates');
+											});	
+										});
+										
+										$('#searchInput').trigger('change');
+										$('#searchLaunchersForm').modal({
+											  backdrop: 'static',
+											  keyboard: false
+										});
+										$('#searchLaunchersForm').off('hidden.bs.modal');
+										$('#searchLaunchersForm').on('hidden.bs.modal', function () {
+												 removeMessage();
+										});
+										$('#searchLaunchersForm').modal('show');
+									}
+								}],
+								validate : function() {
+	
+									if ($('#resourceName').val() == '') {
+										$('#addLauncherForm').resourceDialog(
+												'error', "error.nameRequired");
+										return false;
+									}
+	
+									// TODO validate any of your other fields
+									
+									return true;
+								},
+								clearDialog : function() {
+									
+									$('#resourceId').val('');
+									$('#resourceName').val('');
+									exeInput.setValue('');
+									$('#args').multipleTextInput({ values: []});
+									osSelect.setValue(0);
+									startupScript.setValue("");
+									shutdownScript.setValue("");
+									
+									$('.launcherPropertiesTab').first().trigger('click');
+								},
+								createResource : function() {
+									resource = new Object();
+									resource.id = $('#resourceId').val();
+									resource.name = $('#resourceName').val();
+									resource.exe = exeInput.getValue();
+									resource.args = fixSplit($('#args').multipleSelectValues());
+									resource.os = osSelect.getValue();
+									resource.startupScript = startupScript.getValue();
+									resource.shutdownScript = shutdownScript.getValue();
+									
+									return resource;
+								},
+								displayResource : function(resource) {
+									
+									$('#resourceId').val(resource.id);
+									$('#resourceName').val(resource.name);
+									exeInput.setValue(resource.exe);
+									$('#args').multipleTextInput({ values: splitFix(resource.args)});
+									osSelect.setValue(resource.os.id);
+									startupScript.setValue(resource.startupScript);
+									shutdownScript.setValue(resource.shutdownScript);
+									
+								},
+								complete : function() {
+									loadComplete();
 								}
-
-								// TODO validate any of your other fields
-								
-								return true;
-							},
-							clearDialog : function() {
-								
-								$('#resourceId').val('');
-								$('#resourceName').val('');
-								exeInput.setValue('');
-								$('#args').multipleTextInput({ values: []});
-								osSelect.setValue(0);
-								startupScript.setValue("");
-								shutdownScript.setValue("");
-								
-								$('.launcherPropertiesTab').first().trigger('click');
-							},
-							createResource : function() {
-								resource = new Object();
-								resource.id = $('#resourceId').val();
-								resource.name = $('#resourceName').val();
-								resource.exe = exeInput.getValue();
-								resource.args = fixSplit($('#args').multipleSelectValues());
-								resource.os = osSelect.getValue();
-								resource.startupScript = startupScript.getValue();
-								resource.shutdownScript = shutdownScript.getValue();
-								
-								return resource;
-							},
-							displayResource : function(resource) {
-								
-								$('#resourceId').val(resource.id);
-								$('#resourceName').val(resource.name);
-								exeInput.setValue(resource.exe);
-								$('#args').multipleTextInput({ values: splitFix(resource.args)});
-								osSelect.setValue(resource.os.id);
-								startupScript.setValue(resource.startupScript);
-								shutdownScript.setValue(resource.shutdownScript);
-								
-							},
-							complete : function() {
-								loadComplete();
-							}
-						});
-
+							});
+			   
 			});
 </script>

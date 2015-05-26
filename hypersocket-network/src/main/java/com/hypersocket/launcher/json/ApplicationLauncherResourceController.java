@@ -1,5 +1,6 @@
 package com.hypersocket.launcher.json;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -123,6 +125,79 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/search", method = { RequestMethod.GET,
+			RequestMethod.POST }, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public DataTablesResult search(final HttpServletRequest request,
+			HttpServletResponse response) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException,
+			NumberFormatException, IOException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return resourceService.searchTemplates(
+					request.getParameter("sSearch"),
+					Integer.parseInt(request.getParameter("iDisplayStart")),
+					Integer.parseInt(request.getParameter("iDisplayLength")));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/script", method = RequestMethod.POST, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<ApplicationLauncherResource> createFromScript(
+			HttpServletRequest request, HttpServletResponse response,
+			@RequestParam String script) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+
+			ApplicationLauncherResource newResource = resourceService
+					.createFromTemplate(script);
+
+			return new ResourceStatus<ApplicationLauncherResource>(
+					newResource,
+					I18N.getResource(
+							sessionUtils.getLocale(request),
+							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+							"resource.created.info", newResource.getName()));
+
+		} catch (ResourceException e) {
+			return new ResourceStatus<ApplicationLauncherResource>(false,
+					e.getMessage());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/image/{uuid}", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseStatus(value = HttpStatus.OK)
+	public void downloadTemplateImage(HttpServletRequest request,
+			HttpServletResponse response, @PathVariable String uuid)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException, IOException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+
+			resourceService.downloadTemplateImage(uuid, request, response);
+
+		} finally {
+			clearAuthenticatedContext();
+		}
 	}
 
 	@AuthenticationRequired
