@@ -25,12 +25,13 @@ import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
-import com.hypersocket.client.rmi.BrowserLauncher;
+import com.hypersocket.client.rmi.AWTBrowserLauncher;
 import com.hypersocket.client.rmi.GUICallback;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
 import com.hypersocket.client.rmi.ResourceService;
+import com.hypersocket.client.rmi.Resource.Type;
 import com.hypersocket.client.service.AbstractServicePlugin;
 import com.hypersocket.client.service.ResourceMapper;
 
@@ -129,8 +130,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								.getResourceRealm(serviceClient.getHost());
 
 						ResourceImpl res = new ResourceImpl(name + " - " + I18N.getResource("text.defaultBrowser"));
+						res.setType(Type.NETWORK);
 						res.setLaunchable(true);
-						res.setResourceLauncher(new BrowserLauncher(
+						res.setResourceLauncher(new AWTBrowserLauncher(
 								template.getLaunchUrl()));
 						resourceRealm.addResource(res);
 					}
@@ -295,6 +297,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						networkResources.add(template);
 
 						ResourceImpl res = new ResourceImpl(name);
+						res.setType(Type.NETWORK);
 						
 						if (transport.equals("TCP")) {
 
@@ -355,6 +358,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						if(launcherTemplates.size() > 0) {
 							for(ApplicationLauncherTemplate t : launcherTemplates) {
 								ResourceImpl app = new ResourceImpl(name + " - " + t.getName());
+								app.setType(Type.NETWORK);
 								app.setLaunchable(true);
 								app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
 										template.getHostname(), t));
