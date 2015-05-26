@@ -30,6 +30,7 @@ import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
+import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.netty.HttpRequestDispatcherHandler;
@@ -111,6 +112,11 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 		menuService.registerExtendableTable(APPLICATION_LAUNCHER_ACTIONS);
 
+		menuService.registerTableAction(APPLICATION_LAUNCHER_ACTIONS,
+				new AbstractTableAction("exportApplicationResource",
+						"fa-download", "exportApplicationResource",
+						ApplicationLauncherResourcePermission.READ, 0, null,
+						null));
 		
 		eventService.registerEvent(ApplicationLauncherEvent.class,
 				RESOURCE_BUNDLE, this);

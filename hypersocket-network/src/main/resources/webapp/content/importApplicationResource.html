@@ -8,7 +8,6 @@
 			<div class="modal-body">
 
 				<div id="uploadLaunchersProperties"></div>
-				<div id="tabUploadProperties" class="dialogTab">
 					<div class="propertyItem form-group">
 						<label for="file" class="col-md-3 control-label"
 							localize="importLauncher.file.label"></label>
@@ -18,9 +17,7 @@
 								<span class="help-block" localize="importLauncher.file.info"></span>
 							</div>
 						</div>
-					</div>
 				</div>
-				
 			</div>
 			<div class="modal-footer">
 				<button id="importLaunchersButton" type="button" class="btn btn-primary">
@@ -34,19 +31,6 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#uploadLaunchers').localize();
-		
-		$('#uploadLaunchersProperties').propertyPage({
-			url : 'template/launchers/import',
-			showButtons : false,
-			useTemplates : true,
-			canUpdate : currentMenu.canUpdate,
-			additionalTabs : [ 
-				{
-					id : "tabUploadProperties",
-					name : getResource("uploadLaunchers.tab")
-				}
-			]
-		});
 
 		$('#uploadLaunchers').data('action', function(callback) {
 			$('#jsonFile').val('');

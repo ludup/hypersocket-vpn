@@ -169,7 +169,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 
 			ApplicationLauncherResource newResource = resourceService
-					.createFromTemplate(script);
+					.importResources(script, getCurrentRealm()).iterator().next();
 
 			return new ResourceStatus<ApplicationLauncherResource>(
 					newResource,
@@ -378,24 +378,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		}
 
 	}
-
-	@AuthenticationRequired
-	@RequestMapping(value = "template/launchers/import", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<PropertyCategory> getUploagKeyTemplate(
-			HttpServletRequest request) throws AccessDeniedException,
-			UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request));
-		try {
-			return new ResourceList<PropertyCategory>();
-		} finally {
-			clearAuthenticatedContext();
-		}
-	}
-
+	
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/import", method = { RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
