@@ -4,11 +4,14 @@ import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
+import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
@@ -33,6 +36,11 @@ public class NetworkProtocolServiceImpl extends
 		AbstractResourceServiceImpl<NetworkProtocol> implements
 		NetworkProtocolService {
 
+	static Logger log = LoggerFactory
+			.getLogger(NetworkProtocolServiceImpl.class);
+
+	public static final String NETWORK_PROTOCOLS_ACTIONS = "networkProtocolsActions";
+
 	public static final String RESOURCE_BUNDLE = "NetworkProtocolService";
 
 	@Autowired
@@ -51,12 +59,12 @@ public class NetworkProtocolServiceImpl extends
 	EventService eventService;
 
 	@Autowired
-	RealmService realmService; 
-	
+	RealmService realmService;
+
 	public NetworkProtocolServiceImpl() {
 		super("networkProtocol");
 	}
-	
+
 	@PostConstruct
 	private void postConstruct() {
 
@@ -66,25 +74,29 @@ public class NetworkProtocolServiceImpl extends
 				RESOURCE_BUNDLE, "category.websites");
 
 		repository.loadPropertyTemplates("networkProtocolTemplate.xml");
-		
+
 		for (NetworkProtocolPermission p : NetworkProtocolPermission.values()) {
-			permissionService.registerPermission(p,cat);
+			permissionService.registerPermission(p, cat);
 		}
-		
+
 		menuService.registerMenu(new MenuRegistration(
 				NetworkResourceServiceImpl.RESOURCE_BUNDLE, "protocols",
 				"fa-exchange", "protocols", 200,
 				NetworkProtocolPermission.READ,
 				NetworkProtocolPermission.CREATE,
 				NetworkProtocolPermission.UPDATE,
-				NetworkProtocolPermission.DELETE), NetworkResourceServiceImpl.MENU_NETWORK);
+				NetworkProtocolPermission.DELETE),
+				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		/**
-		 * Register the events. All events have to be registerd so the system
-		 * knows about them.
-		 */
-		eventService.registerEvent(NetworkProtocolEvent.class,
-				RESOURCE_BUNDLE, this);
+		menuService.registerExtendableTable(NETWORK_PROTOCOLS_ACTIONS);
+
+		menuService.registerTableAction(NETWORK_PROTOCOLS_ACTIONS,
+				new AbstractTableAction("exportNetworkProtocol", "fa-download",
+						"exportNetworkProtocol",
+						NetworkProtocolPermission.UPDATE, 0, null, null));
+
+		eventService.registerEvent(NetworkProtocolEvent.class, RESOURCE_BUNDLE,
+				this);
 		eventService.registerEvent(NetworkProtocolCreatedEvent.class,
 				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(NetworkProtocolUpdatedEvent.class,
@@ -103,7 +115,7 @@ public class NetworkProtocolServiceImpl extends
 			public boolean hasCreatedDefaultResources(Realm realm) {
 				return repository.getResourceCount(realm, "") > 0;
 			}
-			
+
 		});
 	}
 
@@ -112,7 +124,8 @@ public class NetworkProtocolServiceImpl extends
 		createProtocol(realm, "FTP (Data)", NetworkTransport.BOTH, 20, null);
 		createProtocol(realm, "FTP (Control)", NetworkTransport.TCP, 21, null);
 		createProtocol(realm, "FTPS (Data)", NetworkTransport.BOTH, 989, null);
-		createProtocol(realm, "FTPS (Control)", NetworkTransport.BOTH, 990, null);
+		createProtocol(realm, "FTPS (Control)", NetworkTransport.BOTH, 990,
+				null);
 		createProtocol(realm, "Telnet", NetworkTransport.TCP, 23, null);
 		createProtocol(realm, "SSH", NetworkTransport.TCP, 22, null);
 		createProtocol(realm, "VNC", NetworkTransport.TCP, 5900, 5910);
@@ -138,8 +151,8 @@ public class NetworkProtocolServiceImpl extends
 	}
 
 	@SuppressWarnings("unchecked")
-	void createProtocol(Realm realm, String name, NetworkTransport transport, Integer start,
-			Integer end) {
+	void createProtocol(Realm realm, String name, NetworkTransport transport,
+			Integer start, Integer end) {
 		NetworkProtocol protocol = new NetworkProtocol();
 		protocol.setRealm(realm);
 		protocol.setName(name);
@@ -147,9 +160,10 @@ public class NetworkProtocolServiceImpl extends
 		protocol.setStartPort(start);
 		protocol.setEndPort(end);
 
-		repository.saveResource(protocol, new HashMap<String,String>());
+		repository.saveResource(protocol, new HashMap<String, String>());
 
 	}
+
 	@Override
 	protected AbstractResourceRepository<NetworkProtocol> getRepository() {
 		return repository;
@@ -164,11 +178,11 @@ public class NetworkProtocolServiceImpl extends
 	public Class<NetworkProtocolPermission> getPermissionType() {
 		return NetworkProtocolPermission.class;
 	}
-	
+
 	protected Class<NetworkProtocol> getResourceClass() {
 		return NetworkProtocol.class;
 	}
-	
+
 	@Override
 	protected void fireResourceCreationEvent(NetworkProtocol resource) {
 		eventService.publishEvent(new NetworkProtocolCreatedEvent(this,
@@ -217,8 +231,8 @@ public class NetworkProtocolServiceImpl extends
 		resource.setStartPort(startPort);
 		resource.setEndPort(endPort);
 		resource.setTransport(transport);
-		
-		updateResource(resource, new HashMap<String,String>());
+
+		updateResource(resource, new HashMap<String, String>());
 
 		return resource;
 	}
@@ -235,7 +249,7 @@ public class NetworkProtocolServiceImpl extends
 		resource.setTransport(transport);
 		resource.setRealm(realm);
 
-		createResource(resource, new HashMap<String,String>());
+		createResource(resource, new HashMap<String, String>());
 
 		return resource;
 	}

@@ -81,10 +81,13 @@
 		</div>
 	</div>
 </div>
+<div id="additionalActions"></div>
+<div id="uploadLauncherDiv"></div>
+
 <script type="text/javascript">
 	$(document).ready(function() {
 				$('#contentLaunchers').localize();
-				
+								
 				var osSelect = $('#osButton').selectButton({
 					id: 'os',
 					url: 'launchers/os',
@@ -134,71 +137,120 @@
 					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
 				
-				$('#contentLaunchers').ajaxResourcePage(
-						{
-							id : "Launcher",
-							tableUrl : "launchers/table",
-							title: getResource("launchers.label"),
-							icon: 'fa-rocket',
-							resourceUrl : "launchers/launcher",
-							fields : [ {
-								name : "name"
-							}],
-							resourceKey : "launcher",
-							canCreate: currentMenu.canCreate,
-							canUpdate: currentMenu.canUpdate,
-							canDelete: currentMenu.canDelete,
-							validate : function() {
+				getJSON('menus/tableActions/applicationLauncherActions', null, function(data) {
+					var actions = new Array();
+					if(data.resources.length > 0) {
+						$.each(data.resources, function(idx, action) {
+							var div = action.resourceKey + 'Div';
+							$('#additionalActions').append('<div id="' + div + '"></div>');
+							$('#' + div).load('content/' + action.url + '.html');
 
-								if ($('#resourceName').val() == '') {
-									$('#addLauncherForm').resourceDialog(
-											'error', "error.nameRequired");
-									return false;
-								}
-
-								// TODO validate any of your other fields
-								
-								return true;
-							},
-							clearDialog : function() {
-								
-								$('#resourceId').val('');
-								$('#resourceName').val('');
-								exeInput.setValue('');
-								$('#args').multipleTextInput({ values: []});
-								osSelect.setValue(0);
-								startupScript.setValue("");
-								shutdownScript.setValue("");
-								
-								$('.launcherPropertiesTab').first().trigger('click');
-							},
-							createResource : function() {
-								resource = new Object();
-								resource.id = $('#resourceId').val();
-								resource.name = $('#resourceName').val();
-								resource.exe = exeInput.getValue();
-								resource.args = fixSplit($('#args').multipleSelectValues());
-								resource.os = osSelect.getValue();
-								resource.startupScript = startupScript.getValue();
-								resource.shutdownScript = shutdownScript.getValue();
-								
-								return resource;
-							},
-							displayResource : function(resource) {
-								
-								$('#resourceId').val(resource.id);
-								$('#resourceName').val(resource.name);
-								exeInput.setValue(resource.exe);
-								$('#args').multipleTextInput({ values: splitFix(resource.args)});
-								osSelect.setValue(resource.os.id);
-								startupScript.setValue(resource.startupScript);
-								shutdownScript.setValue(resource.shutdownScript);
-								
-							},
-							complete : function() {
-								loadComplete();
-							}
+							actions.push({
+								resourceKey : action.resourceKey,
+								iconClass : action.iconClass,
+								action : function(resource, callback) {
+									if($('#' + action.resourceKey).data('action')) {
+										$('#' + action.resourceKey).data('action')(resource, callback);
+									}
+								},
+								enabled : true,
+								enableFunction: action.enableFunction,
+								displayFunction: action.displayFunction
+							});
 						});
-
+					}
+					$('#uploadLauncherDiv').load('content/importApplicationResource.html');
+				
+					$('#contentLaunchers').ajaxResourcePage(
+							{
+								id : "Launcher",
+								tableUrl : "launchers/table",
+								title: getResource("launchers.label"),
+								icon: 'fa-rocket',
+								resourceUrl : "launchers/launcher",
+								fields : [ {
+									name : "name"
+								}],
+								resourceKey : "launcher",
+								canCreate: currentMenu.canCreate,
+								canUpdate: currentMenu.canUpdate,
+								canDelete: currentMenu.canDelete,
+								additionalActionsDropdown: true,
+								additionalActions: actions,
+								validate : function() {
+	
+									if ($('#resourceName').val() == '') {
+										$('#addLauncherForm').resourceDialog(
+												'error', "error.nameRequired");
+										return false;
+									}
+	
+									// TODO validate any of your other fields
+									
+									return true;
+								},
+								clearDialog : function() {
+									
+									$('#resourceId').val('');
+									$('#resourceName').val('');
+									exeInput.setValue('');
+									$('#args').multipleTextInput({ values: []});
+									osSelect.setValue(0);
+									startupScript.setValue("");
+									shutdownScript.setValue("");
+									
+									$('.launcherPropertiesTab').first().trigger('click');
+								},
+								createResource : function() {
+									resource = new Object();
+									resource.id = $('#resourceId').val();
+									resource.name = $('#resourceName').val();
+									resource.exe = exeInput.getValue();
+									resource.args = fixSplit($('#args').multipleSelectValues());
+									resource.os = osSelect.getValue();
+									resource.startupScript = startupScript.getValue();
+									resource.shutdownScript = shutdownScript.getValue();
+									
+									return resource;
+								},
+								displayResource : function(resource) {
+									
+									$('#resourceId').val(resource.id);
+									$('#resourceName').val(resource.name);
+									exeInput.setValue(resource.exe);
+									$('#args').multipleTextInput({ values: splitFix(resource.args)});
+									osSelect.setValue(resource.os.id);
+									startupScript.setValue(resource.startupScript);
+									shutdownScript.setValue(resource.shutdownScript);
+									
+								},
+								complete : function() {
+									loadComplete();
+								},
+								additionalButtons: [ {
+										
+									    resourceKey: 'import',
+										icon: 'fa-upload',
+										buttonClass: 'btn-primary',
+										action: function(callback) {
+											$('#uploadLaunchers').data('action')(
+													function() {
+														callback();
+													});
+										
+									   	}
+								       }
+								       ,            
+									   {
+										resourceKey: 'export',
+										icon: 'fa-download',
+										buttonClass: 'btn-primary',
+										action: function(callback) {
+											window.location = basePath + '/api/launchers/exportAllLaunchers';
+										}
+									  }
+								]
+					});
+				});
 			});
 </script>

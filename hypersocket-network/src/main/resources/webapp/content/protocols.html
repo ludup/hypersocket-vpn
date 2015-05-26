@@ -53,7 +53,9 @@
 				</div>
 			</div>
 		</div>
-	</div>
+</div>
+<div id="additionalActions"></div>
+<div id="uploadProtocolDiv"></div>
 <script type="text/javascript">
 
 
@@ -70,68 +72,117 @@
 			name: 'TCP',
 			value: 'TCP'
 		});
+		
+		getJSON('menus/tableActions/networkProtocolsActions', null, function(data) {
+			var actions = new Array();
+			if(data.resources.length > 0) {
+				$.each(data.resources, function(idx, action) {
+					var div = action.resourceKey + 'Div';
+					debugger;
+					$('#additionalActions').append('<div id="' + div + '"></div>');
+					$('#' + div).load('content/' + action.url + '.html');
 
-		$('#contentProtocols').ajaxResourcePage(
-				{
-				title: getResource('protocols.title'),
-				icon: 'fa-exchange',
-				tableUrl : "networkProtocols/table",
-				resourceUrl : "networkProtocols/networkProtocol",
-				fields : [ { name: "name" }, 
-				           { name: "transport" },
-				           { name: "portRange" } ],
-				resourceKey : 'protocol',
-				canCreate: currentMenu.canCreate,
-				canUpdate: currentMenu.canUpdate,
-				canDelete: currentMenu.canDelete,
-				validate : function() {
-					if ($('#protocolName').val() == '') {
-						$('#addProtocolForm').resourceDialog('error',
-								"error.nameRequired");
-						return false;
-					}
+					actions.push({
+						resourceKey : action.resourceKey,
+						iconClass : action.iconClass,
+						action : function(resource, callback) {
+							if($('#' + action.resourceKey).data('action')) {
+								$('#' + action.resourceKey).data('action')(resource, callback);
+							}
+						},
+						enabled : true,
+						enableFunction: action.enableFunction,
+						displayFunction: action.displayFunction
+					});
+				});
+			}
 
-					if ($('#end').val() != ''
-							&& $('#start').val() > $('#end').val()) {
-						$('#addProtocolForm').resourceDialog('error',
-								"error.portEndError");
-						return false;
-					}
-
-					return true;
-				},
-				clearDialog : function() {
-					$('#protocolName').val('');
-					$('#transport').val('TCP');
-					$('#start').val('');
-					$('#end').val('');
-					$('#protocolId').val('');
-				},
-				createResource : function() {
-					protocol = new Object();
-					protocol.name = $('#protocolName').val();
-					protocol.transport = $('#transport').val();
-					protocol.startPort = $('#start').val();
-					protocol.endPort = $('#end').val();
-					protocol.id = $('#protocolId').val();
-
-					return protocol;
-				},
-				resourceCreated : function(resource) {
-					$('#protocols').multipleSelect( { insert: [ resource ] });
-				},
-				displayResource : function(resource) {
-					$('#protocolName').val(resource.name);
-					$('#transport').val(resource.transport);
-					$('#start').val(resource.startPort);
-					$('#end').val(resource.endPort);
-					$('#protocolId').val(resource.id);
-				},
-				complete: function() {
-					loadComplete();
-				}
-			});
-
+			$('#contentProtocols').ajaxResourcePage(
+					{
+					title: getResource('protocols.title'),
+					icon: 'fa-exchange',
+					tableUrl : "networkProtocols/table",
+					resourceUrl : "networkProtocols/networkProtocol",
+					fields : [ { name: "name" }, 
+					           { name: "transport" },
+					           { name: "portRange" } ],
+					resourceKey : 'protocol',
+					canCreate: currentMenu.canCreate,
+					canUpdate: currentMenu.canUpdate,
+					canDelete: currentMenu.canDelete,
+					additionalActionsDropdown: true,
+					additionalActions: actions,
+					validate : function() {
+						if ($('#protocolName').val() == '') {
+							$('#addProtocolForm').resourceDialog('error',
+									"error.nameRequired");
+							return false;
+						}
+	
+						if ($('#end').val() != ''
+								&& $('#start').val() > $('#end').val()) {
+							$('#addProtocolForm').resourceDialog('error',
+									"error.portEndError");
+							return false;
+						}
+	
+						return true;
+					},
+					clearDialog : function() {
+						$('#protocolName').val('');
+						$('#transport').val('TCP');
+						$('#start').val('');
+						$('#end').val('');
+						$('#protocolId').val('');
+					},
+					createResource : function() {
+						protocol = new Object();
+						protocol.name = $('#protocolName').val();
+						protocol.transport = $('#transport').val();
+						protocol.startPort = $('#start').val();
+						protocol.endPort = $('#end').val();
+						protocol.id = $('#protocolId').val();
+	
+						return protocol;
+					},
+					resourceCreated : function(resource) {
+						$('#protocols').multipleSelect( { insert: [ resource ] });
+					},
+					displayResource : function(resource) {
+						$('#protocolName').val(resource.name);
+						$('#transport').val(resource.transport);
+						$('#start').val(resource.startPort);
+						$('#end').val(resource.endPort);
+						$('#protocolId').val(resource.id);
+					},
+					complete: function() {
+						loadComplete();
+					},
+					additionalButtons: [ {
+						
+					    resourceKey: 'import',
+						icon: 'fa-upload',
+						buttonClass: 'btn-primary',
+						action: function(callback) {
+							$('#importProtocols').data('action')(
+									function() {
+										callback();
+									});
+						
+					   	}
+				       }
+				       ,            
+					   {
+						resourceKey: 'export',
+						icon: 'fa-download',
+						buttonClass: 'btn-primary',
+						action: function(callback) {
+							window.location = basePath + '/api/networkProtocols/exportAll';
+						}
+					  }
+				]
+				});
+		});
 		
 	});
 </script>
