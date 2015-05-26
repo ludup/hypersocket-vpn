@@ -1,8 +1,9 @@
 package com.hypersocket.launcher;
 
-import java.util.Collection;
+import java.io.IOException;
 
-import org.springframework.web.multipart.MultipartFile;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.realm.Realm;
@@ -10,8 +11,8 @@ import com.hypersocket.resource.AbstractResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
-import com.hypersocket.resource.ResourceExportException;
-import com.hypersocket.resource.ResourceNotFoundException;
+import com.hypersocket.tables.DataTablesResult;
+
 
 public interface ApplicationLauncherResourceService extends
 		AbstractResourceService<ApplicationLauncherResource> {
@@ -26,5 +27,14 @@ public interface ApplicationLauncherResourceService extends
 			String exe, String args, ApplicationLauncherOS os,
 			String startupScript, String shutdownScript)
 			throws ResourceCreationException, AccessDeniedException;
+
+	DataTablesResult searchTemplates(String search, int iDisplayStart,
+			int iDisplayLength) throws IOException, AccessDeniedException;
+
+	void downloadTemplateImage(String uuid, HttpServletRequest request,
+			HttpServletResponse response) throws IOException;
+
+	ApplicationLauncherResource createFromTemplate(String script)
+			throws AccessDeniedException, ResourceException;
 
 }
