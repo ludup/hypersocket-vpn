@@ -73,7 +73,7 @@ public class NetworkResourceServiceImpl extends
 	EventService eventService;
 
 	public NetworkResourceServiceImpl() {
-
+		super("networkResource");
 	}
 
 	@PostConstruct
@@ -273,6 +273,11 @@ public class NetworkResourceServiceImpl extends
 			Throwable t) {
 		eventService.publishEvent(new NetworkResourceDeletedEvent(this,
 				resource, t, getCurrentSession()));
+	}
+
+	@Override
+	protected Class<NetworkResource> getResourceClass() {
+		return NetworkResource.class;
 	}
 
 }

@@ -56,6 +56,10 @@ public class WebsiteResourceServiceImpl extends
 	@Autowired
 	RealmService realmService;
 
+	public WebsiteResourceServiceImpl() {
+		super("website");
+	}
+	
 	@PostConstruct
 	private void postConstruct() {
 
@@ -205,6 +209,11 @@ public class WebsiteResourceServiceImpl extends
 				RESOURCE_BUNDLE, "error.urlNotAuthorized", hostname, port,
 				resource.getName()));
 
+	}
+
+	@Override
+	protected Class<WebsiteResource> getResourceClass() {
+		return WebsiteResource.class;
 	}
 
 }
