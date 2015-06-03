@@ -383,7 +383,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/import", method = { RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<ApplicationLauncherResource> uploadLauncher(
+	public ResourceStatus<ApplicationLauncherResource> importLaunchers(
 			HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "file") MultipartFile jsonFile)
 			throws AccessDeniedException, UnauthorizedException,
