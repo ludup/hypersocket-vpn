@@ -130,7 +130,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								.getResourceRealm(serviceClient.getHost());
 
 						ResourceImpl res = new ResourceImpl(name + " - " + I18N.getResource("text.defaultBrowser"));
-						res.setType(Type.NETWORK);
+						res.setType(Type.BROWSER);
 						res.setLaunchable(true);
 						res.setResourceLauncher(new AWTBrowserLauncher(
 								template.getLaunchUrl()));
