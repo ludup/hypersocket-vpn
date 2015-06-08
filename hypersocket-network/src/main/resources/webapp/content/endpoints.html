@@ -146,20 +146,18 @@
 						validate : function() {
 
 							if ($('#resourceName').val() == '') {
-								$('#addResourceForm').resourceDialog('error',
-										"error.nameRequired");
+								showError("error.nameRequired");
 								return false;
 							}
 
 							if (hostnameInput.getValue() == '') {
-								$('#addResourceForm').resourceDialog('error',
-										"error.hostnameRequired");
+								showError("error.hostnameRequired");
 								return false;
 							}
 							
 							if(!isReplacementVariable(hostnameInput.getValue())) {
 								if(!isValidHostname(hostnameInput.getValue())) { 
-					 				$('#addResourceForm').resourceDialog('error', "error.hostnameInvalid");
+									showError("error.hostnameInvalid");
 					 				return false;
 					 			} 
 							}
@@ -169,7 +167,7 @@
 									if(!isValidHostname(destinationHostname.getValue()) 
 											&& !isValidIpv4Address(destinationHostname.getValue()) 
 											&& !isValidIpv6Address(destinationHostname.getValue())) {
-										$('#addResourceForm').resourceDialog('error', "error.destinationInvalid");
+										showError("error.destinationInvalid");
 						 				return false;
 									}
 								}

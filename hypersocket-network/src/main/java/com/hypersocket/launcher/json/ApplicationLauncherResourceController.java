@@ -311,7 +311,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<ApplicationLauncherResource>(
-					resourceService.getResources());
+					resourceService.allResources());
 		} finally {
 			clearAuthenticatedContext();
 		}

@@ -114,15 +114,13 @@
 					additionalActions: actions,
 					validate : function() {
 						if ($('#protocolName').val() == '') {
-							$('#addProtocolForm').resourceDialog('error',
-									"error.nameRequired");
+							showError("error.nameRequired");
 							return false;
 						}
 	
 						if ($('#end').val() != ''
 								&& $('#start').val() > $('#end').val()) {
-							$('#addProtocolForm').resourceDialog('error',
-									"error.portEndError");
+							showError("error.portEndError");
 							return false;
 						}
 	

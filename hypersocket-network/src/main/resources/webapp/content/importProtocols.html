@@ -52,13 +52,12 @@
 			$('#jsonFile').val('');
 			$('#importProtocols').data('callback', callback);
 			$('#importProtocols').modal('show');
-			$('#importProtocols').resourceDialog('error','reset');
 		});
 
 		$('#importProtocolsButton').click(function(e) {
 	
 			if (!$('#jsonFile')[0].files[0]) {
-				$('#importProtocols').resourceDialog('error', getResource("error.selectProtocolsFile"));
+				showError(getResource("error.selectProtocolsFile"));
 				return;
 			}
 			
@@ -80,11 +79,11 @@
 				   				$('#importProtocols').data('callback')();
 			  	 				showSuccess(data.message);
 			 				} else {
-			 	  				$('#importProtocols').resourceDialog('error',data.message);
+			 					showError(data.message);
 			 				} 
 						},
 				error : function(jqXHR,textStatus,errorThrown) {
-		      				$('#importProtocols').resourceDialog('error',errorThrown);
+					showError(errorThrown);
 						},
 				complete: function() {
 							$('#uploadIcon').removeClass('fa-spinner fa-spin');

@@ -26,9 +26,6 @@ public interface NetworkResourceService extends
 
 	NetworkResource getResourceById(Long id) throws ResourceNotFoundException;
 
-	void deleteResource(NetworkResource resource)
-			throws ResourceChangeException, AccessDeniedException;
-
 	NetworkResource updateResource(NetworkResource resourceById, String name,
 			String hostname, String destinationHostname,
 			Set<NetworkProtocol> protocols,

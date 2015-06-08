@@ -36,13 +36,12 @@
 			$('#jsonFile').val('');
 			$('#uploadLaunchers').data('callback', callback);
 			$('#uploadLaunchers').modal('show');
-			$('#uploadLaunchers').resourceDialog('error','reset');
 		});
 
 		$('#importLaunchersButton').click(function(e) {
 	
 			if (!$('#jsonFile')[0].files[0]) {
-				$('#uploadLaunchers').resourceDialog('error', getResource("error.selectLaunchersFile"));
+				showError(getResource("error.selectLaunchersFile"));
 				return;
 			}
 			
@@ -64,11 +63,11 @@
 				   				$('#uploadLaunchers').data('callback')();
 			  	 				showSuccess(data.message);
 			 				} else {
-			 	  				$('#uploadLaunchers').resourceDialog('error',data.message);
+			 					showError(data.message);
 			 				} 
 						},
 				error : function(jqXHR,textStatus,errorThrown) {
-		      				$('#uploadLaunchers').resourceDialog('error',errorThrown);
+					showError(errorThrown);
 						},
 				complete: function() {
 							$('#uploadIcon').removeClass('fa-spinner fa-spin');

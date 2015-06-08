@@ -224,7 +224,7 @@ public class NetworkProtocolController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkProtocol>(
-					resourceService.getResources());
+					resourceService.allResources());
 		} finally {
 			clearAuthenticatedContext();
 		}
