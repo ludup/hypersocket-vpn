@@ -410,8 +410,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 							"launcher.import.success", collects.size()));
 		} catch (ResourceException e) {
 			return new ResourceStatus<ApplicationLauncherResource>(false,
-					I18N.getResource(sessionUtils.getLocale(request),
-							e.getBundle(), e.getResourceKey(), e.getArgs()));
+					e.getMessage());
 		} catch (Exception e) {
 			return new ResourceStatus<ApplicationLauncherResource>(
 					false,

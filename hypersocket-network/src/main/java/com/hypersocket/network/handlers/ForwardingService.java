@@ -9,9 +9,9 @@ import com.hypersocket.session.Session;
 public interface ForwardingService<T extends ForwardingResource> extends
 		AuthenticatedService {
 
-	T getResourceById(Long resourceId) throws ResourceNotFoundException;
-
 	void verifyResourceSession(T resource, String hostname, int port,
 			NetworkTransport transport, Session session)
 			throws AccessDeniedException;
+
+	T getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;
 }

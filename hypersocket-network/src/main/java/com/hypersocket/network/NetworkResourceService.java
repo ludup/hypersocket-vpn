@@ -18,13 +18,10 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
-import com.hypersocket.resource.ResourceNotFoundException;
 
 public interface NetworkResourceService extends
 		ForwardingService<NetworkResource>,
 		AbstractAssignableResourceService<NetworkResource> {
-
-	NetworkResource getResourceById(Long id) throws ResourceNotFoundException;
 
 	NetworkResource updateResource(NetworkResource resourceById, String name,
 			String hostname, String destinationHostname,

@@ -326,9 +326,7 @@ public class NetworkProtocolController extends ResourceController {
 					NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
 					"protocol.import.success", collects.size()));
 		} catch (ResourceException e) {
-			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
-					sessionUtils.getLocale(request), e.getBundle(),
-					e.getResourceKey(), e.getArgs()));
+			return new ResourceStatus<NetworkProtocol>(false, e.getMessage());
 		} catch (Exception e) {
 			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
 					sessionUtils.getLocale(request),

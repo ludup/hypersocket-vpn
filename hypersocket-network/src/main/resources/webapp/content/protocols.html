@@ -78,7 +78,6 @@
 			if(data.resources.length > 0) {
 				$.each(data.resources, function(idx, action) {
 					var div = action.resourceKey + 'Div';
-					debugger;
 					$('#additionalActions').append('<div id="' + div + '"></div>');
 					$('#' + div).load('content/' + action.url + '.html');
 
