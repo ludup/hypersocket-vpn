@@ -174,6 +174,7 @@ public class NetworkProtocolController extends ResourceController {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@AuthenticationRequired
 	@RequestMapping(value = "networkProtocols/networkProtocol/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody

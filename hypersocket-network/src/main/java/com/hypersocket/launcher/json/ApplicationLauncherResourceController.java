@@ -255,6 +255,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@AuthenticationRequired
 	@RequestMapping(value = "launchers/launcher/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody

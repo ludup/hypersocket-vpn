@@ -239,6 +239,7 @@ public class WebsiteResourceController extends ResourceController {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@AuthenticationRequired
 	@RequestMapping(value = "websites/website/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody

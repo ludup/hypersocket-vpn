@@ -288,6 +288,7 @@ public class NetworkResourceController extends ResourceController {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@AuthenticationRequired
 	@RequestMapping(value = "networkResources/networkResource/{id}", method = RequestMethod.DELETE, produces = { "application/json" })
 	@ResponseBody
