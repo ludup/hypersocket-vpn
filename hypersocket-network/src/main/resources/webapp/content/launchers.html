@@ -445,8 +445,7 @@
 								validate : function() {
 	
 									if ($('#resourceName').val() == '') {
-										$('#addLauncherForm').resourceDialog(
-												'error', "error.nameRequired");
+										showError("error.nameRequired");
 										return false;
 									}
 	

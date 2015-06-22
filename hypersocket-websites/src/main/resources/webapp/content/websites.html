@@ -104,8 +104,7 @@
 							validate : function() {
 
 								if ($('#resourceName').val() == '') {
-									$('#addWebsiteForm').resourceDialog(
-											'error', "error.nameRequired");
+									showError("error.nameRequired");
 									return false;
 								}
 
@@ -113,8 +112,7 @@
 									// TODO validate URL
 									return true;
 								} else {
-									$('#addWebsiteForm').resourceDialog(
-											'error', "error.urlRequired");
+									showError("error.urlRequired");
 								}
 
 								return false;
