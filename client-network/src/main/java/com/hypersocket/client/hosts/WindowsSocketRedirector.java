@@ -66,7 +66,11 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 				int exit = cmd.execute();
 				
 				if(exit!=0) {
-					throw new IllegalStateException("Could not install redirect driver exitCode=" + exit);
+					if(exit!=1073) {
+						throw new IllegalStateException("Could not install redirect driver exitCode=" + exit);
+					} else {
+						log.warn("Ignoring 1073 exit code as this indicates driver is already installed");
+					}
 				}
 			} catch (IOException e) {
 				throw new IllegalStateException("Could not update redirect driver", e);
@@ -80,8 +84,12 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 		int exit;
 		try {
 			exit = startCommand.execute();
-			if(exit!=0 && exit!=1056) {
-				throw new IllegalStateException("Could not install redirect driver exitCode=" + exit);
+			if(exit!=0) {
+				if(exit!=1056) {
+					throw new IllegalStateException("Could not install redirect driver exitCode=" + exit);
+				} else {
+					log.warn("Ignoring exit code 1056 as this indicates the redirect service is already running");
+				}
 			}	
 		} catch (IOException e) {
 			throw new IllegalStateException("Could not execute driver start command", e);
@@ -97,7 +105,7 @@ public class WindowsSocketRedirector extends AbstractSocketRedirector implements
 				int exit;
 				try {
 					exit = stopCommand.execute();
-					if(exit!=0) {
+					if(exit!=0 && exit!=1063) {
 						log.error("Could not stop redirect driver exitCode=" + exit);
 					}	
 				} catch (IOException e) {

@@ -103,6 +103,11 @@ public abstract class AbstractSocketRedirector implements SocketRedirector {
 	protected abstract String[] getStopArguments(String sourceAddr, int sourcePort, String destAddr, int destPort);
 
 	public static SocketRedirector getSystemRedirector() throws IOException {
+		
+		if(systemRedirector!=null) {
+			return systemRedirector;
+		}
+		
 		String osName = System.getProperty("os.name");
 		if (SystemUtils.IS_OS_MAC_OSX) {
 			systemRedirector = new OSXSocketRedirector();
