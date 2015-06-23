@@ -196,7 +196,7 @@ public class WebsiteResourceController extends ResourceController {
 	@RequestMapping(value = "websites/website", method = RequestMethod.POST, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<WebsiteResource> createOrUpdateNetworkResource(
+	public ResourceStatus<WebsiteResource> createOrUpdate(
 			HttpServletRequest request, HttpServletResponse response,
 			@RequestBody WebsiteResourceUpdate resource)
 			throws AccessDeniedException, UnauthorizedException,

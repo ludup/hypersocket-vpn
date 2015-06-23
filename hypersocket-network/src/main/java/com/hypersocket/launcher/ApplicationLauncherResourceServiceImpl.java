@@ -22,7 +22,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hypersocket.attributes.AttributeService;
+import com.hypersocket.attributes.user.UserAttributeService;
 import com.hypersocket.events.EventService;
 import com.hypersocket.http.HttpUtils;
 import com.hypersocket.i18n.I18NService;
@@ -78,7 +78,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 	RealmService realmService;
 
 	@Autowired
-	AttributeService attributeService;
+	UserAttributeService attributeService;
 
 	@Autowired
 	TransactionService transactionService;
