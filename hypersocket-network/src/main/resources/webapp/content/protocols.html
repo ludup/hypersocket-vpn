@@ -109,6 +109,8 @@
 					canCreate: currentMenu.canCreate,
 					canUpdate: currentMenu.canUpdate,
 					canDelete: currentMenu.canDelete,
+					importUrl: 'networkProtocols/import',
+					exportUrl: 'networkProtocols/export',
 					additionalActionsDropdown: true,
 					additionalActions: actions,
 					validate : function() {
@@ -154,30 +156,7 @@
 					},
 					complete: function() {
 						loadComplete();
-					},
-					additionalButtons: [ {
-						
-					    resourceKey: 'import',
-						icon: 'fa-upload',
-						buttonClass: 'btn-primary',
-						action: function(callback) {
-							$('#importProtocols').data('action')(
-									function() {
-										callback();
-									});
-						
-					   	}
-				       }
-				       ,            
-					   {
-						resourceKey: 'export',
-						icon: 'fa-download',
-						buttonClass: 'btn-primary',
-						action: function(callback) {
-							window.location = basePath + '/api/networkProtocols/exportAll';
-						}
-					  }
-				]
+					}
 				});
 		});
 		

@@ -25,6 +25,7 @@ import com.hypersocket.auth.json.AuthenticationRequired;
 import com.hypersocket.auth.json.ResourceController;
 import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
+import com.hypersocket.i18n.I18NServiceImpl;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.launcher.ApplicationLauncherOS;
@@ -329,7 +330,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "launchers/exportLauncher/{id}", method = RequestMethod.GET, produces = { "text/plain" })
+	@RequestMapping(value = "launchers/export/{id}", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public String exportLauncher(HttpServletRequest request,
@@ -356,7 +357,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "launchers/exportAllLaunchers", method = RequestMethod.GET, produces = { "text/plain" })
+	@RequestMapping(value = "launchers/export", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public String exportLauncher(HttpServletRequest request,
@@ -398,7 +399,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 			String json = IOUtils.toString(jsonFile.getInputStream());
 			if (!HypersocketUtils.isValidJSON(json)) {
-				throw new ResourceException(ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
+				throw new ResourceException(I18NServiceImpl.USER_INTERFACE_BUNDLE,
 						"error.incorrectJSON");
 			}
 			Collection<ApplicationLauncherResource> collects = resourceService
@@ -407,8 +408,8 @@ public class ApplicationLauncherResourceController extends ResourceController {
 					true,
 					I18N.getResource(
 							sessionUtils.getLocale(request),
-							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
-							"launcher.import.success", collects.size()));
+							I18NServiceImpl.USER_INTERFACE_BUNDLE,
+							"resource.import.success", collects.size()));
 		} catch (ResourceException e) {
 			return new ResourceStatus<ApplicationLauncherResource>(false,
 					e.getMessage());
@@ -417,8 +418,9 @@ public class ApplicationLauncherResourceController extends ResourceController {
 					false,
 					I18N.getResource(
 							sessionUtils.getLocale(request),
-							ApplicationLauncherResourceServiceImpl.RESOURCE_BUNDLE,
-							"launcher.import.failure"));
+							I18NServiceImpl.USER_INTERFACE_BUNDLE,
+							"resource.import.failure",
+							e.getMessage()));
 		} finally {
 			clearAuthenticatedContext();
 		}

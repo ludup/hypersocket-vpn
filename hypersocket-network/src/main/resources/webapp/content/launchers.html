@@ -253,30 +253,11 @@
 								canCreate: currentMenu.canCreate,
 								canUpdate: currentMenu.canUpdate,
 								canDelete: currentMenu.canDelete,
+								importUrl: 'launchers/import',
+								exportUrl: 'launchers/export',
 								additionalActionsDropdown: true,
 								additionalActions: actions,
-								additionalButtons: [ {
-									
-								    resourceKey: 'import',
-									icon: 'fa-upload',
-									buttonClass: 'btn-primary',
-									action: function(callback) {
-										$('#uploadLaunchers').data('action')(
-												function() {
-													callback();
-												});
-									
-								   	}
-							},            
-						   {
-							resourceKey: 'export',
-							icon: 'fa-download',
-							buttonClass: 'btn-primary',
-							action: function(callback) {
-								window.location = basePath + '/api/launchers/exportAllLaunchers';
-							}
-						  },
-						  { 
+								additionalButtons: [{
 									resourceKey: 'applicationSearchOnline',
 									buttonClass: 'btn-primary',
 									icon: 'fa-search',

@@ -90,11 +90,6 @@ public class NetworkProtocolServiceImpl extends
 
 		menuService.registerExtendableTable(NETWORK_PROTOCOLS_ACTIONS);
 
-		menuService.registerTableAction(NETWORK_PROTOCOLS_ACTIONS,
-				new AbstractTableAction("exportNetworkProtocol", "fa-download",
-						"exportNetworkProtocol",
-						NetworkProtocolPermission.UPDATE, 0, null, null));
-
 		eventService.registerEvent(NetworkProtocolEvent.class, RESOURCE_BUNDLE,
 				this);
 		eventService.registerEvent(NetworkProtocolCreatedEvent.class,
