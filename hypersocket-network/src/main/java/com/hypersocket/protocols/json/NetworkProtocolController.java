@@ -23,6 +23,7 @@ import com.hypersocket.auth.json.AuthenticationRequired;
 import com.hypersocket.auth.json.ResourceController;
 import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
+import com.hypersocket.i18n.I18NServiceImpl;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.network.NetworkTransport;
@@ -258,7 +259,7 @@ public class NetworkProtocolController extends ResourceController {
 	}
 
 	@AuthenticationRequired
-	@RequestMapping(value = "networkProtocols/exportAll", method = RequestMethod.GET, produces = { "text/plain" })
+	@RequestMapping(value = "networkProtocols/export", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public String exportLauncher(HttpServletRequest request,
@@ -282,22 +283,6 @@ public class NetworkProtocolController extends ResourceController {
 
 	}
 
-	@AuthenticationRequired
-	@RequestMapping(value = "template/networkProtocols/import", method = RequestMethod.GET, produces = { "application/json" })
-	@ResponseBody
-	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<PropertyCategory> getUploagKeyTemplate(
-			HttpServletRequest request) throws AccessDeniedException,
-			UnauthorizedException, SessionTimeoutException {
-
-		setupAuthenticatedContext(sessionUtils.getSession(request),
-				sessionUtils.getLocale(request));
-		try {
-			return new ResourceList<PropertyCategory>();
-		} finally {
-			clearAuthenticatedContext();
-		}
-	}
 
 	@AuthenticationRequired
 	@RequestMapping(value = "networkProtocols/import", method = { RequestMethod.POST }, produces = { "application/json" })
@@ -317,21 +302,22 @@ public class NetworkProtocolController extends ResourceController {
 		try {
 			String json = IOUtils.toString(jsonFile.getInputStream());
 			if(!HypersocketUtils.isValidJSON(json)){
-				throw new ResourceException(NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
+				throw new ResourceException(I18NServiceImpl.USER_INTERFACE_BUNDLE,
 						"error.incorrectJSON");
 			}
 			Collection<NetworkProtocol> collects = resourceService.importResources(json, getCurrentRealm());
 			return new ResourceStatus<NetworkProtocol>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
-					NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
-					"protocol.import.success", collects.size()));
+					I18NServiceImpl.USER_INTERFACE_BUNDLE,
+					"resource.import.success", collects.size()));
 		} catch (ResourceException e) {
 			return new ResourceStatus<NetworkProtocol>(false, e.getMessage());
 		} catch (Exception e) {
 			return new ResourceStatus<NetworkProtocol>(false, I18N.getResource(
 					sessionUtils.getLocale(request),
-					NetworkProtocolServiceImpl.RESOURCE_BUNDLE,
-					"protocol.import.failure"));
+					I18NServiceImpl.USER_INTERFACE_BUNDLE,
+					"resource.import.failure",
+					e.getMessage()));
 		} finally {
 			clearAuthenticatedContext();
 		}
