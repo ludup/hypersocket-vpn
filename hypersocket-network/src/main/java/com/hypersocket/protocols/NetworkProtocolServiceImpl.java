@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18NService;
-import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
