@@ -291,7 +291,8 @@ public class NetworkProtocolController extends ResourceController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceStatus<NetworkProtocol> uploadLauncher(
 			HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(value = "file") MultipartFile jsonFile)
+			@RequestParam(value = "file") MultipartFile jsonFile,
+			@RequestParam(required=false) boolean dropExisting)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
@@ -306,7 +307,7 @@ public class NetworkProtocolController extends ResourceController {
 				throw new ResourceException(I18NServiceImpl.USER_INTERFACE_BUNDLE,
 						"error.incorrectJSON");
 			}
-			Collection<NetworkProtocol> collects = resourceService.importResources(json, getCurrentRealm());
+			Collection<NetworkProtocol> collects = resourceService.importResources(json, getCurrentRealm(), dropExisting);
 			return new ResourceStatus<NetworkProtocol>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
 					I18NServiceImpl.USER_INTERFACE_BUNDLE,

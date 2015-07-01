@@ -170,7 +170,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 
 			ApplicationLauncherResource newResource = resourceService
-					.importResources(script, getCurrentRealm()).iterator().next();
+					.importResources(script, getCurrentRealm(), false).iterator().next();
 
 			return new ResourceStatus<ApplicationLauncherResource>(
 					newResource,
@@ -387,7 +387,8 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceStatus<ApplicationLauncherResource> importLaunchers(
 			HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(value = "file") MultipartFile jsonFile)
+			@RequestParam(value = "file") MultipartFile jsonFile,
+			@RequestParam(required=false) boolean dropExisting)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
@@ -403,7 +404,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 						"error.incorrectJSON");
 			}
 			Collection<ApplicationLauncherResource> collects = resourceService
-					.importResources(json, getCurrentRealm());
+					.importResources(json, getCurrentRealm(), dropExisting);
 			return new ResourceStatus<ApplicationLauncherResource>(
 					true,
 					I18N.getResource(
