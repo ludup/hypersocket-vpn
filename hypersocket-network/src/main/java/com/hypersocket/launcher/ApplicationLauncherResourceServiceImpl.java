@@ -42,11 +42,10 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
-import com.hypersocket.resource.ExportedResource;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
-import com.hypersocket.tables.DataTablesResult;
+import com.hypersocket.tables.BootstrapTableResult;
 import com.hypersocket.transactions.TransactionService;
 
 @Service
@@ -244,7 +243,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 	}
 
 	@Override
-	public DataTablesResult searchTemplates(String search, int iDisplayStart,
+	public BootstrapTableResult searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException {
 
 		assertPermission(ApplicationLauncherResourcePermission.CREATE);
@@ -269,7 +268,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 		ObjectMapper mapper = new ObjectMapper();
 
-		return mapper.readValue(json, DataTablesResult.class);
+		return mapper.readValue(json, BootstrapTableResult.class);
 	}
 
 	@Override

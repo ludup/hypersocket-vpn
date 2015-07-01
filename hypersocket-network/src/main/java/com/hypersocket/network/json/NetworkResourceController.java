@@ -49,8 +49,8 @@ import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.json.SessionTimeoutException;
 import com.hypersocket.tables.Column;
 import com.hypersocket.tables.ColumnSort;
-import com.hypersocket.tables.DataTablesResult;
-import com.hypersocket.tables.json.DataTablesPageProcessor;
+import com.hypersocket.tables.BootstrapTableResult;
+import com.hypersocket.tables.json.BootstrapTablePageProcessor;
 
 @Controller
 public class NetworkResourceController extends ResourceController {
@@ -88,7 +88,7 @@ public class NetworkResourceController extends ResourceController {
 	@RequestMapping(value = "networkResources/personalTable", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public DataTablesResult personalNetworks(final HttpServletRequest request,
+	public BootstrapTableResult personalNetworks(final HttpServletRequest request,
 			HttpServletResponse response) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException {
 
@@ -97,7 +97,7 @@ public class NetworkResourceController extends ResourceController {
 
 		try {
 			return processDataTablesRequest(request,
-					new DataTablesPageProcessor() {
+					new BootstrapTablePageProcessor() {
 
 						@Override
 						public Column getColumn(int col) {
@@ -152,7 +152,7 @@ public class NetworkResourceController extends ResourceController {
 	@RequestMapping(value = "networkResources/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public DataTablesResult tableNetworkResources(
+	public BootstrapTableResult tableNetworkResources(
 			final HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
@@ -162,7 +162,7 @@ public class NetworkResourceController extends ResourceController {
 
 		try {
 			return processDataTablesRequest(request,
-					new DataTablesPageProcessor() {
+					new BootstrapTablePageProcessor() {
 
 						@Override
 						public Column getColumn(int col) {

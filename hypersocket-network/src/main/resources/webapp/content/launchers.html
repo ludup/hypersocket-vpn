@@ -384,19 +384,19 @@
 												$('#pages').append('<div id="searchPages"></div>');
 												$('#searchResults').empty();
 												
-												if(data.aaData.length > 0) {
+												if(data.rows.length > 0) {
 												
-													populateResults(data.aaData);
+													populateResults(data.rows);
 													
 													// init bootpag
 											        $('#searchPages').bootpag({
-											            total: data.iTotalRecords <= 10 ? 1 : (data.iTotalRecords / 10) + (data.iTotalRecords % 10 != 0 ? 1 : 0),
+											            total: data.total <= 10 ? 1 : (data.total / 10) + (data.total % 10 != 0 ? 1 : 0),
 											            page: 1,
 											            maxVisible: 10
 											        }).on("page", function(event, num){
 														if(num) {
 												        	getJSON('launchers/search?iDisplayStart=' + ((num-1) * 10) + '&iDisplayLength=10&sSearch=' + $('#searchInput').val(), params, function(data) {
-												        		populateResults(data.aaData);
+												        		populateResults(data.rows);
 															});
 														}
 											        	

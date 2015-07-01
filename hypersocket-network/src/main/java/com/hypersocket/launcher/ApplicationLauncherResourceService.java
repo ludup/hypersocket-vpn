@@ -11,7 +11,7 @@ import com.hypersocket.resource.AbstractResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
-import com.hypersocket.tables.DataTablesResult;
+import com.hypersocket.tables.BootstrapTableResult;
 
 
 public interface ApplicationLauncherResourceService extends
@@ -28,7 +28,7 @@ public interface ApplicationLauncherResourceService extends
 			String startupScript, String shutdownScript)
 			throws ResourceCreationException, AccessDeniedException;
 
-	DataTablesResult searchTemplates(String search, int iDisplayStart,
+	BootstrapTableResult searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException;
 
 	void downloadTemplateImage(String uuid, HttpServletRequest request,
