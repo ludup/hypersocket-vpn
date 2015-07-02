@@ -236,7 +236,7 @@ public class NetworkProtocolController extends ResourceController {
 	@RequestMapping(value = "networkProtocols/export/{id}", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
-	public String exportLauncher(HttpServletRequest request,
+	public String exportResource(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable("id") long id)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException, ResourceNotFoundException,
@@ -263,7 +263,7 @@ public class NetworkProtocolController extends ResourceController {
 	@RequestMapping(value = "networkProtocols/export", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
-	public String exportLauncher(HttpServletRequest request,
+	public String exportAll(HttpServletRequest request,
 			HttpServletResponse response) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException,
 			ResourceNotFoundException, ResourceExportException {
@@ -289,7 +289,7 @@ public class NetworkProtocolController extends ResourceController {
 	@RequestMapping(value = "networkProtocols/import", method = { RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceStatus<NetworkProtocol> uploadLauncher(
+	public ResourceStatus<NetworkProtocol> importAll(
 			HttpServletRequest request, HttpServletResponse response,
 			@RequestParam(value = "file") MultipartFile jsonFile,
 			@RequestParam(required=false) boolean dropExisting)

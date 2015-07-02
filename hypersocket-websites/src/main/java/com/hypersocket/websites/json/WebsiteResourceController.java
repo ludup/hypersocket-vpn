@@ -340,7 +340,8 @@ public class WebsiteResourceController extends ResourceController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public ResourceStatus<WebsiteResource> importLaunchers(
 			HttpServletRequest request, HttpServletResponse response,
-			@RequestParam(value = "file") MultipartFile jsonFile)
+			@RequestParam(value = "file") MultipartFile jsonFile,
+			@RequestParam(required=false) boolean dropExisting)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
@@ -356,7 +357,7 @@ public class WebsiteResourceController extends ResourceController {
 						"error.incorrectJSON");
 			}
 			Collection<WebsiteResource> collects = websiteService
-					.importResources(json, getCurrentRealm());
+					.importResources(json, getCurrentRealm(), dropExisting);
 			return new ResourceStatus<WebsiteResource>(
 					true,
 					I18N.getResource(
