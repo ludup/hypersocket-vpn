@@ -22,32 +22,32 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.network.handlers.ForwardingResource;
 import com.hypersocket.protocols.NetworkProtocol;
 
 @Entity
-@Table(name="network_resources")
+@Table(name = "network_resources")
+@JsonDeserialize(using = NetworkResourceDeserializer.class)
 public class NetworkResource extends ForwardingResource {
 
-	@Column(name="hostname")
+	@Column(name = "hostname")
 	String hostname;
-	
-	@Column(name="destination", nullable=true)
+
+	@Column(name = "destination", nullable = true)
 	String destinationHostname;
-	
-	@ManyToMany(fetch=FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name="network_resource_protocols", 
-		joinColumns={@JoinColumn(name="resource_id")}, 
-		inverseJoinColumns={@JoinColumn(name="protocol_id")})
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(name = "network_resource_protocols", joinColumns = { @JoinColumn(name = "resource_id") }, inverseJoinColumns = { @JoinColumn(name = "protocol_id") })
 	Set<NetworkProtocol> protocols = new HashSet<NetworkProtocol>();
 
-	@ManyToMany(fetch=FetchType.EAGER, cascade={CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name="network_resource_launchers", 
-		joinColumns={@JoinColumn(name="resource_id")}, 
-		inverseJoinColumns={@JoinColumn(name="launcher_id")})
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE })
+	@JoinTable(name = "network_resource_launchers", joinColumns = { @JoinColumn(name = "resource_id") }, inverseJoinColumns = { @JoinColumn(name = "launcher_id") })
 	Set<ApplicationLauncherResource> launchers = new HashSet<ApplicationLauncherResource>();
-	
+
 	public String getHostname() {
 		return hostname;
 	}
@@ -59,16 +59,17 @@ public class NetworkResource extends ForwardingResource {
 	public void setDestinationHostname(String destinationHostname) {
 		this.destinationHostname = destinationHostname;
 	}
-	
+
 	@JsonIgnore
 	public String resolveHostname() {
-		return StringUtils.isEmpty(destinationHostname) ? hostname : destinationHostname;
+		return StringUtils.isEmpty(destinationHostname) ? hostname
+				: destinationHostname;
 	}
-	
+
 	public String getDestinationHostname() {
 		return destinationHostname;
 	}
-	
+
 	public Set<NetworkProtocol> getProtocols() {
 		return protocols;
 	}
@@ -76,7 +77,7 @@ public class NetworkResource extends ForwardingResource {
 	public void setProtocols(Set<NetworkProtocol> protocols) {
 		this.protocols = protocols;
 	}
-	
+
 	public Set<ApplicationLauncherResource> getLaunchers() {
 		return launchers;
 	}
@@ -87,8 +88,8 @@ public class NetworkResource extends ForwardingResource {
 
 	public String getProtocolsDesc() {
 		StringBuffer buf = new StringBuffer();
-		for(NetworkProtocol protocol : protocols) {
-			if(buf.length() > 0) {
+		for (NetworkProtocol protocol : protocols) {
+			if (buf.length() > 0) {
 				buf.append(",");
 			}
 			buf.append(protocol.getName());
@@ -96,7 +97,8 @@ public class NetworkResource extends ForwardingResource {
 		return buf.toString();
 	}
 
-	public NetworkProtocol getNetworkProtocol(Integer port, NetworkTransport transport) {
+	public NetworkProtocol getNetworkProtocol(Integer port,
+			NetworkTransport transport) {
 		for (NetworkProtocol protocol : getProtocols()) {
 
 			if (protocol.getTransport() == transport
@@ -116,5 +118,5 @@ public class NetworkResource extends ForwardingResource {
 		}
 		return null;
 	}
-	
+
 }
