@@ -8,6 +8,7 @@
 package com.hypersocket.network;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -21,6 +22,7 @@ import com.hypersocket.events.EventService;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.launcher.ApplicationLauncherResource;
+import com.hypersocket.launcher.ApplicationLauncherResourceService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.events.NetworkResourceCreatedEvent;
@@ -34,12 +36,14 @@ import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
 import com.hypersocket.protocols.NetworkProtocol;
+import com.hypersocket.protocols.NetworkProtocolService;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
 
 @Service
@@ -50,12 +54,18 @@ public class NetworkResourceServiceImpl extends
 	public static final String MENU_NETWORK = "networkResources";
 
 	public static final String RESOURCE_BUNDLE = "NetworkResourceService";
-	
+
 	static Logger log = LoggerFactory
 			.getLogger(NetworkResourceServiceImpl.class);
 
 	@Autowired
 	NetworkResourceRepository resourceRepository;
+
+	@Autowired
+	NetworkProtocolService networkProtocolService;
+
+	@Autowired
+	ApplicationLauncherResourceService applicationLauncherResourceService;
 
 	@Autowired
 	RealmService realmService;
@@ -90,14 +100,13 @@ public class NetworkResourceServiceImpl extends
 				"category.networkResources");
 
 		resourceRepository.loadPropertyTemplates("networkResourceTemplate.xml");
-		
+
 		for (NetworkResourcePermission p : NetworkResourcePermission.values()) {
-			permissionService.registerPermission(p,cat);
+			permissionService.registerPermission(p, cat);
 		}
 
-		menuService.registerMenu(new MenuRegistration(
-				RESOURCE_BUNDLE, MENU_NETWORK,
-				"fa-sitemap", "networkResources", 100,
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
+				MENU_NETWORK, "fa-sitemap", "networkResources", 100,
 				NetworkResourcePermission.READ,
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
@@ -109,12 +118,12 @@ public class NetworkResourceServiceImpl extends
 				NetworkResourcePermission.CREATE,
 				NetworkResourcePermission.UPDATE,
 				NetworkResourcePermission.DELETE), MENU_NETWORK);
-		
+
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
 				"myNetworks", "fa-sitemap", "myNetworkResources", 200) {
 			public boolean canRead() {
-				return resourceRepository
-						.getAssignableResourceCount(realmService.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
+				return resourceRepository.getAssignableResourceCount(realmService
+						.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
 			}
 		}, MenuService.MENU_MY_RESOURCES);
 
@@ -191,7 +200,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
-		updateResource(resource, new HashMap<String,String>());
+		updateResource(resource, new HashMap<String, String>());
 
 		return resource;
 
@@ -214,7 +223,7 @@ public class NetworkResourceServiceImpl extends
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
 
-		createResource(resource, new HashMap<String,String>());
+		createResource(resource, new HashMap<String, String>());
 
 		return resource;
 
@@ -280,4 +289,70 @@ public class NetworkResourceServiceImpl extends
 		return NetworkResource.class;
 	}
 
+	protected void prepareExport(NetworkResource resource) {
+
+		super.prepareExport(resource);
+
+		for (NetworkProtocol networkProtocol : resource.getProtocols()) {
+			networkProtocol.setId(null);
+			networkProtocol.setRealm(null);
+		}
+
+		for (ApplicationLauncherResource applicationLauncherResource : resource
+				.getLaunchers()) {
+			applicationLauncherResource.setId(null);
+			applicationLauncherResource.setRealm(null);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void prepareImport(NetworkResource resource, Realm realm)
+			throws ResourceCreationException, AccessDeniedException {
+
+		Set<NetworkProtocol> networkProtocolList = new HashSet<NetworkProtocol>();
+		for (NetworkProtocol networkProtocol : resource.getProtocols()) {
+			try {
+				NetworkProtocol existingProtocol = networkProtocolService
+						.getResourceByName(networkProtocol.getName(), realm);
+				networkProtocolList.add(existingProtocol);
+			} catch (ResourceNotFoundException e) {
+				networkProtocol.setRealm(realm);
+				networkProtocolService.createResource(networkProtocol);
+
+				try {
+					networkProtocolList
+							.add(networkProtocolService.getResourceByName(
+									networkProtocol.getName(), realm));
+				} catch (ResourceNotFoundException e1) {
+					log.error(
+							"Failed to find resource: "
+									+ networkProtocol.getName(), e1);
+					throw new AccessDeniedException();
+				}
+			}
+		}
+		resource.setProtocols(networkProtocolList);
+
+		Set<ApplicationLauncherResource> launcherList = new HashSet<ApplicationLauncherResource>();
+		for (ApplicationLauncherResource launcher : resource.getLaunchers()) {
+			try {
+				ApplicationLauncherResource existingLauncher = applicationLauncherResourceService
+						.getResourceByName(launcher.getName(), realm);
+				launcherList.add(existingLauncher);
+			} catch (ResourceNotFoundException e) {
+				launcher.setRealm(realm);
+				applicationLauncherResourceService.createResource(launcher);
+
+				try {
+					launcherList.add(applicationLauncherResourceService
+							.getResourceByName(launcher.getName(), realm));
+				} catch (ResourceNotFoundException e1) {
+					log.error("Failed to find resource: " + launcher.getName(),
+							e1);
+					throw new AccessDeniedException();
+				}
+			}
+		}
+		resource.setLaunchers(launcherList);
+	}
 }
