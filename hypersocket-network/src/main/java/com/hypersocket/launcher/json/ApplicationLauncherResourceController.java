@@ -147,10 +147,12 @@ public class ApplicationLauncherResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 
 		try {
+			String iDisplayStart = request.getParameter("iDisplayStart");
+			String iDisplayLength = request.getParameter("iDisplayLength");
 			return resourceService.searchTemplates(
 					request.getParameter("sSearch"),
-					Integer.parseInt(request.getParameter("iDisplayStart")),
-					Integer.parseInt(request.getParameter("iDisplayLength")));
+					iDisplayStart == null ? 0 :Integer.parseInt(iDisplayStart),
+					iDisplayLength == null ? 10 :Integer.parseInt(iDisplayLength));
 		} finally {
 			clearAuthenticatedContext();
 		}

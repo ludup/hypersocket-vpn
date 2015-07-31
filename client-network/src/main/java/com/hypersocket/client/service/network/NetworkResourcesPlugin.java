@@ -19,19 +19,21 @@ import org.slf4j.LoggerFactory;
 import com.hypersocket.Version;
 import com.hypersocket.client.HypersocketClient;
 import com.hypersocket.client.NetworkResource;
+import com.hypersocket.client.ServiceResource.Status;
 import com.hypersocket.client.hosts.AbstractSocketRedirector;
 import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
-import com.hypersocket.client.rmi.AWTBrowserLauncher;
+import com.hypersocket.client.rmi.BrowserLauncher;
 import com.hypersocket.client.rmi.GUICallback;
+import com.hypersocket.client.rmi.Resource.Type;
 import com.hypersocket.client.rmi.ResourceImpl;
+import com.hypersocket.client.rmi.ResourceProtocol;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
 import com.hypersocket.client.rmi.ResourceRealm;
 import com.hypersocket.client.rmi.ResourceService;
-import com.hypersocket.client.rmi.Resource.Type;
 import com.hypersocket.client.service.AbstractServicePlugin;
 import com.hypersocket.client.service.ResourceMapper;
 
@@ -44,7 +46,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	Map<String, NetworkResource> localForwards = new HashMap<String, NetworkResource>();
 	Map<String, String> resourceForwards = new HashMap<String, String>();
-	
+
 	HypersocketClient<?> serviceClient;
 	HostsFileManager mgr;
 	SocketRedirector redirector;
@@ -69,7 +71,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		if (log.isInfoEnabled()) {
 			log.info("Starting Websites");
 		}
-		
+
 		startWebsites();
 
 		return true;
@@ -129,11 +131,17 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						ResourceRealm resourceRealm = resourceService
 								.getResourceRealm(serviceClient.getHost());
 
-						ResourceImpl res = new ResourceImpl(name + " - " + I18N.getResource("text.defaultBrowser"));
+						ResourceImpl res = new ResourceImpl(name + " - "
+								+ I18N.getResource("text.defaultBrowser"));
 						res.setType(Type.BROWSER);
 						res.setLaunchable(true);
-						res.setResourceLauncher(new AWTBrowserLauncher(
-								template.getLaunchUrl()));
+						if (template.getLaunchUrl().startsWith("https://")) {
+							res.setIcon("web-https");
+						} else {
+							res.setIcon("web-http");
+						}
+						res.setResourceLauncher(new BrowserLauncher(template
+								.getLaunchUrl()));
 						resourceRealm.addResource(res);
 					}
 
@@ -170,13 +178,12 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			boolean started = startLocalForwarding(resource);
 
 			if (log.isInfoEnabled()) {
-				log.info("Local forwarding to "
-						+ hostname
-						+ ":"
+				log.info("Local forwarding to " + hostname + ":"
 						+ resource.getPort()
 						+ (started ? " succeeded" : " failed"));
 			}
-
+			resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
+			resourceService.getServiceResources().add(resource);
 			if (started) {
 				template.addLiveResource(resource);
 				success = true;
@@ -193,8 +200,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	protected void startNetworkResources() {
 		try {
-			String json = serviceClient.getTransport()
-					.get("networkResources/personal");
+			String json = serviceClient.getTransport().get(
+					"networkResources/personal");
 
 			int errors = processNetworkResources(json);
 
@@ -211,12 +218,10 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		}
 	}
 
-	
-
 	protected int processNetworkResources(String json) throws IOException {
 
-		final Map<String,String> variables = serviceClient.getUserVariables();
-		
+		final Map<String, String> variables = serviceClient.getUserVariables();
+
 		return processResourceList(json, new ResourceMapper() {
 
 			@Override
@@ -224,42 +229,60 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 				boolean success = false;
 
-				
 				try {
-					String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
-					String destinationHostname = serviceClient.processReplacements((String) field
-							.get("destinationHostname"), variables);
+					String hostname = serviceClient.processReplacements(
+							(String) field.get("hostname"), variables);
+					String destinationHostname = serviceClient
+							.processReplacements(
+									(String) field.get("destinationHostname"),
+									variables);
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
 
 					JSONArray launchers = (JSONArray) field.get("launchers");
-					
+
 					@SuppressWarnings("unchecked")
 					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers
 							.iterator();
-					
-					// For now, ignore version if on Linux, os.version is not that useful for us
+
+					// For now, ignore version if on Linux, os.version is not
+					// that useful for us
 					Version ourVersion = null;
-					if(!SystemUtils.IS_OS_LINUX) {
-						ourVersion = new Version(System.getProperty("os.version"));
+					if (!SystemUtils.IS_OS_LINUX) {
+						ourVersion = new Version(System
+								.getProperty("os.version"));
 					}
-					
+
 					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
 					while (it3.hasNext()) {
 						JSONObject launcher = it3.next();
-						
+
 						String family = (String) launcher.get("osFamily");
 						String version = (String) launcher.get("osVersion");
-						
-						if(System.getProperty("os.name").toLowerCase().startsWith(family.toLowerCase())) {
+
+						if (System.getProperty("os.name").toLowerCase()
+								.startsWith(family.toLowerCase())) {
 							Version launcherVersion = new Version(version);
-							if(ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
+							if (ourVersion == null
+									|| ourVersion.compareTo(launcherVersion) >= 0) {
 								String n = (String) launcher.get("name");
 								String exe = (String) launcher.get("exe");
 								String args = (String) launcher.get("args");
-								String startupScript = (String) launcher.get("startupScript");
-								String shutdownScript = (String) launcher.get("shutdownScript");
-								launcherTemplates.add(new ApplicationLauncherTemplate(n, exe, startupScript, shutdownScript, variables, args));
+								String startupScript = (String) launcher
+										.get("startupScript");
+								String shutdownScript = (String) launcher
+										.get("shutdownScript");
+
+								if (log.isInfoEnabled()) {
+									log.info(String
+											.format("Adding launcher template %s to execute %s %s.",
+													n, exe, args));
+								}
+
+								launcherTemplates
+										.add(new ApplicationLauncherTemplate(n,
+												exe, startupScript,
+												shutdownScript, variables, args));
 							}
 						}
 					}
@@ -292,13 +315,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						}
 
 						NetworkResourceTemplate template = new NetworkResourceTemplate(
-								name, hostname, destinationHostname, protocolName, transport,
-								startPort, endPort);
+								name, hostname, destinationHostname,
+								protocolName, transport, startPort, endPort);
 						networkResources.add(template);
 
+						//
 						ResourceImpl res = new ResourceImpl(name);
 						res.setType(Type.NETWORK);
-						
+
 						if (transport.equals("TCP")) {
 
 							for (long port = startPort; port <= endPort; port++) {
@@ -307,21 +331,24 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 									NetworkResource resource = new NetworkResource(
 											id, hostname, destinationHostname,
 											(int) port, "tunnel");
-									
-									if(resourceForwards.containsKey(resource.getId())) {
+
+									if (resourceForwards.containsKey(resource
+											.getId())) {
 										if (log.isInfoEnabled()) {
-											log.info("Skipping forward for resource id " + resource.getId()
+											log.info("Skipping forward for resource id "
+													+ resource.getId()
 													+ " because there is already an active forward");
 										}
 										continue;
 									} else {
-										
+
 										if (log.isInfoEnabled()) {
-											log.info("Starting forward for resource id " + resource.getId());
+											log.info("Starting forward for resource id "
+													+ resource.getId());
 										}
-										
+
 										boolean started = startLocalForwarding(resource);
-	
+
 										if (log.isInfoEnabled()) {
 											log.info("Local forwarding to "
 													+ hostname
@@ -330,15 +357,15 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 													+ (started ? " succeeded"
 															: " failed"));
 										}
-	
+
+										resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
+										resourceService.getServiceResources().add(resource);
 										if (started) {
-	
 											ResourceProtocolImpl proto = new ResourceProtocolImpl(
 													pid, protocolName);
 											res.addProtocol(proto);
-											template.addLiveResource(resource);
-											
 											success = true;
+											template.addLiveResource(resource);
 										} else {
 											break;
 										}
@@ -354,15 +381,22 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							}
 						}
 
-	
-						if(launcherTemplates.size() > 0) {
-							for(ApplicationLauncherTemplate t : launcherTemplates) {
-								ResourceImpl app = new ResourceImpl(name + " - " + t.getName());
-								app.setType(Type.NETWORK);
-								app.setLaunchable(true);
-								app.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
-										template.getHostname(), t));
-								resourceRealm.addResource(app);
+						if (launcherTemplates.size() > 0) {
+							// One icon for each protocol the resource uses, but
+							// they share the launcher
+							for (ResourceProtocol p : res.getProtocols()) {
+								for (ApplicationLauncherTemplate t : launcherTemplates) {
+									ResourceImpl app = new ResourceImpl(name
+											+ " - " + t.getName());
+									app.setType(Type.NETWORK);
+									app.setLaunchable(true);
+									app.setIcon("proto-"
+											+ p.getProtocol().toLowerCase());
+									app.setResourceLauncher(new ApplicationLauncher(
+											serviceClient.getPrincipalName(),
+											template.getHostname(), t));
+									resourceRealm.addResource(app);
+								}
 							}
 						}
 					}
@@ -426,7 +460,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				resource.setAliasInterface(alias);
 
 				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
-				resourceForwards.put(resource.getId() + "/" + resource.getPort(), "127.0.0.1" + ":" + actualPort);
+				resourceForwards.put(
+						resource.getId() + "/" + resource.getPort(),
+						"127.0.0.1" + ":" + actualPort);
 				return true;
 			} catch (Exception e) {
 				log.error("Failed to redirect local forwarding", e);
@@ -440,16 +476,17 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	public synchronized void stopAllForwarding() {
 
-		List<NetworkResource> tmp = new ArrayList<NetworkResource>(localForwards.values());
+		List<NetworkResource> tmp = new ArrayList<NetworkResource>(
+				localForwards.values());
 		for (NetworkResource resource : tmp) {
 			stopLocalForwarding(resource);
 		}
-		
+
 	}
-	
+
 	private boolean isHostnameInUse(String hostname) {
-		for(NetworkResource resource : localForwards.values()) {
-			if(resource.getHostname().equals(hostname)) {
+		for (NetworkResource resource : localForwards.values()) {
+			if (resource.getHostname().equals(hostname)) {
 				return true;
 			}
 		}
@@ -457,11 +494,10 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	}
 
 	private synchronized void stopLocalForwarding(NetworkResource resource) {
-		String key = "127.0.0.1" + ":"
-				+ resource.getLocalPort();
+		String key = "127.0.0.1" + ":" + resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
-			serviceClient.getTransport().stopLocalForwarding(
-					"127.0.0.1", resource.getLocalPort());
+			serviceClient.getTransport().stopLocalForwarding("127.0.0.1",
+					resource.getLocalPort());
 			try {
 				redirector.stopRedirecting(resource.getAliasInterface(),
 						resource.getPort(), "127.0.0.1",
@@ -470,9 +506,10 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				log.error("Failed to stop local forwarding redirect", e);
 			} finally {
 				localForwards.remove(key);
-				resourceForwards.remove(resource.getId() + "/" + resource.getPort());
-				
-				if(!isHostnameInUse(resource.getHostname())) {
+				resourceForwards.remove(resource.getId() + "/"
+						+ resource.getPort());
+
+				if (!isHostnameInUse(resource.getHostname())) {
 					try {
 						mgr.removeHostname(resource.getHostname());
 					} catch (IOException e) {
