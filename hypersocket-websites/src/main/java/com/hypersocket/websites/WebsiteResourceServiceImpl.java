@@ -32,9 +32,8 @@ import com.hypersocket.websites.events.WebsiteResourceSessionClosed;
 import com.hypersocket.websites.events.WebsiteResourceSessionOpened;
 import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
 
-public class WebsiteResourceServiceImpl extends
-		AbstractAssignableResourceServiceImpl<WebsiteResource> implements
-		WebsiteResourceService {
+public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServiceImpl<WebsiteResource>
+		implements WebsiteResourceService {
 
 	public static final String RESOURCE_BUNDLE = "WebsiteResourceService";
 
@@ -59,47 +58,38 @@ public class WebsiteResourceServiceImpl extends
 	public WebsiteResourceServiceImpl() {
 		super("website");
 	}
-	
+
 	@PostConstruct
 	private void postConstruct() {
 
 		i18nService.registerBundle(RESOURCE_BUNDLE);
 
-		PermissionCategory cat = permissionService.registerPermissionCategory(
-				RESOURCE_BUNDLE, "category.websites");
+		PermissionCategory cat = permissionService.registerPermissionCategory(RESOURCE_BUNDLE, "category.websites");
 
 		for (WebsitePermission p : WebsitePermission.values()) {
 			permissionService.registerPermission(p, cat);
 		}
 
 		websiteRepository.loadPropertyTemplates("websiteResourceTemplate.xml");
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
-				"websites", "fa-globe", "websites", 100,
-				WebsitePermission.READ, WebsitePermission.CREATE,
-				WebsitePermission.UPDATE, WebsitePermission.DELETE),
+		menuService.registerMenu(
+				new MenuRegistration(RESOURCE_BUNDLE, "websites", "fa-globe", "websites", 100, WebsitePermission.READ,
+						WebsitePermission.CREATE, WebsitePermission.UPDATE, WebsitePermission.DELETE),
 				MenuService.MENU_RESOURCES);
 
-		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE,
-				"myWebsites", "fa-globe", "myWebsites", 200) {
+		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "myWebsites", "fa-globe", "myWebsites", 200) {
 			public boolean canRead() {
-				return websiteRepository.getAssignableResourceCount(realmService
-						.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
+				return websiteRepository
+						.getAssignableResourceCount(realmService.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
 			}
 		}, MenuService.MENU_MY_RESOURCES);
 
-		eventService.registerEvent(WebsiteResourceEvent.class, RESOURCE_BUNDLE,
-				this);
-		eventService.registerEvent(WebsiteResourceCreatedEvent.class,
-				RESOURCE_BUNDLE, this);
-		eventService.registerEvent(WebsiteResourceUpdatedEvent.class,
-				RESOURCE_BUNDLE, this);
-		eventService.registerEvent(WebsiteResourceDeletedEvent.class,
-				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceCreatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceUpdatedEvent.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceDeletedEvent.class, RESOURCE_BUNDLE);
 
-		eventService.registerEvent(WebsiteResourceSessionOpened.class,
-				RESOURCE_BUNDLE, this);
-		eventService.registerEvent(WebsiteResourceSessionClosed.class,
-				RESOURCE_BUNDLE, this);
+		eventService.registerEvent(WebsiteResourceSessionOpened.class, RESOURCE_BUNDLE);
+		eventService.registerEvent(WebsiteResourceSessionClosed.class, RESOURCE_BUNDLE);
 
 	}
 
@@ -120,47 +110,38 @@ public class WebsiteResourceServiceImpl extends
 
 	@Override
 	protected void fireResourceCreationEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
-				getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, getCurrentSession(), resource));
 
 	}
 
 	@Override
-	protected void fireResourceCreationEvent(WebsiteResource resource,
-			Throwable t) {
-		eventService.publishEvent(new WebsiteResourceCreatedEvent(this,
-				resource, t, getCurrentSession()));
+	protected void fireResourceCreationEvent(WebsiteResource resource, Throwable t) {
+		eventService.publishEvent(new WebsiteResourceCreatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
-				getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
 	protected void fireResourceUpdateEvent(WebsiteResource resource, Throwable t) {
-		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this,
-				resource, t, getCurrentSession()));
+		eventService.publishEvent(new WebsiteResourceUpdatedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
 	protected void fireResourceDeletionEvent(WebsiteResource resource) {
-		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
-				getCurrentSession(), resource));
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, getCurrentSession(), resource));
 	}
 
 	@Override
-	protected void fireResourceDeletionEvent(WebsiteResource resource,
-			Throwable t) {
-		eventService.publishEvent(new WebsiteResourceDeletedEvent(this,
-				resource, t, getCurrentSession()));
+	protected void fireResourceDeletionEvent(WebsiteResource resource, Throwable t) {
+		eventService.publishEvent(new WebsiteResourceDeletedEvent(this, resource, t, getCurrentSession()));
 	}
 
 	@Override
-	public WebsiteResource updateResource(WebsiteResource website, String name,
-			String launchUrl, String additionalUrls, Set<Role> roles)
-			throws ResourceChangeException, AccessDeniedException {
+	public WebsiteResource updateResource(WebsiteResource website, String name, String launchUrl, String additionalUrls,
+			Set<Role> roles) throws ResourceChangeException, AccessDeniedException {
 
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
@@ -173,9 +154,8 @@ public class WebsiteResourceServiceImpl extends
 	}
 
 	@Override
-	public WebsiteResource createResource(String name, String launchUrl,
-			String additionalUrls, Set<Role> roles, Realm realm)
-			throws ResourceCreationException, AccessDeniedException {
+	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles,
+			Realm realm) throws ResourceCreationException, AccessDeniedException {
 
 		WebsiteResource website = new WebsiteResource();
 		website.setName(name);
@@ -189,8 +169,7 @@ public class WebsiteResourceServiceImpl extends
 	}
 
 	@Override
-	public void verifyResourceSession(WebsiteResource resource,
-			String hostname, int port, NetworkTransport transport,
+	public void verifyResourceSession(WebsiteResource resource, String hostname, int port, NetworkTransport transport,
 			Session session) throws AccessDeniedException {
 
 		for (URL url : resource.getUrls()) {
@@ -205,9 +184,8 @@ public class WebsiteResourceServiceImpl extends
 			}
 		}
 
-		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(),
-				RESOURCE_BUNDLE, "error.urlNotAuthorized", hostname, port,
-				resource.getName()));
+		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(), RESOURCE_BUNDLE, "error.urlNotAuthorized",
+				hostname, port, resource.getName()));
 
 	}
 

@@ -249,18 +249,15 @@ public class ApplicationLauncherResourceServiceImpl extends
 		assertPermission(ApplicationLauncherResourcePermission.CREATE);
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("sSearch", search);
-		params.put("iDisplayStart", String.valueOf(iDisplayStart));
-		params.put("iDisplayLength", String.valueOf(iDisplayLength));
-		params.put("sEcho", "0");
-		params.put("iSortingCols", "1");
-		params.put("iSortCol_0", "0");
-		params.put("sSortDir_0", "asc");
+		params.put("search", search);
+		params.put("offset", String.valueOf(iDisplayStart));
+		params.put("limit", String.valueOf(iDisplayLength));
+		params.put("order", "asc");
 
 		String json = HttpUtils
 				.doHttpPost(
 						System.getProperty("hypersocket.templateServerUrl",
-								"https://templates.hypersocket.com/hypersocket/api/templates")
+								"https://templates1x.hypersocket.com/hypersocket/api/templates")
 								+ "/"
 								+ (Boolean
 										.getBoolean("hypersocketLauncher.enablePrivate") ? "developer"
@@ -280,7 +277,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 				HttpUtils.doHttpGet(
 						System.getProperty(
 								"hypersocket.templateServerImageUrl",
-								"https://templates.hypersocket.com/hypersocket/api/templates/image/")
+								"https://templates1x.hypersocket.com/hypersocket/api/templates/image/")
 								+ uuid, true));
 
 	}
