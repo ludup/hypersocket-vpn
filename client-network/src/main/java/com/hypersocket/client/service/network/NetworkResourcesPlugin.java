@@ -176,14 +176,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			NetworkResource resource = new NetworkResource(template.getId(),
 					hostname, url.getHost(), (int) port, "website");
 			boolean started = startLocalForwarding(resource);
-
-			if (log.isInfoEnabled()) {
-				log.info("Local forwarding to " + hostname + ":"
-						+ resource.getPort()
-						+ (started ? " succeeded" : " failed"));
-			}
-			resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
-			resourceService.getServiceResources().add(resource);
 			if (started) {
 				template.addLiveResource(resource);
 				success = true;
@@ -348,18 +340,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 										}
 
 										boolean started = startLocalForwarding(resource);
-
-										if (log.isInfoEnabled()) {
-											log.info("Local forwarding to "
-													+ hostname
-													+ ":"
-													+ resource.getPort()
-													+ (started ? " succeeded"
-															: " failed"));
-										}
-
-										resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
-										resourceService.getServiceResources().add(resource);
 										if (started) {
 											ResourceProtocolImpl proto = new ResourceProtocolImpl(
 													pid, protocolName);
@@ -437,7 +417,27 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		return "Network Resources";
 	}
 
-	public synchronized boolean startLocalForwarding(NetworkResource resource)
+
+	public boolean startLocalForwarding(NetworkResource resource)
+			throws IOException {
+		boolean started = setupLocalForwarding(resource);
+
+		if (log.isInfoEnabled()) {
+			log.info("Local forwarding to "
+					+ resource.getHostname()
+					+ ":"
+					+ resource.getPort()
+					+ (started ? " succeeded"
+							: " failed"));
+		}
+
+		resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
+		resourceService.getServiceResources().add(resource);
+		
+		return started;
+	}
+
+	synchronized boolean setupLocalForwarding(NetworkResource resource)
 			throws IOException {
 
 		if (mgr == null) {
@@ -494,6 +494,11 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	}
 
 	private synchronized void stopLocalForwarding(NetworkResource resource) {
+		try {
+			resourceService.getServiceResources().remove(resource);
+		} catch (RemoteException e1) {
+			// Accessing locally, shouldn't happen
+		}
 		String key = "127.0.0.1" + ":" + resource.getLocalPort();
 		if (localForwards.containsKey(key)) {
 			serviceClient.getTransport().stopLocalForwarding("127.0.0.1",
