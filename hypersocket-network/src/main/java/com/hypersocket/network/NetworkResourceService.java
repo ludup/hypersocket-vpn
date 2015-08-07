@@ -18,6 +18,7 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceNotFoundException;
 
 public interface NetworkResourceService extends
 		ForwardingService<NetworkResource>,
@@ -34,5 +35,7 @@ public interface NetworkResourceService extends
 			Set<ApplicationLauncherResource> launchers, Set<Role> roles,
 			Realm realm) throws ResourceCreationException,
 			AccessDeniedException;
+	
+	NetworkResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;
 
 }

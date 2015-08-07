@@ -9,6 +9,7 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceNotFoundException;
 
 public interface WebsiteResourceService extends
 		AbstractAssignableResourceService<WebsiteResource>, ForwardingService<WebsiteResource> {
@@ -20,5 +21,7 @@ public interface WebsiteResourceService extends
 	WebsiteResource createResource(String name, String launchUrl,
 			String additionalUrls, Set<Role> roles, Realm realm)
 			throws ResourceCreationException, AccessDeniedException;
+	
+	WebsiteResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;
 
 }
