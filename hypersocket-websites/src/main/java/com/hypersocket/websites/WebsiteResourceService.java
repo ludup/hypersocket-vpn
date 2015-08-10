@@ -5,7 +5,6 @@ import java.util.Set;
 import com.hypersocket.network.handlers.ForwardingService;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
-import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
@@ -19,7 +18,7 @@ public interface WebsiteResourceService extends
 			throws ResourceChangeException, AccessDeniedException;
 
 	WebsiteResource createResource(String name, String launchUrl,
-			String additionalUrls, Set<Role> roles, Realm realm)
+			String additionalUrls, Set<Role> roles)
 			throws ResourceCreationException, AccessDeniedException;
 	
 	WebsiteResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;

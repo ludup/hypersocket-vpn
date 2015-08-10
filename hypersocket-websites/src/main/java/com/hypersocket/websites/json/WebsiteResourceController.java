@@ -214,8 +214,6 @@ public class WebsiteResourceController extends ResourceController {
 
 			WebsiteResource newResource;
 
-			Realm realm = sessionUtils.getCurrentRealm(request);
-
 			Set<Role> roles = new HashSet<Role>();
 			for (Long id : resource.getRoles()) {
 				roles.add(permissionRepository.getRoleById(id));
@@ -229,7 +227,7 @@ public class WebsiteResourceController extends ResourceController {
 			} else {
 				newResource = websiteService.createResource(resource.getName(),
 						resource.getLaunchUrl(), resource.getAdditionalUrls(),
-						roles, realm);
+						roles);
 			}
 			return new ResourceStatus<WebsiteResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),

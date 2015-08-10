@@ -154,8 +154,8 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 	}
 
 	@Override
-	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles,
-			Realm realm) throws ResourceCreationException, AccessDeniedException {
+	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles)
+			throws ResourceCreationException, AccessDeniedException {
 
 		WebsiteResource website = new WebsiteResource();
 		website.setName(name);
