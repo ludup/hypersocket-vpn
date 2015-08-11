@@ -20,6 +20,7 @@ import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.events.EventService;
 import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
+import com.hypersocket.realm.UserVariableReplacement;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.HypersocketServer;
 import com.hypersocket.server.handlers.HttpResponseProcessor;
@@ -51,6 +52,9 @@ public abstract class AbstractForwardingHandler<T extends ForwardingResource> im
 	@Autowired
 	EventService eventService;
 
+	@Autowired
+	UserVariableReplacement userVariableReplacement;
+	
 	String path;
 	
 	public AbstractForwardingHandler(String path) {
@@ -84,17 +88,23 @@ public abstract class AbstractForwardingHandler<T extends ForwardingResource> im
 			Long resourceId = Long
 					.parseLong(request.getParameter("resourceId"));
 
-			String hostname = request.getParameter("hostname");
-			
 			Integer port = Integer.parseInt(request.getParameter("port"));
 
 			T resource = getService().getResourceById(resourceId);
 			
-			if(StringUtils.isEmpty(hostname)) {
-				hostname = resource.getDestinationHostname();
-				if(StringUtils.isEmpty(hostname)) {
-					hostname = resource.getHostname();
-				}
+			String hostname = resource.getDestinationHostname();
+			if(StringUtils.isBlank(hostname)) {
+				hostname = resource.getHostname();
+			}
+			
+			if(log.isInfoEnabled()) {
+				log.info("REMOVEME: Checking replacements for " + hostname);
+			}
+			
+			hostname = userVariableReplacement.replaceVariables(session.getCurrentPrincipal(), hostname);
+			
+			if(log.isInfoEnabled()) {
+				log.info("REMOVEME: Hostname value is now " + hostname);
 			}
 			
 			getService().verifyResourceSession(
