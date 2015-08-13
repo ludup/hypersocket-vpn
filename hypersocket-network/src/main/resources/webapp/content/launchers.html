@@ -239,7 +239,7 @@
 					}
 					$('#uploadLauncherDiv').load('content/importApplicationResource.html');
 				
-					$('#contentLaunchers').ajaxResourcePage(
+					var resourcePage = $('#contentLaunchers').ajaxResourcePage(
 							{
 								id : "Launcher",
 								tableUrl : "launchers/table",
@@ -286,6 +286,7 @@
 											switch(page) {
 												case 0:
 												{
+													debugger;
 													$('#searchDialog').hide();
 													if(templateName.getValue().trim()=='') {
 														templateName.setValue(template.name);
@@ -358,7 +359,7 @@
 														$('#addTemplate').children('i').addClass('fa-save');
 														if(data.success) {
 															loadResources(function() {
-																$('#contentLaunchers').ajaxResourcePageInsert(data.resource);
+																resourcePage.refresh();
 																$('#searchLaunchersForm').modal('hide');
 																showInformation(getResource('info.createdResource').format(data.resource.name));
 															});

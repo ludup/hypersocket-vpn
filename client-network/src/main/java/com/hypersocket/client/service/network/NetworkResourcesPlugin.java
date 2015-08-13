@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -224,10 +225,17 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				try {
 					String hostname = serviceClient.processReplacements(
 							(String) field.get("hostname"), variables);
-					String destinationHostname = serviceClient
-							.processReplacements(
-									(String) field.get("destinationHostname"),
-									variables);
+					String destinationHostname = (String) field.get("destinationHostname");
+					
+					if(StringUtils.isBlank(destinationHostname)) {
+						destinationHostname = hostname;
+					} else {
+						destinationHostname = serviceClient
+								.processReplacements(
+										destinationHostname,
+										variables);
+					}
+					
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
 

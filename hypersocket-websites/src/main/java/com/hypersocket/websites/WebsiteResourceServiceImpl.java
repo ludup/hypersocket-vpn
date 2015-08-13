@@ -18,7 +18,6 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
-import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
@@ -154,8 +153,8 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 	}
 
 	@Override
-	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles,
-			Realm realm) throws ResourceCreationException, AccessDeniedException {
+	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles)
+			throws ResourceCreationException, AccessDeniedException {
 
 		WebsiteResource website = new WebsiteResource();
 		website.setName(name);
