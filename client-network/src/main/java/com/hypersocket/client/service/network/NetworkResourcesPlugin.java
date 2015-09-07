@@ -28,7 +28,6 @@ import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
 import com.hypersocket.client.rmi.BrowserLauncher;
-import com.hypersocket.client.rmi.GUICallback;
 import com.hypersocket.client.rmi.Resource.Type;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocol;
