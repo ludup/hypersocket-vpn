@@ -7,12 +7,12 @@
  ******************************************************************************/
 package com.hypersocket.network;
 
-import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
-import com.hypersocket.repository.DetachedCriteriaConfiguration;
+import com.hypersocket.repository.CriteriaConfiguration;
 
-public class NetworkTransportCriteria implements DetachedCriteriaConfiguration {
+public class NetworkTransportCriteria implements CriteriaConfiguration {
 
 	NetworkTransport transport;
 	
@@ -21,7 +21,7 @@ public class NetworkTransportCriteria implements DetachedCriteriaConfiguration {
 	}
 	
 	@Override
-	public void configure(DetachedCriteria criteria) {
+	public void configure(Criteria criteria) {
 		criteria.add(Restrictions.eq("transport", transport));
 	}
 
