@@ -26,4 +26,8 @@ public class NetworkResourceSessionOpened extends NetworkResourceSessionEvent {
 	public String[] getResourceKeys() {
 		return ArrayUtils.add(super.getResourceKeys(), EVENT_RESOURCE_KEY);
 	}
+	
+	public boolean isUsage() {
+		return true;
+	}
 }

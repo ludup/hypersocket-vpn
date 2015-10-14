@@ -7,7 +7,7 @@ import com.hypersocket.session.Session;
 import com.hypersocket.websites.WebsiteResource;
 import com.hypersocket.websites.WebsiteResourceServiceImpl;
 
-public class WebsiteResourceSessionEvent extends ResourceSessionEvent {
+public abstract class WebsiteResourceSessionEvent extends ResourceSessionEvent {
 
 	private static final long serialVersionUID = -3240036750533492092L;
 
