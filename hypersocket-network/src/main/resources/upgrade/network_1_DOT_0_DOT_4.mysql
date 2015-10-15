@@ -1,4 +1,4 @@
 EXIT IF FRESH
-ALTER TABLE launchers CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE network_resources CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE network_protocols CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE launchers CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE network_resources CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER TABLE network_protocols CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci;
