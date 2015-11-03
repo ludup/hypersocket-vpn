@@ -12,8 +12,6 @@ import javax.script.ScriptException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.ehcache.transaction.TransactionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hypersocket.attributes.user.UserAttributeService;
 import com.hypersocket.events.EventService;
-import com.hypersocket.http.HttpUtils;
+import com.hypersocket.http.HttpUtilsImpl;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
@@ -47,6 +45,8 @@ import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.tables.BootstrapTableResult;
 import com.hypersocket.transactions.TransactionService;
+
+import net.sf.ehcache.transaction.TransactionException;
 
 @Service
 public class ApplicationLauncherResourceServiceImpl extends
@@ -82,6 +82,9 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Autowired
 	TransactionService transactionService;
+	
+	@Autowired
+	HttpUtilsImpl httpUtils;
 	
 	public ApplicationLauncherResourceServiceImpl() {
 		super("applicationLauncher");
@@ -254,7 +257,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 		params.put("limit", String.valueOf(iDisplayLength));
 		params.put("order", "asc");
 
-		String json = HttpUtils
+		String json = httpUtils
 				.doHttpPost(
 						System.getProperty("hypersocket.templateServerUrl",
 								"https://templates1x.hypersocket.com/hypersocket/api/templates")
@@ -274,7 +277,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 		request.setAttribute(
 				HttpRequestDispatcherHandler.CONTENT_INPUTSTREAM,
-				HttpUtils.doHttpGet(
+				httpUtils.doHttpGet(
 						System.getProperty(
 								"hypersocket.templateServerImageUrl",
 								"https://templates1x.hypersocket.com/hypersocket/api/templates/image/")
