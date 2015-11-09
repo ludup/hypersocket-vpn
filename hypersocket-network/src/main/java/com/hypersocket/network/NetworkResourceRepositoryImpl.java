@@ -20,7 +20,6 @@ import com.hypersocket.resource.AbstractAssignableResourceRepositoryImpl;
 import com.hypersocket.tables.ColumnSort;
 
 @Repository
-@Transactional
 public class NetworkResourceRepositoryImpl extends
 		AbstractAssignableResourceRepositoryImpl<NetworkResource> implements
 		NetworkResourceRepository {
