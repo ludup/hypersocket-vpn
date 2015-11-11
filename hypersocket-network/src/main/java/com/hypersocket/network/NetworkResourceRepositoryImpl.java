@@ -12,7 +12,6 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.hypersocket.realm.Realm;
 import com.hypersocket.repository.CriteriaConfiguration;
