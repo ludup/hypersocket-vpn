@@ -107,8 +107,8 @@ public class NetworkResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return ResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return ResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
@@ -172,8 +172,8 @@ public class NetworkResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return NetworkResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return NetworkResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override

@@ -67,8 +67,8 @@ public class NetworkProtocolController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return NetworkProtocolColumns.values()[col];
+						public Column getColumn(String col) {
+							return NetworkProtocolColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override

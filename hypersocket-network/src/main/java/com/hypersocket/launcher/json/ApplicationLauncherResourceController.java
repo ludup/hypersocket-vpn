@@ -69,8 +69,8 @@ public class ApplicationLauncherResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return ApplicationLauncherResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return ApplicationLauncherResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
