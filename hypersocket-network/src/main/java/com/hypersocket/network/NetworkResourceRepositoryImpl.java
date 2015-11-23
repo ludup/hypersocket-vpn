@@ -12,6 +12,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hypersocket.realm.Realm;
 import com.hypersocket.repository.CriteriaConfiguration;
@@ -24,6 +25,7 @@ public class NetworkResourceRepositoryImpl extends
 		NetworkResourceRepository {
 
 	@Override
+	@Transactional(readOnly=true)
 	public List<NetworkResource> search(Realm realm, String searchPattern,
 			int start, int length, ColumnSort[] sorting, CriteriaConfiguration... configs) {
 		return super.search(realm, searchPattern, start, length, sorting, new CriteriaConfiguration() {
