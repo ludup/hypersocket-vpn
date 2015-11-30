@@ -41,6 +41,19 @@
 							</div>
 						</div>
 					</div>
+					
+					<div id="tabLogo" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="endpoint.logo.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="logo"></div>
+								<div>
+									<span class="help-block" localize="endpoint.logo.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
 					<div id="tabProtocols" class="dialogTab">
 						<div id="protocols"></div>
 					</div>
@@ -105,6 +118,20 @@
 				return data.resources;
 			}
 		});
+		
+		var logo = $('#logo').logoInput({
+			typeCallback: function() {
+				// Matches that used by the client so the shape/colour will be the same
+				return 'ENDPOINTS';
+			},
+			defaultTextCallback: function() {
+				return $('#resourceName').val();
+			},
+			url : basePath + '/api/fileUpload/file'
+		});
+		$('#resourceName').on('input', function(){
+			logo.defaultTextChanged();
+		});
 			
 		$('#endpointProperties').propertyPage({
 			url : 'networkResources/template',
@@ -115,6 +142,10 @@
 			additionalTabs : [ {
 				id : "tabDetails",
 				name : getResource("details.label")
+			},
+			{
+				id : "tabLogo",
+				name : getResource("logo.label")
 			},
 			{
 				id : "tabProtocols",
@@ -135,6 +166,10 @@
 						id : "EndPoints",
 						title: getResource('endpoints.title'),
 						icon: 'fa-sitemap',
+						logo: true,
+						logoResourceTypeCallback: function(resource) {
+							return 'ENDPOINTS';
+						},
 						tableUrl : "networkResources/table",
 						resourceUrl : "networkResources/networkResource",
 						fields : [ { name: "name" }, 
@@ -178,6 +213,7 @@
 						},
 						clearDialog : function(create) {
 							$('#resourceName').val('');
+							logo.clear();
 							hostnameInput.setValue('');
 							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
@@ -198,11 +234,13 @@
 									.multipleSelectValues();
 							resource.roles = $('#roles').multipleSelectValues();
 							resource.id = $('#resourceId').val();
+							resource.logo = logo.getValue();
 							return resource;
 						},
 						displayResource : function(resource, readOnly) {
 							$('#resourceName').val(resource.name);
 							$('#resourceName').attr('disabled', readOnly);
+							logo.setValue(resource.logo);
 							hostnameInput.setValue(resource.hostname);
 							destinationHostname.setValue(resource.destinationHostname);
 							if(readOnly) {

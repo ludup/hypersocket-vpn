@@ -45,6 +45,7 @@ import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
+import com.hypersocket.ui.IndexPageFilter;
 
 @Service
 public class NetworkResourceServiceImpl extends AbstractAssignableResourceServiceImpl<NetworkResource>
@@ -79,6 +80,9 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Autowired
 	EventService eventService;
+	
+	@Autowired
+	IndexPageFilter indexPageFilter;
 
 	public NetworkResourceServiceImpl() {
 		super("networkResource");
@@ -131,6 +135,8 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
 		}
+		
+		indexPageFilter.addStyleSheet("${uiPath}/css/networkResources.css");
 	}
 
 	@Override

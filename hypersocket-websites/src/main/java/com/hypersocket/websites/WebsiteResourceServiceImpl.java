@@ -24,6 +24,7 @@ import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.session.Session;
+import com.hypersocket.ui.IndexPageFilter;
 import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
 import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
 import com.hypersocket.websites.events.WebsiteResourceEvent;
@@ -53,6 +54,9 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Autowired
 	RealmService realmService;
+	
+	@Autowired
+	IndexPageFilter indexPageFilter;
 
 	public WebsiteResourceServiceImpl() {
 		super("website");
@@ -90,6 +94,7 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 		eventService.registerEvent(WebsiteResourceSessionOpened.class, RESOURCE_BUNDLE);
 		eventService.registerEvent(WebsiteResourceSessionClosed.class, RESOURCE_BUNDLE);
 
+		indexPageFilter.addStyleSheet("${uiPath}/css/websites.css");
 	}
 
 	@Override

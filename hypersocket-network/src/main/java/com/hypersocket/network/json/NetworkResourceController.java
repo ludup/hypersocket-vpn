@@ -281,6 +281,7 @@ public class NetworkResourceController extends ResourceController {
 						resource.getDestinationHostname(), protocols,
 						launchers, roles, realm);
 			}
+			newResource.setLogo(resource.getLogo());
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
 							NetworkResourceServiceImpl.RESOURCE_BUNDLE,

@@ -48,6 +48,17 @@
 							</div>
 						</div>
 					</div>
+					<div id="tabLogo" class="dialogTab">
+						<div class="propertyItem form-group">
+							<label class="col-xs-3 control-label" localize="launcher.logo.label"></label>
+							<div class="propertyValue col-xs-9">
+								<div id="logo"></div>
+								<div>
+									<span class="help-block" localize="launcher.logo.info"></span>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div id="tabScripts" class="dialogTab">
 						<div class="propertyItem form-group">
 							<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
@@ -189,11 +200,30 @@
 					allowOrdering: true,
 					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
 				});
+
+				var logo = $('#logo').logoInput({
+					typeCallback: function() {
+						// Matches that used by the client so the shape/colour will be the same
+						return 'NETWORK';
+					},
+					defaultTextCallback: function() {
+						return $('#resourceName').val();
+					},
+					url : basePath + '/api/fileUpload/file'
+				});
+				$('#resourceName').on('input', function(){
+					logo.defaultTextChanged();
+				});
 				
 				$('#launcherProperties').propertyPage({
 					url : 'launchers/template',
 					showButtons : false,
 					useTemplates : true,
+					resourceNameField: '#resourceName',
+					typeCallback: function() {
+						// Matches that used by the client so the shape/colour will be the same
+						return 'APPLICATION';
+					},
 					canUpdate : currentMenu.canUpdate,
 					additionalTabs : [ {
 						id : "tabProgram",
@@ -201,6 +231,9 @@
 					}, {
 						id : "tabScripts",
 						name : getResource("tabScripts.label")
+					}, {
+						id : "tabLogo",
+						name : getResource("tabLogo.label")
 					}]
 				});
 				
@@ -245,6 +278,10 @@
 								tableUrl : "launchers/table",
 								title: getResource("launchers.label"),
 								icon: 'fa-rocket',
+								logo: true,
+								logoResourceTypeCallback: function(resource) {
+									return 'APPLICATION';
+								},
 								resourceUrl : "launchers/launcher",
 								fields : [ {
 									name : "name"
@@ -439,6 +476,7 @@
 									$('#resourceName').val('');
 									exeInput.setValue('');
 									$('#args').multipleTextInput({ values: []});
+									logo.clear();
 									osSelect.setValue(0);
 									startupScript.setValue("");
 									shutdownScript.setValue("");
@@ -454,6 +492,7 @@
 									resource.os = osSelect.getValue();
 									resource.startupScript = startupScript.getValue();
 									resource.shutdownScript = shutdownScript.getValue();
+									resource.logo = logo.getValue();
 									
 									return resource;
 								},
@@ -464,6 +503,7 @@
 									exeInput.setValue(resource.exe);
 									$('#args').multipleTextInput({ values: splitFix(resource.args)});
 									osSelect.setValue(resource.os.id);
+									logo.setValue(resource.logo);
 									startupScript.setValue(resource.startupScript);
 									shutdownScript.setValue(resource.shutdownScript);
 									

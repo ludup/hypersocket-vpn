@@ -23,7 +23,18 @@ public class WebsiteResource extends ForwardingResource {
 
 	@Column(name="additional_urls", length=8000)
 	String additionalUrls;
+
+	@Column(name = "logo")
+	String logo;
 	
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
+	}
+
 	public void setLaunchUrl(String launchUrl) {
 		this.launchUrl = launchUrl;
 	}

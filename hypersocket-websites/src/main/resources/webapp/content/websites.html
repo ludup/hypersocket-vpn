@@ -40,8 +40,21 @@
 									</div>
 								</div>
 							</div>
+							
 					</div>
 					<div id="tabRoles" class="dialogTab">
+					<div id="tabLogo" class="dialogTab">
+							<div class="propertyItem">
+								<label for="logo" class="col-md-3 control-label" 
+									localize="website.logo"></label> 
+								<div class="propertyValue col-md-9">
+									<div id="logo"></div>
+									<div>
+										<span class="help-block" localize="website.logo.info"></span>
+									</div>
+								</div>
+							</div>
+					</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>
 				</div>
@@ -78,6 +91,10 @@
 					{
 						id : "tabRoles",
 						name : getResource("label.roles")
+					},
+					{
+						id : "tabLogo",
+						name : getResource("website.logo.label")
 					}]
 				});
 				
@@ -85,6 +102,20 @@
 						values : '',
 						disabled : false, 
 						resourceKey : 'additionalUrls'
+				});
+				
+				var logo = $('#logo').logoInput({
+					defaultTextCallback: function() {
+						return $('#resourceName').val();
+					},
+					typeCallback: function() {
+						// Matches that used by the client so the shape/colour will be the same
+						return 'BROWSER';
+					},
+					url : basePath + '/api/fileUpload/file'
+				});
+				$('#resourceName').on('input', function(){
+					logo.defaultTextChanged();
 				});
 
 				$('#contentWebsites').ajaxResourcePage(
@@ -97,6 +128,10 @@
 							fields : [ {
 								name : "name"
 							}],
+							logo: true,
+							logoResourceTypeCallback: function(resource) {
+								return 'BROWSER';
+							},
 							resourceKey : "website",
 							canCreate: currentMenu.canCreate,
 							canUpdate: currentMenu.canUpdate,
@@ -126,6 +161,7 @@
 								$('#additionalUrls').multipleTextInput();
 								$('#tabRoles').multipleSelect();
 								$('.clickableTab').first().trigger('click');
+								logo.clear();
 							},
 							createResource : function() {
 								resource = new Object();
@@ -134,6 +170,7 @@
 								resource.launchUrl = $('#url').val();
 								resource.additionalUrls = fixSplit($('#additionalUrls').multipleSelectValues());
 								resource.roles = $('#tabRoles').multipleSelectValues();
+								resource.logo = logo.getValue();
 								
 								return resource;
 							},
@@ -147,6 +184,10 @@
 									selectedIsObjectList : true,
 									resourceKey : 'website'
 								});
+								if(resource.logo == '')
+									logo.clear();
+								else
+									logo.setValue(resource.logo);
 							},
 							complete : function() {
 								loadComplete();

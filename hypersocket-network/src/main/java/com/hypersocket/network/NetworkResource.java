@@ -47,6 +47,9 @@ public class NetworkResource extends ForwardingResource {
 			CascadeType.MERGE })
 	@JoinTable(name = "network_resource_launchers", joinColumns = { @JoinColumn(name = "resource_id") }, inverseJoinColumns = { @JoinColumn(name = "launcher_id") })
 	Set<ApplicationLauncherResource> launchers = new HashSet<ApplicationLauncherResource>();
+	
+	@Column(name = "logo")
+	String logo;
 
 	public String getHostname() {
 		return hostname;
@@ -54,6 +57,14 @@ public class NetworkResource extends ForwardingResource {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 	public void setDestinationHostname(String destinationHostname) {
