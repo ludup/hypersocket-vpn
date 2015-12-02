@@ -96,16 +96,8 @@ public abstract class AbstractForwardingHandler<T extends ForwardingResource> im
 			if(StringUtils.isBlank(hostname)) {
 				hostname = resource.getHostname();
 			}
-			
-			if(log.isInfoEnabled()) {
-				log.info("REMOVEME: Checking replacements for " + hostname);
-			}
-			
+		
 			hostname = userVariableReplacement.replaceVariables(session.getCurrentPrincipal(), hostname);
-			
-			if(log.isInfoEnabled()) {
-				log.info("REMOVEME: Hostname value is now " + hostname);
-			}
 			
 			getService().verifyResourceSession(
 					resource, hostname, port, NetworkTransport.TCP, session);
