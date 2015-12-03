@@ -24,10 +24,12 @@ public class WebsiteResourceTemplate implements Serializable {
 	String launchUrl;
 	String[] additionalUrls;
 	List<NetworkResource> liveResources = new ArrayList<NetworkResource>();
+	String logo;
 	
-	public WebsiteResourceTemplate(Long id, String name, String launchUrl, String[] additionalUrls) throws MalformedURLException {
+	public WebsiteResourceTemplate(Long id, String name, String launchUrl, String[] additionalUrls, String logo) throws MalformedURLException {
 		this.id = id;
 		this.name = name;
+		this.logo = logo;
 		this.launchUrl = sanitizeURL(launchUrl).toExternalForm();
 		List<String> tmp = new ArrayList<String>();
 		for(String url : additionalUrls) {
@@ -50,6 +52,10 @@ public class WebsiteResourceTemplate implements Serializable {
 		
 		return new URL(u.getProtocol(), hostname, u.getPort(), u.getFile());
 	}
+	public String getLogo() {
+		return logo;
+	}
+
 	public String getName() {
 		return name;
 	}

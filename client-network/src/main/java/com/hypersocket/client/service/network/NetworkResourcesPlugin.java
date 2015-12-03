@@ -104,18 +104,22 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				String additionalUrls = (String) resource.get("additionalUrls");
 				Long id = (Long) resource.get("id");
 				Number modified = (Number) resource.get("modifiedDate");
+				String logo = (String) resource.get("logo");
 
 				try {
 					// Create a Template (the local state object, NOT sent over
 					// RMI)
 					WebsiteResourceTemplate template = new WebsiteResourceTemplate(
 							id, name, launchUrl, additionalUrls
-									.split("\\]\\|\\["));
+									.split("\\]\\|\\["), logo);
 
 					// Create a Resource (the object that will be sent over RMI)
 					ResourceImpl res = new ResourceImpl("network-" + id, name);
 					res.setType(Type.BROWSER);
 					res.setLaunchable(true);
+					res.setGroup(res.getName());
+					res.setGroupIcon(template.getLogo());
+					res.setIcon(template.getLogo());
 					if (modified != null) {
 						Calendar c = Calendar.getInstance();
 						c.setTimeInMillis(modified.longValue());
@@ -177,6 +181,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						(String) field.get("hostname"), variables);
 				String destinationHostname = (String) field
 						.get("destinationHostname");
+				String reslogo = field.containsKey("logo") ? (String) field
+						.get("logo") : null;
 
 				if (StringUtils.isBlank(destinationHostname)) {
 					destinationHostname = hostname;
@@ -281,54 +287,46 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							protocolName, transport, startPort, endPort));
 				}
 
-				//
-				// Create a Resource for each protocol and application. Each
-				// resource under
-				// the same application will use an identical launcher
-				//
-				// TODO This is a bit odd, and is only done like to be able to
-				// use the PROTOCOL
-				// icon for the launcher. When the server is capable of defining
-				// icons for
-				// each resource we will use those and this code will be a bit
-				// more sensible
-				//
+				for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
 
-				for (ProtocolTemplate protocol : protocolTemplates) {
-					// Create a Template (the local state object, NOT sent over
+					// Create a Resource (the object that will be sent over
 					// RMI)
-					NetworkResourceTemplate template = new NetworkResourceTemplate(
-							id, name, hostname, destinationHostname, protocol
-									.getName(), protocol.getTransport(),
-							protocol.getStartPort(), protocol.getEndPort());
+					ResourceImpl res = new ResourceImpl(id + "-"
+							+ +launcherTemplate.getId(), name);
+					res.setType(Type.NETWORK);
+					res.setLaunchable(true);
+					res.setModified(modifiedDate);
+					res.setIcon(reslogo);
+					
+					// TODO - this is disabled for now, until the grouping component is completed. 
+					// res.setGroup(launcherTemplate.getName());
+					// res.setGroupIcon(launcherTemplate.getLogo());
+					res.setGroup(res.getName());
+					res.setGroupIcon(reslogo);
 
-					for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
+					res.setResourceLauncher(new ApplicationLauncher(
+							serviceClient.getPrincipalName(),
+							destinationHostname, launcherTemplate));
 
-						// Create a Resource (the object that will be sent over
-						// RMI)
-						ResourceImpl res = new ResourceImpl(id + "-"
-								+ protocol.getId() + "-"
-								+ launcherTemplate.getId(), name + " - "
-								+ launcherTemplate.getName());
-						res.setType(Type.NETWORK);
-						res.setLaunchable(true);
-						res.setModified(modifiedDate);
-						res.setIcon(launcherTemplate.getLogo());
-						// res.setIcon("res://types/proto-" +
-						// protocol.getName().toLowerCase() + ".png");
-						res.setResourceLauncher(new ApplicationLauncher(
-								serviceClient.getPrincipalName(), template
-										.getHostname(), launcherTemplate));
-
-						// Map the Resource to the Template (we will need it
-						// later
-						// to start or stop the tunnels)
+					for (ProtocolTemplate protocol : protocolTemplates) {
+						/*
+						 * Create a Template (the local state object, NOT sent
+						 * over RMI)
+						 */
+						NetworkResourceTemplate template = new NetworkResourceTemplate(
+								id, name, hostname, destinationHostname,
+								protocol.getName(), protocol.getTransport(),
+								protocol.getStartPort(), protocol.getEndPort());
+						/*
+						 * Map the Resource to the Template (we will need it
+						 * later to start or stop the tunnels)
+						 */
 						resourceToNetworkResourceTemplate.put(res, template);
-
-						// Add to the list of resources found
-						realmResources.add(res);
-						success = true;
 					}
+
+					// Add to the list of resources found
+					realmResources.add(res);
+					success = true;
 				}
 
 				return success;
@@ -389,7 +387,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		stopAllNetworkResourcesForResource(resource);
 		if (wrt != null) {
 			return startWebsiteResource(resource, wrt);
-		} else if (wrt != null) {
+		} else if (nrt != null) {
 			return startNetworkResource(resource, nrt);
 		}
 		return true;
@@ -460,14 +458,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			WebsiteResourceTemplate wrt) {
 		boolean success = false;
 		List<NetworkResource> netResources = new ArrayList<NetworkResource>();
-		final NetworkResource netResource = vpnService.createURLForwarding(serviceClient,
-				wrt.getLaunchUrl(), wrt.getId());
+		final NetworkResource netResource = vpnService.createURLForwarding(
+				serviceClient, wrt.getLaunchUrl(), wrt.getId());
 		if (netResource != null) {
 			success = true;
 			netResources.add(netResource);
 			for (String url : wrt.getAdditionalUrls()) {
-				final NetworkResource additionalNetResource = vpnService.createURLForwarding(serviceClient,
-						url, wrt.getId());
+				final NetworkResource additionalNetResource = vpnService
+						.createURLForwarding(serviceClient, url, wrt.getId());
 				if (additionalNetResource == null) {
 					success = false;
 					break;
