@@ -118,7 +118,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					res.setType(Type.BROWSER);
 					res.setLaunchable(true);
 					res.setGroup(res.getName());
-					res.setGroupIcon(template.getLogo());
 					res.setIcon(template.getLogo());
 					if (modified != null) {
 						Calendar c = Calendar.getInstance();
@@ -302,7 +301,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					// res.setGroup(launcherTemplate.getName());
 					// res.setGroupIcon(launcherTemplate.getLogo());
 					res.setGroup(res.getName());
-					res.setGroupIcon(reslogo);
 
 					res.setResourceLauncher(new ApplicationLauncher(
 							serviceClient.getPrincipalName(),
