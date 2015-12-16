@@ -53,6 +53,23 @@ public class WebsiteResourceController extends ResourceController {
 	WebsiteResourceService websiteService;
 
 	@AuthenticationRequired
+	@RequestMapping(value = "websites/fingerprint", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<String> getFingerprint(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			return new ResourceStatus<String>(true, websiteService.getFingerprint());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
 	@RequestMapping(value = "websites/myWebsites", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)

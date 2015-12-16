@@ -20,12 +20,12 @@ public interface ApplicationLauncherResourceService extends
 	ApplicationLauncherResource updateResource(
 			ApplicationLauncherResource resourceById, String name, String exe,
 			String args, ApplicationLauncherOS os, String startupScript,
-			String shutdownScript) throws ResourceChangeException,
+			String shutdownScript, String logo) throws ResourceChangeException,
 			AccessDeniedException;
 
 	ApplicationLauncherResource createResource(String name, Realm realm,
 			String exe, String args, ApplicationLauncherOS os,
-			String startupScript, String shutdownScript)
+			String startupScript, String shutdownScript, String logo)
 			throws ResourceCreationException, AccessDeniedException;
 
 	BootstrapTableResult searchTemplates(String search, int iDisplayStart,

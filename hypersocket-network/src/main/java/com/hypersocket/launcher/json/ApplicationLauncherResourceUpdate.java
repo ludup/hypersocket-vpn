@@ -12,9 +12,18 @@ public class ApplicationLauncherResourceUpdate {
 	String args;
 	String startupScript;
 	String shutdownScript;
+	String logo;
 	
 	public ApplicationLauncherResourceUpdate() {
 		
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 	public Long getId() {

@@ -12,6 +12,10 @@
 					tableUrl : "networkResources/personalTable",
 					title: getResource("endpoints.title"),
 					icon: 'fa-sitemap',
+					logo: true,
+					logoResourceTypeCallback: function(resource) {
+						return 'ENDPOINTS';
+					},
 					resourceUrl : "mount",
 					fields : [ {
 						name : "name"

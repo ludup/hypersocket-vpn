@@ -27,8 +27,19 @@ public class ApplicationLauncherResource extends RealmResource {
 	@Column(name="shutdown_script", length=8000)
 	String shutdownScript = "";
 	
+	@Column(name="logo", length=256)
+	String logo;
+	
 	public String getExe() {
 		return exe;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 	public void setExe(String exe) {

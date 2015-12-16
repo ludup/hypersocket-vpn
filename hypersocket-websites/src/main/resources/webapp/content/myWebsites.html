@@ -12,6 +12,10 @@
 					tableUrl : "websites/personal",
 					title: getResource("websites.title"),
 					icon: 'fa-globe',
+					logo: true,
+					logoResourceTypeCallback: function(resource) {
+						return 'BROWSER';
+					},
 					resourceUrl : "websites/website",
 					fields : [ {
 						name : "name"
