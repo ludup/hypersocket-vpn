@@ -2,7 +2,6 @@ package com.hypersocket.client.service.network;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,11 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.hypersocket.Version;
 import com.hypersocket.client.NetworkResource;
-import com.hypersocket.client.ServiceResource.Status;
-import com.hypersocket.client.hosts.AbstractSocketRedirector;
 import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.hosts.SocketRedirector;
-import com.hypersocket.client.i18n.I18N;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
 import com.hypersocket.client.rmi.BrowserLauncher;
@@ -108,18 +104,21 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				String additionalUrls = (String) resource.get("additionalUrls");
 				Long id = (Long) resource.get("id");
 				Number modified = (Number) resource.get("modifiedDate");
+				String logo = (String) resource.get("logo");
 
 				try {
 					// Create a Template (the local state object, NOT sent over
 					// RMI)
 					WebsiteResourceTemplate template = new WebsiteResourceTemplate(
 							id, name, launchUrl, additionalUrls
-									.split("\\]\\|\\["));
+									.split("\\]\\|\\["), logo);
 
 					// Create a Resource (the object that will be sent over RMI)
 					ResourceImpl res = new ResourceImpl("network-" + id, name);
 					res.setType(Type.BROWSER);
 					res.setLaunchable(true);
+					res.setGroup(res.getName());
+					res.setIcon(template.getLogo());
 					if (modified != null) {
 						Calendar c = Calendar.getInstance();
 						c.setTimeInMillis(modified.longValue());
@@ -181,6 +180,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						(String) field.get("hostname"), variables);
 				String destinationHostname = (String) field
 						.get("destinationHostname");
+				String reslogo = field.containsKey("logo") ? (String) field
+						.get("logo") : null;
 
 				if (StringUtils.isBlank(destinationHostname)) {
 					destinationHostname = hostname;
@@ -250,7 +251,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							launcherTemplates
 									.add(new ApplicationLauncherTemplate(lid,
 											n, exe, startupScript,
-											shutdownScript, logo, variables, args.split("\\]\\|\\[")));
+											shutdownScript, logo, variables,
+											args.split("\\]\\|\\[")));
 						}
 					}
 				}
@@ -283,51 +285,46 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					protocolTemplates.add(new ProtocolTemplate(pid,
 							protocolName, transport, startPort, endPort));
 				}
-				
-				//
-				// Create a Resource for each protocol and application. Each resource under
-				// the same application will use an identical launcher
-				//
-				// TODO This is a bit odd, and is only done like to be able to use the PROTOCOL
-				// icon for the launcher. When the server is capable of defining icons for 
-				// each resource we will use those and this code will be a bit more sensible
-				//
-				
 
-				for (ProtocolTemplate protocol : protocolTemplates) {
-					// Create a Template (the local state object, NOT sent over
+				for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
+
+					// Create a Resource (the object that will be sent over
 					// RMI)
-					NetworkResourceTemplate template = new NetworkResourceTemplate(id, 
-							name, hostname, destinationHostname, protocol
-									.getName(), protocol.getTransport(),
-							protocol.getStartPort(), protocol.getEndPort());
+					ResourceImpl res = new ResourceImpl(id + "-"
+							+ +launcherTemplate.getId(), name);
+					res.setType(Type.NETWORK);
+					res.setLaunchable(true);
+					res.setModified(modifiedDate);
+					res.setIcon(reslogo);
+					
+					// TODO - this is disabled for now, until the grouping component is completed. 
+					// res.setGroup(launcherTemplate.getName());
+					// res.setGroupIcon(launcherTemplate.getLogo());
+					res.setGroup(res.getName());
 
-					for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
+					res.setResourceLauncher(new ApplicationLauncher(
+							serviceClient.getPrincipalName(),
+							destinationHostname, launcherTemplate));
 
-						// Create a Resource (the object that will be sent over
-						// RMI)
-						ResourceImpl res = new ResourceImpl(id + "-"
-								+ protocol.getId() + "-"
-								+ launcherTemplate.getId(), name + " - "
-								+ launcherTemplate.getName());
-						res.setType(Type.NETWORK);
-						res.setLaunchable(true);
-						res.setModified(modifiedDate);
-						res.setIcon(launcherTemplate.getLogo());
-//						res.setIcon("res://types/proto-" + protocol.getName().toLowerCase() + ".png");
-						res.setResourceLauncher(new ApplicationLauncher(
-								serviceClient.getPrincipalName(), template
-										.getHostname(), launcherTemplate));
-
-						// Map the Resource to the Template (we will need it
-						// later
-						// to start or stop the tunnels)
+					for (ProtocolTemplate protocol : protocolTemplates) {
+						/*
+						 * Create a Template (the local state object, NOT sent
+						 * over RMI)
+						 */
+						NetworkResourceTemplate template = new NetworkResourceTemplate(
+								id, name, hostname, destinationHostname,
+								protocol.getName(), protocol.getTransport(),
+								protocol.getStartPort(), protocol.getEndPort());
+						/*
+						 * Map the Resource to the Template (we will need it
+						 * later to start or stop the tunnels)
+						 */
 						resourceToNetworkResourceTemplate.put(res, template);
-
-						// Add to the list of resources found
-						realmResources.add(res);
-						success = true;
 					}
+
+					// Add to the list of resources found
+					realmResources.add(res);
+					success = true;
 				}
 
 				return success;
@@ -351,7 +348,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							+ serviceClient.getHost(), e);
 		}
 
-		stopAllForwarding();
+		vpnService.stopAllForwarding(serviceClient);
 
 		resourceToNetworkResources.clear();
 		resourceToWebsiteResourceTemplate.clear();
@@ -362,65 +359,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	@Override
 	public String getName() {
 		return "Network Resources";
-	}
-
-	public boolean startLocalForwarding(NetworkResource resource)
-			throws IOException {
-		boolean started = setupLocalForwarding(resource);
-
-		if (log.isInfoEnabled()) {
-			log.info("Local forwarding to " + resource.getHostname() + ":"
-					+ resource.getPort() + (started ? " succeeded" : " failed"));
-		}
-
-		resource.setServiceStatus(started ? Status.GOOD : Status.BAD);
-		resourceService.getServiceResources().add(resource);
-
-		return started;
-	}
-
-	synchronized boolean setupLocalForwarding(NetworkResource resource)
-			throws IOException {
-
-		if (mgr == null) {
-			mgr = HostsFileManager.getSystemHostsFile();
-		}
-
-		if (redirector == null) {
-			redirector = AbstractSocketRedirector.getSystemRedirector();
-		}
-
-		String alias = mgr.getAlias(resource.getHostname());
-
-		int actualPort;
-		if ((actualPort = serviceClient.getTransport().startLocalForwarding(
-				"127.0.0.1", 0, resource)) > 0) {
-			try {
-				redirector.startRedirecting(alias, resource.getPort(),
-						"127.0.0.1", actualPort);
-				resource.setLocalPort(actualPort);
-				resource.setAliasInterface(alias);
-
-				localForwards.put("127.0.0.1" + ":" + actualPort, resource);
-				return true;
-			} catch (Exception e) {
-				log.error("Failed to redirect local forwarding", e);
-				return false;
-			}
-		} else {
-			return false;
-		}
-
-	}
-
-	public synchronized void stopAllForwarding() {
-
-		List<NetworkResource> tmp = new ArrayList<NetworkResource>(
-				localForwards.values());
-		for (NetworkResource resource : tmp) {
-			stopLocalForwarding(resource);
-		}
-
 	}
 
 	@Override
@@ -447,7 +385,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		stopAllNetworkResourcesForResource(resource);
 		if (wrt != null) {
 			return startWebsiteResource(resource, wrt);
-		} else if (wrt != null) {
+		} else if (nrt != null) {
 			return startNetworkResource(resource, nrt);
 		}
 		return true;
@@ -459,36 +397,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		return true;
 	}
 
-	private NetworkResource createURLForwarding(String launchUrl,
-			WebsiteResourceTemplate template) {
-
-		try {
-			URL url = new URL(launchUrl);
-
-			String hostname = url.getHost();
-
-			int port = url.getPort();
-			if (port == -1) {
-				port = url.getDefaultPort();
-			}
-
-			NetworkResource resource = new NetworkResource(template.getId(), hostname,
-					url.getHost(), (int) port, "website");
-			boolean started = startLocalForwarding(resource);
-			if (started) {
-				template.addLiveResource(resource);
-				return resource;
-			}
-
-		} catch (MalformedURLException e) {
-			log.error("Failed to parse url " + launchUrl, e);
-		} catch (IOException e) {
-			log.error("Failed to start forwarding for " + launchUrl, e);
-		}
-
-		return null;
-	}
-
 	private boolean startNetworkResource(Resource resource,
 			NetworkResourceTemplate wrt) {
 		boolean success = false;
@@ -498,14 +406,18 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			for (long port = wrt.getStartPort(); port <= wrt.getEndPort(); port++) {
 
 				try {
-					NetworkResource netResource = new NetworkResource(wrt.getParentResourceId(),
-							wrt.getHostname(), wrt.getDestinationHostname(), (int) port, "tunnel");
+					NetworkResource netResource = new NetworkResource(
+							wrt.getParentResourceId(), wrt.getHostname(),
+							wrt.getDestinationHostname(), (int) port, "tunnel");
 
 					if (log.isInfoEnabled()) {
-						log.info(String.format("Starting forward for resource %s:%s", wrt.getDestinationHostname(), port));
+						log.info(String.format(
+								"Starting forward for resource %s:%s",
+								wrt.getDestinationHostname(), port));
 					}
 
-					boolean started = startLocalForwarding(netResource);
+					boolean started = vpnService.startLocalForwarding(
+							netResource, serviceClient);
 					if (started) {
 						netResources.add(netResource);
 						ResourceProtocolImpl proto = new ResourceProtocolImpl(
@@ -516,7 +428,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					} else {
 						break;
 					}
-					
 
 				} catch (Exception e) {
 					if (log.isErrorEnabled()) {
@@ -525,18 +436,19 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				}
 			}
 		}
-		if(success) {
-			if(resourceToNetworkResources.containsKey(resource)) {
-				throw new IllegalStateException("Resource key conflict " + resource);
+		if (success) {
+			if (resourceToNetworkResources.containsKey(resource)) {
+				throw new IllegalStateException("Resource key conflict "
+						+ resource);
 			}
 			resourceToNetworkResources.put(resource, netResources);
 		} else {
 			// Stop any that did manage to start
 			for (NetworkResource nr : netResources) {
-				stopLocalForwarding(nr);
+				vpnService.stopLocalForwarding(nr, serviceClient);
 			}
 		}
-		
+
 		return success;
 	}
 
@@ -544,14 +456,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			WebsiteResourceTemplate wrt) {
 		boolean success = false;
 		List<NetworkResource> netResources = new ArrayList<NetworkResource>();
-		final NetworkResource netResource = createURLForwarding(
-				wrt.getLaunchUrl(), wrt);
+		final NetworkResource netResource = vpnService.createURLForwarding(
+				serviceClient, wrt.getLaunchUrl(), wrt.getId());
 		if (netResource != null) {
 			success = true;
 			netResources.add(netResource);
 			for (String url : wrt.getAdditionalUrls()) {
-				final NetworkResource additionalNetResource = createURLForwarding(
-						url, wrt);
+				final NetworkResource additionalNetResource = vpnService
+						.createURLForwarding(serviceClient, url, wrt.getId());
 				if (additionalNetResource == null) {
 					success = false;
 					break;
@@ -562,14 +474,15 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		}
 
 		if (success) {
-			if(resourceToNetworkResources.containsKey(resource)) {
-				throw new IllegalStateException("Resource key conflict " + resource);
+			if (resourceToNetworkResources.containsKey(resource)) {
+				throw new IllegalStateException("Resource key conflict "
+						+ resource);
 			}
 			resourceToNetworkResources.put(resource, netResources);
 		} else {
 			// Stop any that did manage to start
 			for (NetworkResource nr : netResources) {
-				stopLocalForwarding(nr);
+				vpnService.stopLocalForwarding(nr, serviceClient);
 			}
 		}
 		return success;
@@ -582,52 +495,15 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			log.warn(String
 					.format("Could not find any started network resource for the resource %s",
 							resource.getName()));
-			for(Map.Entry<Resource, List<NetworkResource>> en : resourceToNetworkResources.entrySet()) {
+			for (Map.Entry<Resource, List<NetworkResource>> en : resourceToNetworkResources
+					.entrySet()) {
 			}
 		} else {
 			for (NetworkResource r : netResources) {
-				stopLocalForwarding(r);
+				vpnService.stopLocalForwarding(r, serviceClient);
 			}
 			resourceToNetworkResources.remove(resource);
 		}
 	}
 
-	private boolean isHostnameInUse(String hostname) {
-		for (NetworkResource resource : localForwards.values()) {
-			if (resource.getHostname().equals(hostname)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private synchronized void stopLocalForwarding(NetworkResource resource) {
-		try {
-			resourceService.getServiceResources().remove(resource);
-		} catch (RemoteException e1) {
-			// Accessing locally, shouldn't happen
-		}
-		String key = "127.0.0.1" + ":" + resource.getLocalPort();
-		if (localForwards.containsKey(key)) {
-			log.info(String.format("Stopping local forwarding for %s", key));
-			serviceClient.getTransport().stopLocalForwarding("127.0.0.1",
-					resource.getLocalPort());
-			try {
-				redirector.stopRedirecting(resource.getAliasInterface(),
-						resource.getPort(), "127.0.0.1",
-						resource.getLocalPort());
-			} catch (Exception e) {
-				log.error("Failed to stop local forwarding redirect", e);
-			} finally {
-				localForwards.remove(key);
-
-				if (!isHostnameInUse(resource.getHostname())) {
-					try {
-						mgr.removeHostname(resource.getHostname());
-					} catch (IOException e) {
-					}
-				}
-			}
-		}
-	}
 }

@@ -122,7 +122,7 @@
 		var logo = $('#logo').logoInput({
 			typeCallback: function() {
 				// Matches that used by the client so the shape/colour will be the same
-				return 'ENDPOINTS';
+				return 'NETWORK';
 			},
 			defaultTextCallback: function() {
 				return $('#resourceName').val();
@@ -168,7 +168,7 @@
 						icon: 'fa-sitemap',
 						logo: true,
 						logoResourceTypeCallback: function(resource) {
-							return 'ENDPOINTS';
+							return 'NETWORK';
 						},
 						tableUrl : "networkResources/table",
 						resourceUrl : "networkResources/networkResource",
