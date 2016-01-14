@@ -274,14 +274,13 @@ public class NetworkResourceController extends ResourceController {
 						networkService.getResourceById(resource.getId()),
 						resource.getName(), resource.getHostname(),
 						resource.getDestinationHostname(), protocols,
-						launchers, roles);
+						launchers, roles, resource.getLogo());
 			} else {
 				newResource = networkService.createResource(resource.getName(),
 						resource.getHostname(),
 						resource.getDestinationHostname(), protocols,
-						launchers, roles, realm);
+						launchers, roles, realm, resource.getLogo());
 			}
-			newResource.setLogo(resource.getLogo());
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
 							NetworkResourceServiceImpl.RESOURCE_BUNDLE,
@@ -422,6 +421,23 @@ public class NetworkResourceController extends ResourceController {
 					sessionUtils.getLocale(request),
 					I18NServiceImpl.USER_INTERFACE_BUNDLE,
 					"resource.import.failure", e.getMessage()));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "networkResources/fingerprint", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<String> getFingerprint(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			return new ResourceStatus<String>(true, networkService.getFingerprint() + "-" + protocolService.getFingerprint() + "-" + launcherService.getFingerprint());
 		} finally {
 			clearAuthenticatedContext();
 		}

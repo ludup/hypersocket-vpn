@@ -239,11 +239,11 @@ public class WebsiteResourceController extends ResourceController {
 				newResource = websiteService.updateResource(
 						websiteService.getResourceById(resource.getId()),
 						resource.getName(), resource.getLaunchUrl(),
-						resource.getAdditionalUrls(), roles);
+						resource.getAdditionalUrls(), roles, resource.getLogo());
 			} else {
 				newResource = websiteService.createResource(resource.getName(),
 						resource.getLaunchUrl(), resource.getAdditionalUrls(),
-						roles);
+						roles, resource.getLogo());
 			}
 			return new ResourceStatus<WebsiteResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),

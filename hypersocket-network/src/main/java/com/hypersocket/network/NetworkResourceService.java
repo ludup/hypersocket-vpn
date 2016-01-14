@@ -27,13 +27,13 @@ public interface NetworkResourceService extends
 	NetworkResource updateResource(NetworkResource resourceById, String name,
 			String hostname, String destinationHostname,
 			Set<NetworkProtocol> protocols,
-			Set<ApplicationLauncherResource> launchers, Set<Role> roles)
+			Set<ApplicationLauncherResource> launchers, Set<Role> roles, String logo)
 			throws ResourceChangeException, AccessDeniedException;
 
 	NetworkResource createResource(String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols,
 			Set<ApplicationLauncherResource> launchers, Set<Role> roles,
-			Realm realm) throws ResourceCreationException,
+			Realm realm, String logo) throws ResourceCreationException,
 			AccessDeniedException;
 	
 	NetworkResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;

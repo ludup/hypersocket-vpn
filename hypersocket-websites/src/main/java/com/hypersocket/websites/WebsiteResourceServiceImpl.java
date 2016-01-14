@@ -145,20 +145,21 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Override
 	public WebsiteResource updateResource(WebsiteResource website, String name, String launchUrl, String additionalUrls,
-			Set<Role> roles) throws ResourceChangeException, AccessDeniedException {
+			Set<Role> roles, String logo) throws ResourceChangeException, AccessDeniedException {
 
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
 		website.setAdditionalUrls(additionalUrls);
 		website.getRoles().clear();
 		website.getRoles().addAll(roles);
+		website.setLogo(logo);
 
 		updateResource(website, new HashMap<String, String>());
 		return website;
 	}
 
 	@Override
-	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles)
+	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles, String logo)
 			throws ResourceCreationException, AccessDeniedException {
 
 		WebsiteResource website = new WebsiteResource();
@@ -166,6 +167,7 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 		website.setLaunchUrl(launchUrl);
 		website.setAdditionalUrls(additionalUrls);
 		website.getRoles().addAll(roles);
+		website.setLogo(logo);
 
 		createResource(website, new HashMap<String, String>());
 

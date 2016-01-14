@@ -177,7 +177,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	@Override
 	public NetworkResource updateResource(NetworkResource resource, String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers,
-			Set<Role> roles) throws ResourceChangeException, AccessDeniedException {
+			Set<Role> roles, String logo) throws ResourceChangeException, AccessDeniedException {
 
 		assertPermission(NetworkResourcePermission.UPDATE);
 
@@ -187,6 +187,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		resource.setProtocols(protocols);
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
+		resource.setLogo(logo);
 
 		updateResource(resource, new HashMap<String, String>());
 
@@ -196,7 +197,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Override
 	public NetworkResource createResource(String name, String hostname, String destinationHostname,
-			Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers, Set<Role> roles, Realm realm)
+			Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers, Set<Role> roles, Realm realm, String logo)
 					throws ResourceCreationException, AccessDeniedException {
 
 		NetworkResource resource = new NetworkResource();
@@ -208,6 +209,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		resource.setProtocols(protocols);
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
+		resource.setLogo(logo);
 
 		createResource(resource, new HashMap<String, String>());
 
