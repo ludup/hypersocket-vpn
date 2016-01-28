@@ -60,7 +60,7 @@ public class NetworkResource extends ForwardingResource {
 	}
 
 	public String getLogo() {
-		return logo;
+		return logo == null ? "logo://100_autotype_autotype_auto.png" : logo;
 	}
 
 	public void setLogo(String logo) {

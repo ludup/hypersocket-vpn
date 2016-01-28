@@ -28,7 +28,7 @@ public class WebsiteResource extends ForwardingResource {
 	String logo;
 	
 	public String getLogo() {
-		return logo;
+		return logo == null ? "logo://100_autotype_autotype_auto.png" : logo;
 	}
 
 	public void setLogo(String logo) {
