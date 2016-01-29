@@ -342,7 +342,7 @@ public class WebsiteResourceController extends ResourceController {
 		try {
 			response.setHeader("Content-Disposition", "attachment; filename=\""
 					+ websiteService.getResourceCategory() + "-all" + ".json\"");
-			return websiteService.exportResources(websiteService.allResources());
+			return websiteService.exportResources(websiteService.allResources(), true);
 		} finally {
 			clearAuthenticatedContext();
 		}

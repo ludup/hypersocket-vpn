@@ -269,18 +269,20 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		return NetworkResource.class;
 	}
 
-	protected void prepareExport(NetworkResource resource) {
+	protected void prepareExport(NetworkResource resource, boolean stripIdentity) {
 
-		super.prepareExport(resource);
+		super.prepareExport(resource, stripIdentity);
 
-		for (NetworkProtocol networkProtocol : resource.getProtocols()) {
-			networkProtocol.setId(null);
-			networkProtocol.setRealm(null);
-		}
-
-		for (ApplicationLauncherResource applicationLauncherResource : resource.getLaunchers()) {
-			applicationLauncherResource.setId(null);
-			applicationLauncherResource.setRealm(null);
+		if(stripIdentity){
+			for (NetworkProtocol networkProtocol : resource.getProtocols()) {
+					networkProtocol.setId(null);
+					networkProtocol.setRealm(null);
+			}
+	
+			for (ApplicationLauncherResource applicationLauncherResource : resource.getLaunchers()) {
+				applicationLauncherResource.setId(null);
+				applicationLauncherResource.setRealm(null);
+			}
 		}
 	}
 
