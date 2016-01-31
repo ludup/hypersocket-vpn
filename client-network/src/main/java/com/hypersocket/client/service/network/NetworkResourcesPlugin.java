@@ -435,12 +435,15 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				exitCode = script.launch();
 				
 				if(exitCode!=0) {
-					guiRegistry.onUpdateDone(false, "Script returned non-zero exit code!");
-					return false;
+					guiRegistry.onUpdateDone(false, "Installs script returned non-zero exit code! Installation may have failed.");
+				} else {
+					guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
+					guiRegistry.onUpdateDone(false, null);
 				}
+			} else {
+				guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
+				guiRegistry.onUpdateDone(false, null);
 			}
-			
-			guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
 			
 			File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
 			
@@ -448,7 +451,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				installFile.createNewFile();
 			}
 			installFile.setLastModified(launcherTemplate.getModifiedDate().getTimeInMillis());
-			guiRegistry.onUpdateDone(false, null);
+			
 			return true;
 		
 		} catch(IOException e)  { 
