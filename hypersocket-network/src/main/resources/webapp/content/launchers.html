@@ -19,66 +19,6 @@
 							</div>
 					</div>
 					<div id="launcherProperties"></div>
-					<div id="tabProgram" class="dialogTab">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.os.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="osButton"></div>
-								<div>
-									<span class="help-block" localize="launcher.os.info"></span>
-								</div>
-							</div>
-						</div>
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.exe.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="exe"></div>
-								<div>
-									<span class="help-block" localize="launcher.exe.info"></span>
-								</div>
-							</div>
-						</div>
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.args.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="args"></div>
-								<div>
-									<span class="help-block" localize="launcher.args.info"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="tabLogo" class="dialogTab">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.logo.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="logo"></div>
-								<div>
-									<span class="help-block" localize="launcher.logo.info"></span>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div id="tabScripts" class="dialogTab">
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.startup.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="startupScript"></div>
-								<div>
-									<span class="help-block" localize="launcher.startup.info"></span>
-								</div>
-							</div>
-						</div>
-						<div class="propertyItem form-group">
-							<label class="col-xs-3 control-label" localize="launcher.shutdown.label"></label>
-							<div class="propertyValue col-xs-9">
-								<div id="shutdownScript"></div>
-								<div>
-									<span class="help-block" localize="launcher.shutdown.info"></span>
-								</div>
-							</div>
-						</div>
-					</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>	
 				<div class="modal-footer"></div>
@@ -168,83 +108,24 @@
 				$('#contentLaunchers').localize();
 				$('#searchLaunchers').localize();
 				
-				
-				
+
 				var templateName = $('#templateName').textInput();
 				$('#templateName').hide();
 				var categoryName = $('#categoryName').textInput();
 		
 				var page = 0;
-				
-				var osSelect = $('#osButton').selectButton({
-					id: 'os',
-					url: 'launchers/os',
-					nameAttr: 'name',
-					valueAttr: 'id',
-					getUrlData: function(data) {
-						return data.resources;
-					},
-					nameIsResourceKey: false,
-					changed: function(widget) {
-					}
-				});
-
-				var exeInput = $('#exe').textInput({
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
-				});
-				
-				$('#args').multipleTextInput({ 
-					values : '',
-					disabled : false, 
-					resourceKey : 'args',
-					allowOrdering: true,
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
-				});
-
-				var logo = $('#logo').logoInput({
-					typeCallback: function() {
-						// Matches that used by the client so the shape/colour will be the same
-						return 'NETWORK';
-					},
-					defaultTextCallback: function() {
-						return $('#resourceName').val();
-					},
-					url : basePath + '/api/fileUpload/file'
-				});
-				$('#resourceName').on('input', function(){
-					logo.defaultTextChanged();
-				});
-				
+					
 				$('#launcherProperties').propertyPage({
 					url : 'launchers/template',
 					showButtons : false,
 					useTemplates : true,
+					i18nNamespace: 'launcher',
 					resourceNameField: '#resourceName',
 					typeCallback: function() {
 						// Matches that used by the client so the shape/colour will be the same
 						return 'NETWORK';
 					},
-					canUpdate : currentMenu.canUpdate,
-					additionalTabs : [ {
-						id : "tabProgram",
-						name : getResource("tabProgram.label")
-					}, {
-						id : "tabScripts",
-						name : getResource("tabScripts.label")
-					}, {
-						id : "tabLogo",
-						name : getResource("tabLogo.label")
-					}]
-				});
-				
-				var startupScript = $('#startupScript').textInput({
-					inputType: 'textarea',
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
-				});
-
-				var shutdownScript = $('#shutdownScript').textInput({
-					inputType: 'textarea',
-					variables: [ 'hostname', 'username', 'client.username', 'client.userhome', 'client.userdir', 'timestamp']
+					canUpdate : currentMenu.canUpdate
 				});
 				
 
@@ -270,8 +151,7 @@
 							});
 						});
 					}
-					$('#uploadLauncherDiv').load('content/importApplicationResource.html');
-				
+					
 					var resourcePage = $('#contentLaunchers').ajaxResourcePage(
 							{
 								id : "Launcher",
@@ -466,20 +346,32 @@
 										return false;
 									}
 	
-									// TODO validate any of your other fields
+									if(!$('#launcherProperties').validateProperties()) {
+										showError("error.correctValidationErrors");
+										return false;
+									}
 									
 									return true;
 								},
-								clearDialog : function() {
+								clearDialog : function(create) {
 									
 									$('#resourceId').val('');
 									$('#resourceName').val('');
-									exeInput.setValue('');
-									$('#args').multipleTextInput({ values: []});
-									logo.clear();
-									osSelect.setValue(0);
-									startupScript.setValue("");
-									shutdownScript.setValue("");
+									
+									if(create) {
+										$('#launcherProperties').propertyPage({
+											url : 'launchers/template',
+											showButtons : false,
+											useTemplates : true,
+											i18nNamespace: 'launcher',
+											resourceNameField: '#resourceName',
+											typeCallback: function() {
+												// Matches that used by the client so the shape/colour will be the same
+												return 'NETWORK';
+											},
+											canUpdate : currentMenu.canUpdate
+										});
+									}
 									
 									$('.launcherPropertiesTab').first().trigger('click');
 								},
@@ -487,12 +379,11 @@
 									resource = new Object();
 									resource.id = $('#resourceId').val();
 									resource.name = $('#resourceName').val();
-									resource.exe = exeInput.getValue();
-									resource.args = fixSplit($('#args').multipleSelectValues());
-									resource.os = osSelect.getValue();
-									resource.startupScript = startupScript.getValue();
-									resource.shutdownScript = shutdownScript.getValue();
-									resource.logo = logo.getValue();
+									
+									$('#launcherProperties').saveProperties(true,
+											function(items) {
+										resource.properties = items;
+									});
 									
 									return resource;
 								},
@@ -500,12 +391,19 @@
 									
 									$('#resourceId').val(resource.id);
 									$('#resourceName').val(resource.name);
-									exeInput.setValue(resource.exe);
-									$('#args').multipleTextInput({ values: splitFix(resource.args)});
-									osSelect.setValue(resource.os.id);
-									logo.setValue(resource.logo);
-									startupScript.setValue(resource.startupScript);
-									shutdownScript.setValue(resource.shutdownScript);
+									
+									$('#launcherProperties').propertyPage({
+										url : 'launchers/properties/' + resource.id,
+										showButtons : false,
+										useTemplates : true,
+										i18nNamespace: 'launcher',
+										resourceNameField: '#resourceName',
+										typeCallback: function() {
+											// Matches that used by the client so the shape/colour will be the same
+											return 'NETWORK';
+										},
+										canUpdate : currentMenu.canUpdate
+									});
 									
 								},
 								complete : function() {

@@ -1,6 +1,11 @@
 package com.hypersocket.client.service.network;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -10,6 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.json.simple.JSONArray;
@@ -17,6 +25,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hypersocket.Version;
 import com.hypersocket.client.NetworkResource;
 import com.hypersocket.client.hosts.HostsFileManager;
@@ -24,10 +33,13 @@ import com.hypersocket.client.hosts.SocketRedirector;
 import com.hypersocket.client.rmi.ApplicationLauncher;
 import com.hypersocket.client.rmi.ApplicationLauncherTemplate;
 import com.hypersocket.client.rmi.BrowserLauncher;
+import com.hypersocket.client.rmi.FileMetaData;
+import com.hypersocket.client.rmi.FileMetaDataResourceStatus;
 import com.hypersocket.client.rmi.Resource;
 import com.hypersocket.client.rmi.Resource.Type;
 import com.hypersocket.client.rmi.ResourceImpl;
 import com.hypersocket.client.rmi.ResourceProtocolImpl;
+import com.hypersocket.client.rmi.ScriptLauncher;
 import com.hypersocket.client.service.AbstractServicePlugin;
 import com.hypersocket.client.service.ResourceMapper;
 
@@ -42,15 +54,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	static Logger log = LoggerFactory.getLogger(NetworkResourcesPlugin.class);
 
 	Map<String, NetworkResource> localForwards = new HashMap<String, NetworkResource>();
-	// Map<String, String> resourceForwards = new HashMap<String, String>();
-	// List<ProtocolTemplate> protocolTemplates = new ArrayList<>();
-	// Map<Resource, WebsiteResourceTemplate> resourceToWebsiteResourceTemplate
-	// = new HashMap<Resource, WebsiteResourceTemplate>();
-	// Map<Resource, NetworkResourceTemplate> resourceToNetworkResourceTemplate
-	// = new HashMap<Resource, NetworkResourceTemplate>();
-	// Map<Resource, List<NetworkResource>> resourceToNetworkResources = new
-	// HashMap<Resource, List<NetworkResource>>();
-
 	Map<Resource, NetworkResourceDetail> resourceDetails = new HashMap<Resource, NetworkResourceDetail>();
 	Map<Resource, NetworkResourceDetail> startedResourceDetails = new HashMap<Resource, NetworkResourceDetail>();
 	Map<Resource, List<Resource>> childResources = new HashMap<>();
@@ -58,6 +61,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	HostsFileManager mgr;
 	SocketRedirector redirector;
 
+	String[] ALLOWED_SYSTEM_PROPERTIES = { "user.name", "user.home", "user.dir" };
+	
 	public NetworkResourcesPlugin() {
 		super("websites", "networkResources");
 	}
@@ -198,8 +203,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				String name = (String) field.get("name");
 				Long id = (Long) field.get("id");
 
-				log.info(String.format("Processing endpoint %s (%d) to %s from %s", name, id, destinationHostname, hostname));
-				
+				if(log.isInfoEnabled()) {
+					log.info(String.format("Processing endpoint %s (%d) to %s using hostname %s", name, id, destinationHostname, hostname));
+				}
 				List<ProtocolTemplate> protocolTemplates = new ArrayList<>();
 
 				JSONArray launchers = (JSONArray) field.get("launchers");
@@ -233,18 +239,51 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					if (System.getProperty("os.name").toLowerCase().startsWith(family.toLowerCase())) {
 						Version launcherVersion = new Version(version);
 						if (ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
+							
+							if(log.isInfoEnabled()) {
+								log.info(String.format("Endpoint OS %s %s matches %s %s", 
+										System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+							}
 							String n = (String) launcher.get("name");
 							String exe = (String) launcher.get("exe");
 							String logo = (String) launcher.get("logo");
 							String args = (String) launcher.get("args");
 							String startupScript = (String) launcher.get("startupScript");
 							String shutdownScript = (String) launcher.get("shutdownScript");
-
+							String installScript = (String) launcher.get("installScript");
+							String files = (String) launcher.get("files");
+							
 							Calendar launcherModifiedDate = Calendar.getInstance();
 							Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
 							launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
-							launcherTemplates.add(new ApplicationLauncherTemplate(lid, n, exe, startupScript,
-									shutdownScript, logo, variables, launcherModifiedDate, args.split("\\]\\|\\[")));
+							
+							File applicationDirectory = new File(System.getProperty("client.userdir"), n);
+							
+							ApplicationLauncherTemplate launcherTemplate = new ApplicationLauncherTemplate(
+									lid, 
+									n, 
+									exe, 
+									startupScript,
+									shutdownScript, 
+									applicationDirectory, 
+									logo, 
+									variables, 
+									launcherModifiedDate, 
+									args.split("\\]\\|\\["));
+							
+							launcherTemplates.add(launcherTemplate);
+							
+							downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
+						} else {
+							if(log.isInfoEnabled()) {
+								log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
+										System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+							}
+						}
+					} else {
+						if(log.isInfoEnabled()) {
+							log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
+									System.getProperty("os.name"), System.getProperty("os.version"), family, version));
 						}
 					}
 				}
@@ -308,8 +347,10 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					// res.setGroupIcon(launcherTemplate.getLogo());
 					res.setGroup(res.getName());
 
-					res.setResourceLauncher(new ApplicationLauncher(serviceClient.getPrincipalName(),
-							destinationHostname, launcherTemplate));
+					res.setResourceLauncher(new ApplicationLauncher(
+							serviceClient.getPrincipalName(),
+							destinationHostname, 
+							launcherTemplate));
 
 					// Add to the list of resources found
 					realmResources.add(res);
@@ -329,6 +370,176 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		}, "network resources");
 	}
 
+	protected boolean downloadAndInstall(ApplicationLauncherTemplate launcherTemplate, String[] files, String installScript) {
+
+		
+		try {
+			boolean newInstall = !launcherTemplate.getApplicationDirectory().exists();
+			if(newInstall) {
+				launcherTemplate.getApplicationDirectory().mkdirs();
+			} else {
+				File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
+				if(installFile.exists()) {
+					if(log.isInfoEnabled()) {
+						log.info(String.format("%s is already installed. Last modified timestamp is %d and app current timestamp is %d",
+								launcherTemplate.getName(),
+								installFile.lastModified(), 
+								launcherTemplate.getModifiedDate().getTimeInMillis()));
+					}
+					if(installFile.lastModified()==launcherTemplate.getModifiedDate().getTimeInMillis()) {
+						if(log.isInfoEnabled()) {
+							log.info(String.format("%s is up-to-date", launcherTemplate.getName()));
+						}
+						return true;
+					}
+				}
+			}
+			
+			if(log.isInfoEnabled()) {
+				log.info(String.format("%s is being %s", launcherTemplate.getName(), newInstall ? "installed" : "updated"));
+			}
+			Map<String,FileMetaData> downloadFiles = processDownloadRequirements(files,
+					launcherTemplate.getApplicationDirectory());
+			
+			long length = 0;
+			long totalSoFar = 0;
+			for(FileMetaData file : downloadFiles.values()) {
+				length += file.getFileSize();
+			}
+			
+			guiRegistry.onUpdateInit(1);
+			guiRegistry.getGUI().onUpdateStart(launcherTemplate.getName(), length, null);
+		
+			for(FileMetaData file : downloadFiles.values()) {
+				totalSoFar = downloadFile(file, launcherTemplate.getApplicationDirectory(), launcherTemplate.getName(), totalSoFar, length);
+				guiRegistry.getGUI().onUpdateProgress(launcherTemplate.getName(), file.getFileSize(), totalSoFar, length);
+			}
+		
+			int exitCode = 0;
+			if(StringUtils.isNotBlank(installScript)) {
+				
+				Map<String,String> properties = new HashMap<String,String>();
+				
+				properties.put("username", serviceClient.getPrincipalName());
+				properties.put("timestamp", String.valueOf(System.currentTimeMillis()));
+				properties.put("java.home", System.getProperty("java.home"));
+				properties.put("client.appdir", launcherTemplate.getApplicationDirectory().getAbsolutePath());
+				for(String prop : ALLOWED_SYSTEM_PROPERTIES) {
+					properties.put(prop.replace("user.", "client.user"), System.getProperty(prop));
+				}
+				
+				properties.putAll(launcherTemplate.getVariables());
+				
+				ScriptLauncher script = new ScriptLauncher(installScript, launcherTemplate.getApplicationDirectory(), properties);
+				script.addArg(newInstall ? "-i" : "-u");
+				exitCode = script.launch();
+				
+				if(exitCode!=0) {
+					guiRegistry.onUpdateDone(false, "Script returned non-zero exit code!");
+					return false;
+				}
+			}
+			
+			guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
+			
+			File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
+			
+			if(!installFile.exists()) {
+				installFile.createNewFile();
+			}
+			installFile.setLastModified(launcherTemplate.getModifiedDate().getTimeInMillis());
+			guiRegistry.onUpdateDone(false, null);
+			return true;
+		
+		} catch(IOException e)  { 
+			log.error("Failed to install app " + launcherTemplate.getName(), e);
+			guiRegistry.onUpdateFailure(launcherTemplate.getName(), e);
+		} finally {
+			
+		}
+		return false;
+	}
+	
+	private Map<String,FileMetaData> processDownloadRequirements(String files[], File applicationDirectory) throws IOException {
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		Map<String,FileMetaData> data = new HashMap<String,FileMetaData>();
+		for(String file : files) {
+			String fileJson = serviceClient.getTransport().get("files/file/" + file);
+			FileMetaDataResourceStatus meta = objectMapper.readValue(fileJson, FileMetaDataResourceStatus.class);
+			if(!meta.isSuccess()) {
+				throw new IOException("Could not find file " + file);
+			}
+			File metaFile = new File(applicationDirectory, meta.getResource().getFileName());
+			if(metaFile.exists()) {
+				if(checkMD5Sum(new FileInputStream(metaFile), 
+						meta.getResource().getMd5Sum(), 
+						meta.getResource().getFileName())) {
+					continue;
+				}
+			}
+			
+			data.put(file, meta.getResource());
+		}
+		
+		return data;
+	}
+	
+	private long downloadFile(FileMetaData meta, File applicationDirectory, String app, long totalSoFar, long totalLength) throws IOException {
+
+		
+		File metaFile = new File(applicationDirectory, meta.getFileName());
+
+		InputStream in = serviceClient.getTransport().getContent("files/download/" + meta.getName(), 60000);
+		OutputStream out = new FileOutputStream(metaFile);
+		
+		byte[] buf = new byte[32768];
+		try {
+			while(true) {
+				int r = in.read(buf);
+				if(r==-1) {
+					break;
+				}
+				out.write(buf, 0, r);
+				guiRegistry.onUpdateProgress(app, r, totalSoFar += r, totalLength);
+			}
+		} finally {
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
+		}
+		
+		if(!checkMD5Sum(new FileInputStream(metaFile), meta.getMd5Sum(), meta.getFileName())) {
+			throw new IOException(meta.getFileName() + " is corrupt!");
+		}
+		
+		return totalSoFar;
+	}
+
+	private boolean checkMD5Sum(InputStream in, String expectedMd5Sum, String filename) {
+		if(log.isDebugEnabled()) {
+			log.debug("Checking " + filename + " digest");
+		}
+		try {
+			String localFileHash = Hex.encodeHexString(DigestUtils.md5(in));
+			if(localFileHash.equalsIgnoreCase(expectedMd5Sum)) {
+				if(log.isDebugEnabled()) {
+					log.debug(filename + " exists and has not changed since last use");
+				}
+				return true;
+			}
+			if(log.isDebugEnabled()) {
+				log.debug(filename + " has changed since last use. Updating.");
+			}
+			return false;
+		} catch(IOException ex) { 
+			if(log.isErrorEnabled()) {
+				log.error("Failed to read file during digest calculation", ex);
+			}
+			return false;
+		} finally {
+			IOUtils.closeQuietly(in);
+		}
+	}
 	@Override
 	public void onStop() {
 
@@ -444,12 +655,15 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	private boolean startWebsiteResource(Resource resource, NetworkResourceDetail detail) {
 		boolean success = false;
 		final NetworkResource netResource = vpnService.createURLForwarding(serviceClient,
-				detail.websiteResourceTemplate.getLaunchUrl(), detail.websiteResourceTemplate.getId());
+				detail.websiteResourceTemplate.getLaunchUrl(), 
+				detail.websiteResourceTemplate.getId());
 		if (netResource != null) {
 			success = true;
 			detail.networkResources.add(netResource);
 			for (String url : detail.websiteResourceTemplate.getAdditionalUrls()) {
-				final NetworkResource additionalNetResource = vpnService.createURLForwarding(serviceClient, url,
+				final NetworkResource additionalNetResource = vpnService.createURLForwarding(
+						serviceClient, 
+						url,
 						detail.websiteResourceTemplate.getId());
 				if (additionalNetResource == null) {
 					success = false;

@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hypersocket.client.NetworkResource;
+import com.hypersocket.client.hosts.HostsFileManager;
 import com.hypersocket.client.i18n.I18N;
-import com.hypersocket.utils.IPAddressValidator;
 
 public class WebsiteResourceTemplate implements Serializable {
 
@@ -30,12 +30,12 @@ public class WebsiteResourceTemplate implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.logo = logo;
-		this.launchUrl = sanitizeURL(launchUrl).toExternalForm();
+		this.launchUrl = HostsFileManager.sanitizeURL(launchUrl).toExternalForm();
 		List<String> tmp = new ArrayList<String>();
 		for(String url : additionalUrls) {
 			if(!url.trim().isEmpty()) {
 				try {
-					URL u = sanitizeURL(url);
+					URL u = HostsFileManager.sanitizeURL(url);
 					tmp.add(u.toExternalForm());
 				} catch (MalformedURLException e) {
 					log.error("Could not parse URL " + url, e);
@@ -45,13 +45,6 @@ public class WebsiteResourceTemplate implements Serializable {
 		this.additionalUrls = tmp.toArray(new String[0]);
 	}
 
-	private URL sanitizeURL(String url) throws MalformedURLException {
-		
-		URL u = new URL(url);
-		String hostname = IPAddressValidator.getInstance().getGuaranteedHostname(u.getHost());
-		
-		return new URL(u.getProtocol(), hostname, u.getPort(), u.getFile());
-	}
 	public String getLogo() {
 		return logo;
 	}

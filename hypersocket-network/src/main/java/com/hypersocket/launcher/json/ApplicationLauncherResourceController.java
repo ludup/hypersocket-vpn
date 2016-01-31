@@ -3,7 +3,9 @@ package com.hypersocket.launcher.json;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +37,7 @@ import com.hypersocket.launcher.ApplicationLauncherResourceService;
 import com.hypersocket.launcher.ApplicationLauncherResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.properties.PropertyCategory;
+import com.hypersocket.properties.json.PropertyItem;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceExportException;
@@ -108,7 +111,28 @@ public class ApplicationLauncherResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 
 		try {
-			return new ResourceList<PropertyCategory>();
+			return new ResourceList<PropertyCategory>(resourceService.getResourceTemplate());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "launchers/properties/{id}", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceList<PropertyCategory> getResourceProperties(
+			HttpServletRequest request, @PathVariable Long id) throws AccessDeniedException,
+			UnauthorizedException, SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+
+		try {
+			return new ResourceList<PropertyCategory>(
+					resourceService.getResourceProperties(
+							resourceService.getResourceById(id)));
+		} catch (ResourceNotFoundException e) {
+			return new ResourceList<PropertyCategory>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -226,20 +250,17 @@ public class ApplicationLauncherResourceController extends ResourceController {
 
 			Realm realm = sessionUtils.getCurrentRealm(request);
 
-			ApplicationLauncherOS os = ApplicationLauncherOS.values()[resource
-					.getOs()];
-
+			Map<String, String> properties = new HashMap<String, String>();
+			for (PropertyItem i : resource.getProperties()) {
+				properties.put(i.getId(), i.getValue());
+			}
 			if (resource.getId() != null) {
 				newResource = resourceService.updateResource(
 						resourceService.getResourceById(resource.getId()),
-						resource.getName(), resource.getExe(),
-						resource.getArgs(), os, resource.getStartupScript(),
-						resource.getShutdownScript(), resource.getLogo());
+						resource.getName(), properties);
 			} else {
 				newResource = resourceService.createResource(
-						resource.getName(), realm, resource.getExe(),
-						resource.getArgs(), os, resource.getStartupScript(),
-						resource.getShutdownScript(), resource.getLogo());
+						resource.getName(), realm, properties);
 			}
 			return new ResourceStatus<ApplicationLauncherResource>(
 					newResource,
