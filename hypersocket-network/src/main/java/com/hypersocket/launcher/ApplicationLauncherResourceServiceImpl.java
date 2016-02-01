@@ -28,7 +28,6 @@ import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
-import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.netty.HttpRequestDispatcherHandler;
