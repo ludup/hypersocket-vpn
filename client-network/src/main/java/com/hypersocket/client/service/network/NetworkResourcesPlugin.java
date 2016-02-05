@@ -195,7 +195,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				//String endpointLogo = field.containsKey("logo") ? (String) field.get("logo") : null;
 
 				if (StringUtils.isBlank(destinationHostname)) {
-					destinationHostname = hostname;
+					destinationHostname = serviceClient.processReplacements(hostname, variables);
 				} else {
 					destinationHostname = serviceClient.processReplacements(destinationHostname, variables);
 				}
@@ -349,7 +349,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 					res.setResourceLauncher(new ApplicationLauncher(
 							serviceClient.getPrincipalName(),
-							destinationHostname, 
+							hostname, 
 							launcherTemplate));
 
 					// Add to the list of resources found
@@ -467,7 +467,11 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String,FileMetaData> data = new HashMap<String,FileMetaData>();
+		
 		for(String file : files) {
+			if(StringUtils.isBlank(file)) {
+				continue;
+			}
 			String fileJson = serviceClient.getTransport().get("files/file/" + file);
 			FileMetaDataResourceStatus meta = objectMapper.readValue(fileJson, FileMetaDataResourceStatus.class);
 			if(!meta.isSuccess()) {
