@@ -112,7 +112,7 @@ public class NetworkResourceController extends ResourceController {
 						}
 
 						@Override
-						public Collection<?> getPage(String searchPattern,
+						public Collection<?> getPage(String searchColumn, String searchPattern,
 								int start, int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
@@ -122,7 +122,7 @@ public class NetworkResourceController extends ResourceController {
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getPersonalResourceCount(
@@ -177,22 +177,22 @@ public class NetworkResourceController extends ResourceController {
 						}
 
 						@Override
-						public List<?> getPage(String searchPattern, int start,
+						public List<?> getPage(String searchColumn, String searchPattern, int start,
 								int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.searchResources(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getResourceCount(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {

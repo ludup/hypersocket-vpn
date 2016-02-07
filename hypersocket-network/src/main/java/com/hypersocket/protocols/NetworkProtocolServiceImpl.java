@@ -107,7 +107,7 @@ public class NetworkProtocolServiceImpl extends
 
 			@Override
 			public boolean hasCreatedDefaultResources(Realm realm) {
-				return repository.getResourceCount(realm, "") > 0;
+				return repository.getResourceCount(realm, "", "") > 0;
 			}
 
 		});

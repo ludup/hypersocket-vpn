@@ -26,9 +26,9 @@ public class NetworkResourceRepositoryImpl extends
 
 	@Override
 	@Transactional(readOnly=true)
-	public List<NetworkResource> search(Realm realm, String searchPattern,
+	public List<NetworkResource> search(Realm realm, String searchColumn, String searchPattern,
 			int start, int length, ColumnSort[] sorting, CriteriaConfiguration... configs) {
-		return super.search(realm, searchPattern, start, length, sorting, new CriteriaConfiguration() {
+		return super.search(realm, searchColumn, searchPattern, start, length, sorting, new CriteriaConfiguration() {
 			@Override
 			public void configure(Criteria criteria) {
 				criteria.setFetchMode("protocols", FetchMode.SELECT);
