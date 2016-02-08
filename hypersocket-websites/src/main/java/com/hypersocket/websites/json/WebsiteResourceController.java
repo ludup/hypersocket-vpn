@@ -116,7 +116,7 @@ public class WebsiteResourceController extends ResourceController {
 								AccessDeniedException {
 							return websiteService.searchPersonalResources(
 									sessionUtils.getPrincipal(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
@@ -125,7 +125,7 @@ public class WebsiteResourceController extends ResourceController {
 								AccessDeniedException {
 							return websiteService.getPersonalResourceCount(
 									sessionUtils.getPrincipal(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {

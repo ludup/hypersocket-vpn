@@ -118,7 +118,7 @@ public class NetworkResourceController extends ResourceController {
 								AccessDeniedException {
 							return networkService.searchPersonalResources(
 									sessionUtils.getPrincipal(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
@@ -127,7 +127,7 @@ public class NetworkResourceController extends ResourceController {
 								AccessDeniedException {
 							return networkService.getPersonalResourceCount(
 									sessionUtils.getPrincipal(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {
