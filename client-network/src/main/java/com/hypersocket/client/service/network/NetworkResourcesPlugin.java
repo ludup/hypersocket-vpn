@@ -80,6 +80,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 		startWebsites(realmResources);
  
+		if (log.isInfoEnabled()) {
+			log.info("Loaded Resoruces");
+		}
 	}
 
 	@Override
@@ -189,181 +192,185 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 				boolean success = false;
 
-				String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
-				String destinationHostname = (String) field.get("destinationHostname");
-				
-				//String endpointLogo = field.containsKey("logo") ? (String) field.get("logo") : null;
-
-				if (StringUtils.isBlank(destinationHostname)) {
-					destinationHostname = serviceClient.processReplacements(hostname, variables);
-				} else {
-					destinationHostname = serviceClient.processReplacements(destinationHostname, variables);
-				}
-
-				String name = (String) field.get("name");
-				Long id = (Long) field.get("id");
-
-				if(log.isInfoEnabled()) {
-					log.info(String.format("Processing endpoint %s (%d) to %s using hostname %s", name, id, destinationHostname, hostname));
-				}
-				List<ProtocolTemplate> protocolTemplates = new ArrayList<>();
-
-				JSONArray launchers = (JSONArray) field.get("launchers");
-
-				@SuppressWarnings("unchecked")
-				Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers.iterator();
-
-				// For now, ignore version if on Linux, os.version is not
-				// that useful for us
-				Version ourVersion = null;
-				if (!SystemUtils.IS_OS_LINUX) {
-					ourVersion = new Version(System.getProperty("os.version"));
-				}
-
-				/*
-				 * The last modified date of any actual Resource's we create
-				 * needs to be the most recent last modified date of any of the
-				 * resources components (protocol, launcher, or the server side
-				 * resource itself).
-				 */
-				Number modifiedDateTime = (Number) field.get("modifiedDate");
-
-				List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
-				while (it3.hasNext()) {
-					JSONObject launcher = it3.next();
-
-					String family = (String) launcher.get("osFamily");
-					String version = (String) launcher.get("osVersion");
-					Long lid = (Long) launcher.get("id");
-
-					if (System.getProperty("os.name").toLowerCase().startsWith(family.toLowerCase())) {
-						Version launcherVersion = new Version(version);
-						if (ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
-							
-							if(log.isInfoEnabled()) {
-								log.info(String.format("Endpoint OS %s %s matches %s %s", 
-										System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+				try {
+					String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
+					String destinationHostname = (String) field.get("destinationHostname");
+					
+					//String endpointLogo = field.containsKey("logo") ? (String) field.get("logo") : null;
+	
+					if (StringUtils.isBlank(destinationHostname)) {
+						destinationHostname = serviceClient.processReplacements(hostname, variables);
+					} else {
+						destinationHostname = serviceClient.processReplacements(destinationHostname, variables);
+					}
+	
+					String name = (String) field.get("name");
+					Long id = (Long) field.get("id");
+	
+					if(log.isInfoEnabled()) {
+						log.info(String.format("Processing endpoint %s (%d) to %s using hostname %s", name, id, destinationHostname, hostname));
+					}
+					List<ProtocolTemplate> protocolTemplates = new ArrayList<>();
+	
+					JSONArray launchers = (JSONArray) field.get("launchers");
+	
+					@SuppressWarnings("unchecked")
+					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers.iterator();
+	
+					// For now, ignore version if on Linux, os.version is not
+					// that useful for us
+					Version ourVersion = null;
+					if (!SystemUtils.IS_OS_LINUX) {
+						ourVersion = new Version(System.getProperty("os.version"));
+					}
+	
+					/*
+					 * The last modified date of any actual Resource's we create
+					 * needs to be the most recent last modified date of any of the
+					 * resources components (protocol, launcher, or the server side
+					 * resource itself).
+					 */
+					Number modifiedDateTime = (Number) field.get("modifiedDate");
+	
+					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
+					while (it3.hasNext()) {
+						JSONObject launcher = it3.next();
+	
+						String family = (String) launcher.get("osFamily");
+						String version = (String) launcher.get("osVersion");
+						Long lid = (Long) launcher.get("id");
+	
+						if (System.getProperty("os.name").toLowerCase().startsWith(family.toLowerCase())) {
+							Version launcherVersion = new Version(version);
+							if (ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
+								
+								if(log.isInfoEnabled()) {
+									log.info(String.format("Endpoint OS %s %s matches %s %s", 
+											System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+								}
+								String n = (String) launcher.get("name");
+								String exe = (String) launcher.get("exe");
+								String logo = (String) launcher.get("logo");
+								String args = (String) launcher.get("args");
+								String startupScript = (String) launcher.get("startupScript");
+								String shutdownScript = (String) launcher.get("shutdownScript");
+								String installScript = (String) launcher.get("installScript");
+								String files = (String) launcher.get("files");
+								
+								Calendar launcherModifiedDate = Calendar.getInstance();
+								Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
+								launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
+								
+								File applicationDirectory = new File(System.getProperty("client.userdir"), n);
+								
+								ApplicationLauncherTemplate launcherTemplate = new ApplicationLauncherTemplate(
+										lid, 
+										n, 
+										exe, 
+										startupScript,
+										shutdownScript, 
+										applicationDirectory, 
+										logo, 
+										variables, 
+										launcherModifiedDate, 
+										args.split("\\]\\|\\["));
+								
+								launcherTemplates.add(launcherTemplate);
+								
+								downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
+							} else {
+								if(log.isInfoEnabled()) {
+									log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
+											System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+								}
 							}
-							String n = (String) launcher.get("name");
-							String exe = (String) launcher.get("exe");
-							String logo = (String) launcher.get("logo");
-							String args = (String) launcher.get("args");
-							String startupScript = (String) launcher.get("startupScript");
-							String shutdownScript = (String) launcher.get("shutdownScript");
-							String installScript = (String) launcher.get("installScript");
-							String files = (String) launcher.get("files");
-							
-							Calendar launcherModifiedDate = Calendar.getInstance();
-							Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
-							launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
-							
-							File applicationDirectory = new File(System.getProperty("client.userdir"), n);
-							
-							ApplicationLauncherTemplate launcherTemplate = new ApplicationLauncherTemplate(
-									lid, 
-									n, 
-									exe, 
-									startupScript,
-									shutdownScript, 
-									applicationDirectory, 
-									logo, 
-									variables, 
-									launcherModifiedDate, 
-									args.split("\\]\\|\\["));
-							
-							launcherTemplates.add(launcherTemplate);
-							
-							downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
 						} else {
 							if(log.isInfoEnabled()) {
 								log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
 										System.getProperty("os.name"), System.getProperty("os.version"), family, version));
 							}
 						}
-					} else {
-						if(log.isInfoEnabled()) {
-							log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
-									System.getProperty("os.name"), System.getProperty("os.version"), family, version));
+					}
+					JSONArray protocols = (JSONArray) field.get("protocols");
+	
+					@SuppressWarnings("unchecked")
+					Iterator<JSONObject> it2 = (Iterator<JSONObject>) protocols.iterator();
+	
+					while (it2.hasNext()) {
+						JSONObject protocol = it2.next();
+						Long pid = (Long) protocol.get("id");
+						String protocolName = (String) protocol.get("name");
+						String transport = (String) protocol.get("transport");
+						long tmp = (Long) protocol.get("startPort");
+						int startPort = (int) tmp;
+						int endPort = startPort;
+						if (protocol.get("endPort") != null) {
+							tmp = (Long) protocol.get("endPort");
+							endPort = (int) tmp;
 						}
+						Calendar protocolModifiedDate = Calendar.getInstance();
+						Number protocolModifiedDateTime = (Number) protocol.get("modifiedDate");
+						protocolModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), protocolModifiedDateTime.longValue()));
+						protocolTemplates.add(new ProtocolTemplate(pid, protocolName, transport, startPort, endPort, protocolModifiedDate));
 					}
-				}
-				JSONArray protocols = (JSONArray) field.get("protocols");
-
-				@SuppressWarnings("unchecked")
-				Iterator<JSONObject> it2 = (Iterator<JSONObject>) protocols.iterator();
-
-				while (it2.hasNext()) {
-					JSONObject protocol = it2.next();
-					Long pid = (Long) protocol.get("id");
-					String protocolName = (String) protocol.get("name");
-					String transport = (String) protocol.get("transport");
-					long tmp = (Long) protocol.get("startPort");
-					int startPort = (int) tmp;
-					int endPort = startPort;
-					if (protocol.get("endPort") != null) {
-						tmp = (Long) protocol.get("endPort");
-						endPort = (int) tmp;
+	
+					List<Resource> protocolResources = new ArrayList<>();
+					for (ProtocolTemplate protocol : protocolTemplates) {
+						NetworkResourceDetail detail = new NetworkResourceDetail();
+						/*
+						 * Create a Template (the local state object, NOT sent over
+						 * RMI)
+						 */
+						NetworkResourceTemplate template = new NetworkResourceTemplate(id, name, hostname,
+								destinationHostname, protocol.getName(), protocol.getTransport(), protocol.getStartPort(),
+								protocol.getEndPort());
+	
+						ResourceImpl res = new ResourceImpl(String.valueOf(id) + "-protocol-" + protocol.getId(), name);
+						res.setType(Type.ENDPOINT);
+						res.setLaunchable(false);
+						res.setModified(protocol.getModifiedDate());
+						realmResources.add(res);
+						detail.networkResourceTemplate = template;
+						resourceDetails.put(res, detail);
+						protocolResources.add(res);
 					}
-					Calendar protocolModifiedDate = Calendar.getInstance();
-					Number protocolModifiedDateTime = (Number) protocol.get("modifiedDate");
-					protocolModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), protocolModifiedDateTime.longValue()));
-					protocolTemplates.add(new ProtocolTemplate(pid, protocolName, transport, startPort, endPort, protocolModifiedDate));
+	
+					for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
+	
+						// Create a Resource (the object that will be sent over
+						// RMI)
+						ResourceImpl res = new ResourceImpl(id + "-template-" + +launcherTemplate.getId(), name);
+						res.setType(Type.NETWORK);
+						res.setLaunchable(true);
+						res.setModified(launcherTemplate.getModifiedDate());
+						res.setIcon(launcherTemplate.getLogo());
+	
+						// TODO - this is disabled for now, until the grouping
+						// component is completed.
+						// res.setGroup(launcherTemplate.getName());
+						// res.setGroupIcon(launcherTemplate.getLogo());
+						res.setGroup(res.getName());
+	
+						res.setResourceLauncher(new ApplicationLauncher(
+								serviceClient.getPrincipalName(),
+								hostname, 
+								launcherTemplate));
+	
+						// Add to the list of resources found
+						realmResources.add(res);
+						
+						/* This specifies that when THIS updates, we actually ALL of the protocol resource as well */ 
+						childResources.put(res, protocolResources);
+	
+						// The resource detail is shared across the launchable
+						// resources
+	//					resourceDetails.put(res, detail);
+					}
+					success = true;
+
+				} catch(Throwable t) {
+					log.error("Error loading resource", t);
 				}
-
-				List<Resource> protocolResources = new ArrayList<>();
-				for (ProtocolTemplate protocol : protocolTemplates) {
-					NetworkResourceDetail detail = new NetworkResourceDetail();
-					/*
-					 * Create a Template (the local state object, NOT sent over
-					 * RMI)
-					 */
-					NetworkResourceTemplate template = new NetworkResourceTemplate(id, name, hostname,
-							destinationHostname, protocol.getName(), protocol.getTransport(), protocol.getStartPort(),
-							protocol.getEndPort());
-
-					ResourceImpl res = new ResourceImpl(String.valueOf(id) + "-protocol-" + protocol.getId(), name);
-					res.setType(Type.ENDPOINT);
-					res.setLaunchable(false);
-					res.setModified(protocol.getModifiedDate());
-					realmResources.add(res);
-					detail.networkResourceTemplate = template;
-					resourceDetails.put(res, detail);
-					protocolResources.add(res);
-				}
-
-				for (ApplicationLauncherTemplate launcherTemplate : launcherTemplates) {
-
-					// Create a Resource (the object that will be sent over
-					// RMI)
-					ResourceImpl res = new ResourceImpl(id + "-template-" + +launcherTemplate.getId(), name);
-					res.setType(Type.NETWORK);
-					res.setLaunchable(true);
-					res.setModified(launcherTemplate.getModifiedDate());
-					res.setIcon(launcherTemplate.getLogo());
-
-					// TODO - this is disabled for now, until the grouping
-					// component is completed.
-					// res.setGroup(launcherTemplate.getName());
-					// res.setGroupIcon(launcherTemplate.getLogo());
-					res.setGroup(res.getName());
-
-					res.setResourceLauncher(new ApplicationLauncher(
-							serviceClient.getPrincipalName(),
-							hostname, 
-							launcherTemplate));
-
-					// Add to the list of resources found
-					realmResources.add(res);
-					
-					/* This specifies that when THIS updates, we actually ALL of the protocol resource as well */ 
-					childResources.put(res, protocolResources);
-
-					// The resource detail is shared across the launchable
-					// resources
-//					resourceDetails.put(res, detail);
-				}
-				success = true;
-
 				return success;
 			}
 
