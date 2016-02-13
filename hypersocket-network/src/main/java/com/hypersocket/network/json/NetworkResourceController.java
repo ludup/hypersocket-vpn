@@ -107,27 +107,27 @@ public class NetworkResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return ResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return ResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
-						public Collection<?> getPage(String searchPattern,
+						public Collection<?> getPage(String searchColumn, String searchPattern,
 								int start, int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.searchPersonalResources(
 									sessionUtils.getPrincipal(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getPersonalResourceCount(
 									sessionUtils.getPrincipal(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {
@@ -172,27 +172,27 @@ public class NetworkResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return NetworkResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return NetworkResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
-						public List<?> getPage(String searchPattern, int start,
+						public List<?> getPage(String searchColumn, String searchPattern, int start,
 								int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.searchResources(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getResourceCount(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {
@@ -274,12 +274,12 @@ public class NetworkResourceController extends ResourceController {
 						networkService.getResourceById(resource.getId()),
 						resource.getName(), resource.getHostname(),
 						resource.getDestinationHostname(), protocols,
-						launchers, roles);
+						launchers, roles, resource.getLogo());
 			} else {
 				newResource = networkService.createResource(resource.getName(),
 						resource.getHostname(),
 						resource.getDestinationHostname(), protocols,
-						launchers, roles, realm);
+						launchers, roles, realm, resource.getLogo());
 			}
 			return new ResourceStatus<NetworkResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
@@ -421,6 +421,23 @@ public class NetworkResourceController extends ResourceController {
 					sessionUtils.getLocale(request),
 					I18NServiceImpl.USER_INTERFACE_BUNDLE,
 					"resource.import.failure", e.getMessage()));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
+	@RequestMapping(value = "networkResources/fingerprint", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<String> getFingerprint(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			return new ResourceStatus<String>(true, networkService.getFingerprint() + "-" + protocolService.getFingerprint() + "-" + launcherService.getFingerprint());
 		} finally {
 			clearAuthenticatedContext();
 		}

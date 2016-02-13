@@ -45,6 +45,7 @@ import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.session.Session;
+import com.hypersocket.ui.IndexPageFilter;
 
 @Service
 public class NetworkResourceServiceImpl extends AbstractAssignableResourceServiceImpl<NetworkResource>
@@ -79,6 +80,9 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Autowired
 	EventService eventService;
+	
+	@Autowired
+	IndexPageFilter indexPageFilter;
 
 	public NetworkResourceServiceImpl() {
 		super("networkResource");
@@ -131,6 +135,8 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
 		}
+		
+		indexPageFilter.addStyleSheet("${uiPath}/css/networkResources.css");
 	}
 
 	@Override
@@ -171,7 +177,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	@Override
 	public NetworkResource updateResource(NetworkResource resource, String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers,
-			Set<Role> roles) throws ResourceChangeException, AccessDeniedException {
+			Set<Role> roles, String logo) throws ResourceChangeException, AccessDeniedException {
 
 		assertPermission(NetworkResourcePermission.UPDATE);
 
@@ -181,6 +187,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		resource.setProtocols(protocols);
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
+		resource.setLogo(logo);
 
 		updateResource(resource, new HashMap<String, String>());
 
@@ -190,7 +197,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Override
 	public NetworkResource createResource(String name, String hostname, String destinationHostname,
-			Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers, Set<Role> roles, Realm realm)
+			Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers, Set<Role> roles, Realm realm, String logo)
 					throws ResourceCreationException, AccessDeniedException {
 
 		NetworkResource resource = new NetworkResource();
@@ -202,6 +209,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		resource.setProtocols(protocols);
 		resource.setLaunchers(launchers);
 		resource.setRoles(roles);
+		resource.setLogo(logo);
 
 		createResource(resource, new HashMap<String, String>());
 
@@ -261,18 +269,20 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		return NetworkResource.class;
 	}
 
-	protected void prepareExport(NetworkResource resource) {
+	protected void prepareExport(NetworkResource resource, boolean stripIdentity) {
 
-		super.prepareExport(resource);
+		super.prepareExport(resource, stripIdentity);
 
-		for (NetworkProtocol networkProtocol : resource.getProtocols()) {
-			networkProtocol.setId(null);
-			networkProtocol.setRealm(null);
-		}
-
-		for (ApplicationLauncherResource applicationLauncherResource : resource.getLaunchers()) {
-			applicationLauncherResource.setId(null);
-			applicationLauncherResource.setRealm(null);
+		if(stripIdentity){
+			for (NetworkProtocol networkProtocol : resource.getProtocols()) {
+					networkProtocol.setId(null);
+					networkProtocol.setRealm(null);
+			}
+	
+			for (ApplicationLauncherResource applicationLauncherResource : resource.getLaunchers()) {
+				applicationLauncherResource.setId(null);
+				applicationLauncherResource.setRealm(null);
+			}
 		}
 	}
 

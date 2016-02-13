@@ -10,6 +10,7 @@ public class WebsiteResourceUpdate {
 	String launchUrl;
 	String additionalUrls;
 	Long[] roles;
+	String logo;
 	
 	public WebsiteResourceUpdate() {
 		
@@ -54,7 +55,13 @@ public class WebsiteResourceUpdate {
 	public void setAdditionalUrls(String additionalUrls) {
 		this.additionalUrls = additionalUrls;
 	}
-	
-	
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
+	}
 	
 }

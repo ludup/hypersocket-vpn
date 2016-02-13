@@ -9,6 +9,8 @@ import com.hypersocket.resource.ResourceCreationException;
 
 public interface NetworkProtocolService extends
 		AbstractResourceService<NetworkProtocol> {
+	
+	String getFingerprint();
 
 	NetworkProtocol updateResource(NetworkProtocol resourceById, String name,
 			Integer startPort, Integer endPort, NetworkTransport transport)

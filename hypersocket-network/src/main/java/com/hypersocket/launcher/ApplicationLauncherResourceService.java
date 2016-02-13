@@ -1,6 +1,7 @@
 package com.hypersocket.launcher;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,15 +19,8 @@ public interface ApplicationLauncherResourceService extends
 		AbstractResourceService<ApplicationLauncherResource> {
 
 	ApplicationLauncherResource updateResource(
-			ApplicationLauncherResource resourceById, String name, String exe,
-			String args, ApplicationLauncherOS os, String startupScript,
-			String shutdownScript) throws ResourceChangeException,
+			ApplicationLauncherResource id, String name, Map<String,String> properties) throws ResourceChangeException,
 			AccessDeniedException;
-
-	ApplicationLauncherResource createResource(String name, Realm realm,
-			String exe, String args, ApplicationLauncherOS os,
-			String startupScript, String shutdownScript)
-			throws ResourceCreationException, AccessDeniedException;
 
 	BootstrapTableResult searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException;
@@ -36,5 +30,8 @@ public interface ApplicationLauncherResourceService extends
 
 	ApplicationLauncherResource createFromTemplate(String script)
 			throws AccessDeniedException, ResourceException;
+
+	ApplicationLauncherResource createResource(String name, Realm realm, Map<String, String> properties)
+			throws ResourceCreationException, AccessDeniedException;
 
 }

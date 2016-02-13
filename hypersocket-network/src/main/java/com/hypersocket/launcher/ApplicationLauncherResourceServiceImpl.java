@@ -28,7 +28,6 @@ import com.hypersocket.launcher.events.ApplicationLauncherCreatedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherDeletedEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
-import com.hypersocket.menus.AbstractTableAction;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.netty.HttpRequestDispatcherHandler;
@@ -114,12 +113,6 @@ public class ApplicationLauncherResourceServiceImpl extends
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
 		menuService.registerExtendableTable(APPLICATION_LAUNCHER_ACTIONS);
-
-		menuService.registerTableAction(APPLICATION_LAUNCHER_ACTIONS,
-				new AbstractTableAction("exportApplicationResource",
-						"fa-download", "exportApplicationResource",
-						ApplicationLauncherResourcePermission.READ, 0, null,
-						null));
 		
 		eventService.registerEvent(ApplicationLauncherEvent.class,
 				RESOURCE_BUNDLE, this);
@@ -130,6 +123,8 @@ public class ApplicationLauncherResourceServiceImpl extends
 		eventService.registerEvent(ApplicationLauncherDeletedEvent.class,
 				RESOURCE_BUNDLE, this);
 
+		repository.getEntityStore().registerResourceService(
+				ApplicationLauncherResource.class, repository);
 	}
 
 	@Override
@@ -194,53 +189,27 @@ public class ApplicationLauncherResourceServiceImpl extends
 
 	@Override
 	public ApplicationLauncherResource updateResource(
-			ApplicationLauncherResource resource, String name, String exe,
-			String args, ApplicationLauncherOS os, String startupScript,
-			String shutdownScript) throws ResourceChangeException,
+			ApplicationLauncherResource resource, 
+			String name, Map<String,String> properties) throws ResourceChangeException,
 			AccessDeniedException {
 
 		resource.setName(name);
-		resource.setExe(exe);
-		resource.setArgs(args);
-		resource.setOs(os);
-		resource.setStartupScript(startupScript);
-		resource.setShutdownScript(shutdownScript);
-
-		/**
-		 * Set any additional fields on your resource here before calling
-		 * updateResource.
-		 * 
-		 * Remember to fill in the fire*Event methods to ensure events are fired
-		 * for all operations.
-		 */
-		updateResource(resource, new HashMap<String, String>());
+		
+		updateResource(resource, properties);
 
 		return resource;
 	}
 
 	@Override
 	public ApplicationLauncherResource createResource(String name, Realm realm,
-			String exe, String args, ApplicationLauncherOS os,
-			String startupScript, String shutdownScript)
+			Map<String,String> properties)
 			throws ResourceCreationException, AccessDeniedException {
 
 		ApplicationLauncherResource resource = new ApplicationLauncherResource();
 		resource.setName(name);
-		resource.setExe(exe);
-		resource.setArgs(args);
-		resource.setOs(os);
-		resource.setStartupScript(startupScript);
-		resource.setShutdownScript(shutdownScript);
 		resource.setRealm(realm);
 
-		/**
-		 * Set any additional fields on your resource here before calling
-		 * createResource.
-		 * 
-		 * Remember to fill in the fire*Event methods to ensure events are fired
-		 * for all operations.
-		 */
-		createResource(resource, new HashMap<String, String>());
+		createResource(resource, properties);
 
 		return resource;
 	}

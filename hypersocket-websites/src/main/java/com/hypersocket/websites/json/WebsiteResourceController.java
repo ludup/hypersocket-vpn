@@ -53,6 +53,23 @@ public class WebsiteResourceController extends ResourceController {
 	WebsiteResourceService websiteService;
 
 	@AuthenticationRequired
+	@RequestMapping(value = "websites/fingerprint", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceStatus<String> getFingerprint(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			return new ResourceStatus<String>(true, websiteService.getFingerprint());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+
+	@AuthenticationRequired
 	@RequestMapping(value = "websites/myWebsites", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
@@ -88,27 +105,27 @@ public class WebsiteResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return ResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return ResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
-						public Collection<?> getPage(String searchPattern,
+						public Collection<?> getPage(String searchColumn, String searchPattern,
 								int start, int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.searchPersonalResources(
 									sessionUtils.getPrincipal(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.getPersonalResourceCount(
 									sessionUtils.getPrincipal(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {
@@ -133,27 +150,27 @@ public class WebsiteResourceController extends ResourceController {
 					new BootstrapTablePageProcessor() {
 
 						@Override
-						public Column getColumn(int col) {
-							return WebsiteResourceColumns.values()[col];
+						public Column getColumn(String col) {
+							return WebsiteResourceColumns.valueOf(col.toUpperCase());
 						}
 
 						@Override
-						public List<?> getPage(String searchPattern, int start,
+						public List<?> getPage(String searchColumn, String searchPattern, int start,
 								int length, ColumnSort[] sorting)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.searchResources(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern, start, length, sorting);
+									searchColumn, searchPattern, start, length, sorting);
 						}
 
 						@Override
-						public Long getTotalCount(String searchPattern)
+						public Long getTotalCount(String searchColumn, String searchPattern)
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.getResourceCount(
 									sessionUtils.getCurrentRealm(request),
-									searchPattern);
+									searchColumn, searchPattern);
 						}
 					});
 		} finally {
@@ -222,11 +239,11 @@ public class WebsiteResourceController extends ResourceController {
 				newResource = websiteService.updateResource(
 						websiteService.getResourceById(resource.getId()),
 						resource.getName(), resource.getLaunchUrl(),
-						resource.getAdditionalUrls(), roles);
+						resource.getAdditionalUrls(), roles, resource.getLogo());
 			} else {
 				newResource = websiteService.createResource(resource.getName(),
 						resource.getLaunchUrl(), resource.getAdditionalUrls(),
-						roles);
+						roles, resource.getLogo());
 			}
 			return new ResourceStatus<WebsiteResource>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
@@ -325,7 +342,7 @@ public class WebsiteResourceController extends ResourceController {
 		try {
 			response.setHeader("Content-Disposition", "attachment; filename=\""
 					+ websiteService.getResourceCategory() + "-all" + ".json\"");
-			return websiteService.exportResources(websiteService.allResources());
+			return websiteService.exportResources(websiteService.allResources(), true);
 		} finally {
 			clearAuthenticatedContext();
 		}

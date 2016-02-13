@@ -16,6 +16,7 @@ public class NetworkResourceUpdate {
 	Long[] protocols;
 	Long[] launchers;
 	Long[] roles;
+	String logo;
 	
 	public NetworkResourceUpdate() {
 		
@@ -27,6 +28,14 @@ public class NetworkResourceUpdate {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 	public String getName() {

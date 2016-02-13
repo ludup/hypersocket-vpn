@@ -28,11 +28,13 @@ public class NetworkResourceTemplate implements Serializable {
 	String transport;
 	String status;
 	List<NetworkResource> liveResources = new ArrayList<NetworkResource>();
+	Long parentResourceId;
 
-	public NetworkResourceTemplate(String name, String hostname,
+	public NetworkResourceTemplate(Long parentResourceId, String name, String hostname,
 			String destinationHostname, String protocol, String transport,
 			int startPort, int endPort) {
 		this.name = name;
+		this.parentResourceId = parentResourceId;
 		this.hostname = IPAddressValidator.getInstance().getGuaranteedHostname(
 				hostname);
 		this.destinationHostname = destinationHostname;
@@ -40,6 +42,10 @@ public class NetworkResourceTemplate implements Serializable {
 		this.startPort = startPort;
 		this.endPort = endPort;
 		this.transport = transport;
+	}
+
+	public Long getParentResourceId() {
+		return parentResourceId;
 	}
 
 	public String getName() {

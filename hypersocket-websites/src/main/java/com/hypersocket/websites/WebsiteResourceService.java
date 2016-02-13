@@ -14,11 +14,11 @@ public interface WebsiteResourceService extends
 		AbstractAssignableResourceService<WebsiteResource>, ForwardingService<WebsiteResource> {
 
 	WebsiteResource updateResource(WebsiteResource resourceById, String name,
-			String launchUrl, String additionalUrls, Set<Role> roles)
+			String launchUrl, String additionalUrls, Set<Role> roles, String logo)
 			throws ResourceChangeException, AccessDeniedException;
 
 	WebsiteResource createResource(String name, String launchUrl,
-			String additionalUrls, Set<Role> roles)
+			String additionalUrls, Set<Role> roles, String logo)
 			throws ResourceCreationException, AccessDeniedException;
 	
 	WebsiteResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;

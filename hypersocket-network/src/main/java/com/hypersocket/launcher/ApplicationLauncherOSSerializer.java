@@ -18,7 +18,9 @@ public class ApplicationLauncherOSSerializer extends JsonSerializer<ApplicationL
 		    generator.writeFieldName("id");
 		    generator.writeNumber(value.getId());
 		    generator.writeFieldName("name");
-		    generator.writeString(value.getName());
+		    generator.writeString(value.name());
+		    generator.writeFieldName("displayName");
+		    generator.writeString(value.getDisplayName());
 		    generator.writeFieldName("version");
 		    generator.writeString(value.getVersion());
 		    generator.writeFieldName("family");

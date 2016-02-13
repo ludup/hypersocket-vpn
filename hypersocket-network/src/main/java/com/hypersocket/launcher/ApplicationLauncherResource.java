@@ -27,8 +27,25 @@ public class ApplicationLauncherResource extends RealmResource {
 	@Column(name="shutdown_script", length=8000)
 	String shutdownScript = "";
 	
+	@Column(name="install_script", length=8000)
+	String installScript = "";
+	
+	@Column(name="logo", length=256)
+	String logo;
+	
+	@Column(name="files", length=8000)
+	String files;
+	
 	public String getExe() {
 		return exe;
+	}
+
+	public String getLogo() {
+		return logo == null ? "logo://100_autotype_autotype_auto.png" : logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 	public void setExe(String exe) {
@@ -47,16 +64,20 @@ public class ApplicationLauncherResource extends RealmResource {
 		return os;
 	}
 
+	public void setOs(String os) {
+		this.os = ApplicationLauncherOS.valueOf(os);
+	}
+	
 	public void setOs(ApplicationLauncherOS os) {
 		this.os = os;
 	}
 	
 	public String getOsFamily() {
-		return os.getFamily();
+		return os==null? "" : os.getFamily();
 	}
 	
 	public String getOsVersion() {
-		return os.getVersion();
+		return os==null? "" : os.getVersion();
 	}
 
 	public String getStartupScript() {
@@ -67,12 +88,28 @@ public class ApplicationLauncherResource extends RealmResource {
 		this.startupScript = startupScript;
 	}
 
+	public String getInstallScript() {
+		return installScript == null ? "" : installScript;
+	}
+
+	public void setInstallScript(String installScript) {
+		this.installScript = installScript;
+	}
+	
 	public String getShutdownScript() {
 		return shutdownScript == null ? "" : shutdownScript;
 	}
 
 	public void setShutdownScript(String shutdownScript) {
 		this.shutdownScript = shutdownScript;
+	}
+
+	public String getFiles() {
+		return files;
+	}
+
+	public void setFiles(String files) {
+		this.files = files;
 	}
 	
 	
