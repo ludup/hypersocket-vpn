@@ -11,9 +11,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -184,6 +186,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	protected int processNetworkResources(final List<Resource> realmResources, String json) throws IOException {
 
 		final Map<String, String> variables = serviceClient.getUserVariables();
+		final Set<Long> alreadyInstalled = new HashSet<Long>();
 
 		return processResourceList(json, new ResourceMapper() {
 
@@ -231,6 +234,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					 * resource itself).
 					 */
 					Number modifiedDateTime = (Number) field.get("modifiedDate");
+					log.info("REMOVEME Modified date time of main resource " + name + " is " + modifiedDateTime);
 	
 					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
 					while (it3.hasNext()) {
@@ -259,6 +263,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								
 								Calendar launcherModifiedDate = Calendar.getInstance();
 								Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
+								log.info("  REMOVEME Modified date time of template resource " + n + " is " + launcherModifiedDateTime.longValue());
 								launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
 								
 								File applicationDirectory = new File(System.getProperty("client.userdir"), n);
@@ -277,7 +282,22 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								
 								launcherTemplates.add(launcherTemplate);
 								
-								downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
+								/*
+								 * We only want to do this ONCE per actual application, not launcher
+								 * template. If not, as soon as you have more than one launcher for 
+								 * a template, the same files will be downloaded over and over again,
+								 * and because the modification dates differ for each template (they
+								 * are actually the latest date of all related resources), this behavior
+								 * will continue on every login.
+								 */
+								if(!alreadyInstalled.contains(lid)) {
+									try {
+									downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
+									}
+									finally {
+										alreadyInstalled.add(lid);
+									}
+								}
 							} else {
 								if(log.isInfoEnabled()) {
 									log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
@@ -359,7 +379,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						// Add to the list of resources found
 						realmResources.add(res);
 						
-						/* This specifies that when THIS updates, we actually ALL of the protocol resource as well */ 
+						/* This specifies that when THIS updates, we actually want ALL of the protocol resource as well */ 
 						childResources.put(res, protocolResources);
 	
 						// The resource detail is shared across the launchable
