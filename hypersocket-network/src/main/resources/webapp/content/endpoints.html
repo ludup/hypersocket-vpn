@@ -1,5 +1,4 @@
 <div id="contentEndpoints">
-
 	<div class="modal" id="addResourceForm" tabindex="-1" role="dialog" dialog-for="contentEndpoints">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -28,7 +27,7 @@
 								<div id="hostname"></div>
 								<div>
 									<span class="help-block" localize="endpoint.hostname.info"></span>
-								</div>
+								</div>`
 							</div>
 						</div>
 						<div class="propertyItem form-group">
@@ -166,6 +165,7 @@
 						id : "EndPoints",
 						title: getResource('endpoints.title'),
 						icon: 'fa-sitemap',
+						infoHtml: getResource('endpoints.help'),
 						logo: true,
 						logoResourceTypeCallback: function(resource) {
 							return 'NETWORK';
