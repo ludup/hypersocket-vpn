@@ -292,7 +292,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								 */
 								if(!alreadyInstalled.contains(lid)) {
 									try {
-									downloadAndInstall(launcherTemplate, files.split("\\]\\|\\["), installScript);
+										downloadAndInstall(launcherTemplate, files!=null ? files.split("\\]\\|\\[") : new String[] {}, installScript);
 									}
 									finally {
 										alreadyInstalled.add(lid);
@@ -484,9 +484,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		} catch(IOException e)  { 
 			log.error("Failed to install app " + launcherTemplate.getName(), e);
 			guiRegistry.onUpdateFailure(launcherTemplate.getName(), e);
-		} finally {
-			
-		}
+		} 
+		
 		return false;
 	}
 	
