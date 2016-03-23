@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.hypersocket.network.NetworkTransport;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 public class NetworkProtocolDeserializer extends
 		JsonDeserializer<NetworkProtocol> {
@@ -25,7 +25,7 @@ public class NetworkProtocolDeserializer extends
 		protocol.setHidden(((BooleanNode) node.get("hidden")).booleanValue());
 		protocol.setResourceCategory(node.get("resourceCategory").asText());
 		protocol.setSystem(((BooleanNode) node.get("system")).booleanValue());
-		protocol.setTransport(NetworkTransport.valueOf(node.get("transport")
+		protocol.setTransport(ForwardingTransport.valueOf(node.get("transport")
 				.asText()));
 		protocol.setStartPort(((IntNode) node.get("startPort")).intValue());
 		if (node.get("endPort") != NullNode.instance) {

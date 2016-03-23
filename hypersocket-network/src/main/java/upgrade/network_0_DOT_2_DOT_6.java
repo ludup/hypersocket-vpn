@@ -12,10 +12,10 @@ import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hypersocket.network.NetworkResourceRepository;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.protocols.NetworkProtocolRepository;
 import com.hypersocket.realm.RealmService;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 public class network_0_DOT_2_DOT_6 implements Runnable {
 
@@ -39,7 +39,7 @@ public class network_0_DOT_2_DOT_6 implements Runnable {
 	}
 
 	@SuppressWarnings("unchecked")
-	void createProtocol(String name, NetworkTransport transport, Integer start,
+	void createProtocol(String name, ForwardingTransport transport, Integer start,
 			Integer end) {
 		NetworkProtocol protocol = new NetworkProtocol();
 		protocol.setName(name);

@@ -24,8 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.hypersocket.launcher.ApplicationLauncherResource;
-import com.hypersocket.network.handlers.ForwardingResource;
 import com.hypersocket.protocols.NetworkProtocol;
+import com.hypersocket.server.forward.ForwardingResource;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 @Entity
 @Table(name = "network_resources")
@@ -109,11 +110,11 @@ public class NetworkResource extends ForwardingResource {
 	}
 
 	public NetworkProtocol getNetworkProtocol(Integer port,
-			NetworkTransport transport) {
+			ForwardingTransport transport) {
 		for (NetworkProtocol protocol : getProtocols()) {
 
 			if (protocol.getTransport() == transport
-					|| protocol.getTransport() == NetworkTransport.BOTH) {
+					|| protocol.getTransport() == ForwardingTransport.BOTH) {
 				if (protocol.getEndPort() != null) {
 					if (protocol.getStartPort().intValue() >= port.intValue()
 							&& port.intValue() <= protocol.getEndPort()
