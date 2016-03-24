@@ -14,7 +14,6 @@ import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -29,6 +28,7 @@ import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 @Service
 public class NetworkProtocolServiceImpl extends
@@ -115,37 +115,37 @@ public class NetworkProtocolServiceImpl extends
 
 	private void createDefaultProtocols(Realm realm) {
 
-		createProtocol(realm, "FTP (Data)", NetworkTransport.BOTH, 20, null);
-		createProtocol(realm, "FTP (Control)", NetworkTransport.TCP, 21, null);
-		createProtocol(realm, "FTPS (Data)", NetworkTransport.BOTH, 989, null);
-		createProtocol(realm, "FTPS (Control)", NetworkTransport.BOTH, 990,
+		createProtocol(realm, "FTP (Data)", ForwardingTransport.BOTH, 20, null);
+		createProtocol(realm, "FTP (Control)", ForwardingTransport.TCP, 21, null);
+		createProtocol(realm, "FTPS (Data)", ForwardingTransport.BOTH, 989, null);
+		createProtocol(realm, "FTPS (Control)", ForwardingTransport.BOTH, 990,
 				null);
-		createProtocol(realm, "Telnet", NetworkTransport.TCP, 23, null);
-		createProtocol(realm, "SSH", NetworkTransport.TCP, 22, null);
-		createProtocol(realm, "VNC", NetworkTransport.TCP, 5900, 5910);
-		createProtocol(realm, "VNC:0", NetworkTransport.TCP, 5900, null);
-		createProtocol(realm, "VNC:1", NetworkTransport.TCP, 5901, null);
-		createProtocol(realm, "VNC:2", NetworkTransport.TCP, 5902, null);
-		createProtocol(realm, "VNC:3", NetworkTransport.TCP, 5903, null);
-		createProtocol(realm, "VNC:4", NetworkTransport.TCP, 5904, null);
-		createProtocol(realm, "VNC:5", NetworkTransport.TCP, 5905, null);
-		createProtocol(realm, "RDP", NetworkTransport.TCP, 3389, null);
-		createProtocol(realm, "HTTP", NetworkTransport.TCP, 80, null);
-		createProtocol(realm, "HTTPS", NetworkTransport.TCP, 443, null);
-		createProtocol(realm, "POP3", NetworkTransport.TCP, 110, null);
-		createProtocol(realm, "SSL-POP", NetworkTransport.TCP, 995, null);
-		createProtocol(realm, "SMTP", NetworkTransport.TCP, 25, null);
-		createProtocol(realm, "SSMTP", NetworkTransport.TCP, 465, null);
-		createProtocol(realm, "IMAP", NetworkTransport.TCP, 143, null);
-		createProtocol(realm, "IMAP4-SSL", NetworkTransport.TCP, 585, null);
-		createProtocol(realm, "IMAPS", NetworkTransport.TCP, 993, null);
-		createProtocol(realm, "LDAP", NetworkTransport.TCP, 389, null);
-		createProtocol(realm, "LDAPS", NetworkTransport.TCP, 636, null);
-		createProtocol(realm, "IPP", NetworkTransport.BOTH, 631, null);
+		createProtocol(realm, "Telnet", ForwardingTransport.TCP, 23, null);
+		createProtocol(realm, "SSH", ForwardingTransport.TCP, 22, null);
+		createProtocol(realm, "VNC", ForwardingTransport.TCP, 5900, 5910);
+		createProtocol(realm, "VNC:0", ForwardingTransport.TCP, 5900, null);
+		createProtocol(realm, "VNC:1", ForwardingTransport.TCP, 5901, null);
+		createProtocol(realm, "VNC:2", ForwardingTransport.TCP, 5902, null);
+		createProtocol(realm, "VNC:3", ForwardingTransport.TCP, 5903, null);
+		createProtocol(realm, "VNC:4", ForwardingTransport.TCP, 5904, null);
+		createProtocol(realm, "VNC:5", ForwardingTransport.TCP, 5905, null);
+		createProtocol(realm, "RDP", ForwardingTransport.TCP, 3389, null);
+		createProtocol(realm, "HTTP", ForwardingTransport.TCP, 80, null);
+		createProtocol(realm, "HTTPS", ForwardingTransport.TCP, 443, null);
+		createProtocol(realm, "POP3", ForwardingTransport.TCP, 110, null);
+		createProtocol(realm, "SSL-POP", ForwardingTransport.TCP, 995, null);
+		createProtocol(realm, "SMTP", ForwardingTransport.TCP, 25, null);
+		createProtocol(realm, "SSMTP", ForwardingTransport.TCP, 465, null);
+		createProtocol(realm, "IMAP", ForwardingTransport.TCP, 143, null);
+		createProtocol(realm, "IMAP4-SSL", ForwardingTransport.TCP, 585, null);
+		createProtocol(realm, "IMAPS", ForwardingTransport.TCP, 993, null);
+		createProtocol(realm, "LDAP", ForwardingTransport.TCP, 389, null);
+		createProtocol(realm, "LDAPS", ForwardingTransport.TCP, 636, null);
+		createProtocol(realm, "IPP", ForwardingTransport.BOTH, 631, null);
 	}
 
 	@SuppressWarnings("unchecked")
-	void createProtocol(Realm realm, String name, NetworkTransport transport,
+	void createProtocol(Realm realm, String name, ForwardingTransport transport,
 			Integer start, Integer end) {
 		NetworkProtocol protocol = new NetworkProtocol();
 		protocol.setRealm(realm);
@@ -218,7 +218,7 @@ public class NetworkProtocolServiceImpl extends
 	@Override
 	public NetworkProtocol updateResource(NetworkProtocol resource,
 			String name, Integer startPort, Integer endPort,
-			NetworkTransport transport) throws ResourceChangeException,
+			ForwardingTransport transport) throws ResourceChangeException,
 			AccessDeniedException {
 
 		resource.setName(name);
@@ -233,7 +233,7 @@ public class NetworkProtocolServiceImpl extends
 
 	@Override
 	public NetworkProtocol createResource(String name, Realm realm,
-			Integer startPort, Integer endPort, NetworkTransport transport)
+			Integer startPort, Integer endPort, ForwardingTransport transport)
 			throws ResourceCreationException, AccessDeniedException {
 
 		NetworkProtocol resource = new NetworkProtocol();

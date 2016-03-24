@@ -14,11 +14,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hypersocket.events.EventService;
 import com.hypersocket.network.NetworkResource;
 import com.hypersocket.network.NetworkResourceService;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.network.events.NetworkResourceSessionClosed;
 import com.hypersocket.network.events.NetworkResourceSessionOpened;
+import com.hypersocket.server.HypersocketServer;
+import com.hypersocket.server.forward.AbstractForwardingHandler;
+import com.hypersocket.server.forward.ForwardingService;
+import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
 
 @Component
@@ -30,6 +34,12 @@ public class TCPForwardingHandler extends
 	@Autowired
 	NetworkResourceService networkService;
 
+	@Autowired
+	EventService eventService; 
+	
+	@Autowired
+	HypersocketServer server;
+	
 	public TCPForwardingHandler() {
 		super("tunnel");
 	}
@@ -49,7 +59,7 @@ public class TCPForwardingHandler extends
 			NetworkResource resource, String hostname, Integer port) {
 		eventService.publishEvent(new NetworkResourceSessionOpened(this, true,
 				resource, session, port, resource.getNetworkProtocol(port,
-						NetworkTransport.TCP)));
+						ForwardingTransport.TCP)));
 	}
 
 	@Override
@@ -67,7 +77,7 @@ public class TCPForwardingHandler extends
 			long totalBytesOut) {
 		eventService.publishEvent(new NetworkResourceSessionClosed(this,
 				resource, resource.getNetworkProtocol(port,
-						NetworkTransport.TCP), session, totalBytesIn,
+						ForwardingTransport.TCP), session, totalBytesIn,
 				totalBytesOut, port));
 
 	}

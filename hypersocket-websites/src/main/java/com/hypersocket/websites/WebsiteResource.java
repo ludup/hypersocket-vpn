@@ -12,11 +12,11 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hypersocket.network.handlers.ForwardingResource;
+import com.hypersocket.server.forward.url.URLForwardingResource;
 
 @Entity
 @Table(name="websites")
-public class WebsiteResource extends ForwardingResource {
+public class WebsiteResource extends URLForwardingResource {
 
 	@Column(name="launch_url", length=1024)
 	String launchUrl;

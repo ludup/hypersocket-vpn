@@ -26,7 +26,6 @@ import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NServiceImpl;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.protocols.NetworkProtocol;
@@ -37,6 +36,7 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceExportException;
 import com.hypersocket.resource.ResourceNotFoundException;
+import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.json.SessionTimeoutException;
 import com.hypersocket.tables.Column;
 import com.hypersocket.tables.ColumnSort;
@@ -154,12 +154,12 @@ public class NetworkProtocolController extends ResourceController {
 						resourceService.getResourceById(resource.getId()),
 						resource.getName(), resource.getStartPort(),
 						resource.getEndPort(),
-						NetworkTransport.valueOf(resource.getTransport()));
+						ForwardingTransport.valueOf(resource.getTransport()));
 			} else {
 				newResource = resourceService.createResource(
 						resource.getName(), realm, resource.getStartPort(),
 						resource.getEndPort(),
-						NetworkTransport.valueOf(resource.getTransport()));
+						ForwardingTransport.valueOf(resource.getTransport()));
 			}
 			return new ResourceStatus<NetworkProtocol>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),

@@ -13,7 +13,6 @@ import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NService;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
@@ -23,13 +22,12 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
 import com.hypersocket.ui.IndexPageFilter;
 import com.hypersocket.websites.events.WebsiteResourceCreatedEvent;
 import com.hypersocket.websites.events.WebsiteResourceDeletedEvent;
 import com.hypersocket.websites.events.WebsiteResourceEvent;
-import com.hypersocket.websites.events.WebsiteResourceSessionClosed;
-import com.hypersocket.websites.events.WebsiteResourceSessionOpened;
 import com.hypersocket.websites.events.WebsiteResourceUpdatedEvent;
 
 public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServiceImpl<WebsiteResource>
@@ -90,9 +88,6 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 		eventService.registerEvent(WebsiteResourceCreatedEvent.class, RESOURCE_BUNDLE);
 		eventService.registerEvent(WebsiteResourceUpdatedEvent.class, RESOURCE_BUNDLE);
 		eventService.registerEvent(WebsiteResourceDeletedEvent.class, RESOURCE_BUNDLE);
-
-		eventService.registerEvent(WebsiteResourceSessionOpened.class, RESOURCE_BUNDLE);
-		eventService.registerEvent(WebsiteResourceSessionClosed.class, RESOURCE_BUNDLE);
 
 		indexPageFilter.addStyleSheet("${uiPath}/css/websites.css");
 	}
@@ -175,7 +170,7 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 	}
 
 	@Override
-	public void verifyResourceSession(WebsiteResource resource, String hostname, int port, NetworkTransport transport,
+	public void verifyResourceSession(WebsiteResource resource, String hostname, int port, ForwardingTransport transport,
 			Session session) throws AccessDeniedException {
 
 		for (URL url : resource.getUrls()) {
@@ -190,8 +185,12 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 			}
 		}
 
-		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(), RESOURCE_BUNDLE, "error.urlNotAuthorized",
-				hostname, port, resource.getName()));
+		throw new AccessDeniedException(I18N.getResource(getCurrentLocale(), 
+				RESOURCE_BUNDLE, 
+				"error.urlNotAuthorized",
+				hostname, 
+				port, 
+				resource.getName()));
 
 	}
 

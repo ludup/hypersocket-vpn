@@ -5,8 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.hypersocket.network.NetworkTransport;
 import com.hypersocket.resource.RealmResource;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 @Entity
 @Table(name = "network_protocols")
@@ -14,7 +14,7 @@ import com.hypersocket.resource.RealmResource;
 public class NetworkProtocol extends RealmResource {
 
 	@Column(name = "transport", nullable = false)
-	NetworkTransport transport;
+	ForwardingTransport transport;
 
 	@Column(name = "start_port", nullable = false)
 	Integer startPort;
@@ -22,11 +22,11 @@ public class NetworkProtocol extends RealmResource {
 	@Column(name = "end_port", nullable = true)
 	Integer endPort;
 
-	public NetworkTransport getTransport() {
+	public ForwardingTransport getTransport() {
 		return transport;
 	}
 
-	public void setTransport(NetworkTransport transport) {
+	public void setTransport(ForwardingTransport transport) {
 		this.transport = transport;
 	}
 

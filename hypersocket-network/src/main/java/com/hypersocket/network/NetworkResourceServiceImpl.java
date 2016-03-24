@@ -44,6 +44,7 @@ import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceNotFoundException;
+import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
 import com.hypersocket.ui.IndexPageFilter;
 
@@ -140,7 +141,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	}
 
 	@Override
-	public void verifyResourceSession(NetworkResource resource, String hostname, int port, NetworkTransport transport,
+	public void verifyResourceSession(NetworkResource resource, String hostname, int port, ForwardingTransport transport,
 			Session session) throws AccessDeniedException {
 
 		if (log.isDebugEnabled()) {
@@ -156,7 +157,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		}
 	}
 
-	public NetworkProtocol verifyPort(NetworkResource resource, Integer port, NetworkTransport transport)
+	public NetworkProtocol verifyPort(NetworkResource resource, Integer port, ForwardingTransport transport)
 			throws AccessDeniedException {
 
 		if (log.isDebugEnabled()) {

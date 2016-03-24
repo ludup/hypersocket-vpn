@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.hypersocket.launcher.ApplicationLauncherOS;
 import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.protocols.NetworkProtocol;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 public class NetworkResourceDeserializer extends
 		JsonDeserializer<NetworkResource> {
@@ -45,7 +46,7 @@ public class NetworkResourceDeserializer extends
 					.get("resourceCategory").asText());
 			networkProtocol.setSystem(protocol.get("system").asBoolean());
 
-			networkProtocol.setTransport(NetworkTransport.valueOf(protocol.get(
+			networkProtocol.setTransport(ForwardingTransport.valueOf(protocol.get(
 					"transport").asText()));
 			networkProtocol.setStartPort(protocol.get("startPort").asInt());
 			networkProtocol.setEndPort(protocol.get("endPort").asInt());

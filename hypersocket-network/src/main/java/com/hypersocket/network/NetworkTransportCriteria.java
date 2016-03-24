@@ -11,12 +11,13 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
 import com.hypersocket.repository.CriteriaConfiguration;
+import com.hypersocket.server.forward.ForwardingTransport;
 
 public class NetworkTransportCriteria implements CriteriaConfiguration {
 
-	NetworkTransport transport;
+	ForwardingTransport transport;
 	
-	public NetworkTransportCriteria(NetworkTransport transport) {
+	public NetworkTransportCriteria(ForwardingTransport transport) {
 		this.transport = transport;
 	}
 	
