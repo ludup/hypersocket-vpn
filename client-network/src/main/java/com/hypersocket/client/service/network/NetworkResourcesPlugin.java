@@ -234,7 +234,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					 * resource itself).
 					 */
 					Number modifiedDateTime = (Number) field.get("modifiedDate");
-					log.info("REMOVEME Modified date time of main resource " + name + " is " + modifiedDateTime);
 	
 					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
 					while (it3.hasNext()) {
@@ -248,8 +247,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							Version launcherVersion = new Version(version);
 							if (ourVersion == null || ourVersion.compareTo(launcherVersion) >= 0) {
 								
-								if(log.isInfoEnabled()) {
-									log.info(String.format("Endpoint OS %s %s matches %s %s", 
+								if(log.isDebugEnabled()) {
+									log.debug(String.format("Endpoint OS %s %s matches %s %s", 
 											System.getProperty("os.name"), System.getProperty("os.version"), family, version));
 								}
 								String n = (String) launcher.get("name");
@@ -263,7 +262,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								
 								Calendar launcherModifiedDate = Calendar.getInstance();
 								Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
-								log.info("  REMOVEME Modified date time of template resource " + n + " is " + launcherModifiedDateTime.longValue());
 								launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
 								
 								File applicationDirectory = new File(System.getProperty("client.userdir"), n);
@@ -299,14 +297,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 									}
 								}
 							} else {
-								if(log.isInfoEnabled()) {
-									log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
+								if(log.isDebugEnabled()) {
+									log.debug(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
 											System.getProperty("os.name"), System.getProperty("os.version"), family, version));
 								}
 							}
 						} else {
-							if(log.isInfoEnabled()) {
-								log.info(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
+							if(log.isDebugEnabled()) {
+								log.debug(String.format("Endpoint OS %s %s DOES NOT match %s %s", 
 										System.getProperty("os.name"), System.getProperty("os.version"), family, version));
 							}
 						}
