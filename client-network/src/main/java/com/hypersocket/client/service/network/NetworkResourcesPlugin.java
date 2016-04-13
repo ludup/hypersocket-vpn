@@ -186,8 +186,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	protected int processNetworkResources(final List<Resource> realmResources, String json) throws IOException {
 
 		final Map<String, String> variables = serviceClient.getUserVariables();
-		final Map<Long, PendingDownload> pendingDownloads = new HashMap<Long, PendingDownload>();
-		
+		final Set<Long> alreadyInstalled = new HashSet<Long>();
+
 		return processResourceList(json, new ResourceMapper() {
 
 			@Override
@@ -280,11 +280,21 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								
 								launcherTemplates.add(launcherTemplate);
 								
-								if(!pendingDownloads.containsKey(lid)) {
-									pendingDownloads.put(lid, new PendingDownload(
-											launcherTemplate, 
-											files!=null ? files.split("\\]\\|\\[") : new String[] {}, 
-													installScript));
+								/*
+								 * We only want to do this ONCE per actual application, not launcher
+								 * template. If not, as soon as you have more than one launcher for 
+								 * a template, the same files will be downloaded over and over again,
+								 * and because the modification dates differ for each template (they
+								 * are actually the latest date of all related resources), this behavior
+								 * will continue on every login.
+								 */
+								if(!alreadyInstalled.contains(lid)) {
+									try {
+										downloadAndInstall(launcherTemplate, files!=null ? files.split("\\]\\|\\[") : new String[] {}, installScript);
+									}
+									finally {
+										alreadyInstalled.add(lid);
+									}
 								}
 							} else {
 								if(log.isDebugEnabled()) {
@@ -299,17 +309,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 							}
 						}
 					}
-					
-					if(pendingDownloads.size() > 0) {
-						guiRegistry.onUpdateInit(pendingDownloads.size());
-						for(PendingDownload download : pendingDownloads.values()) {
-							downloadAndInstall(download.getLauncherTemplate(), 
-									download.getFiles(),
-									download.getInstallScript());
-						}
-						guiRegistry.onUpdateDone(false, null);
-					}
-					
 					JSONArray protocols = (JSONArray) field.get("protocols");
 	
 					@SuppressWarnings("unchecked")
@@ -396,31 +395,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		}, "network resources");
 	}
 
-	class PendingDownload {
-		ApplicationLauncherTemplate launcherTemplate;
-		String[] files;
-		String installScript;
-		
-		PendingDownload(ApplicationLauncherTemplate launcherTemplate, String[] files, String installScript) {
-			this.launcherTemplate = launcherTemplate;
-			this.files = files;
-			this.installScript = installScript;
-		}
-
-		public ApplicationLauncherTemplate getLauncherTemplate() {
-			return launcherTemplate;
-		}
-
-		public String[] getFiles() {
-			return files;
-		}
-
-		public String getInstallScript() {
-			return installScript;
-		}
-		
-		
-	}
 	protected boolean downloadAndInstall(ApplicationLauncherTemplate launcherTemplate, String[] files, String installScript) {
 
 		
@@ -457,7 +431,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			for(FileMetaData file : downloadFiles.values()) {
 				length += file.getFileSize();
 			}
-
+			
+			guiRegistry.onUpdateInit(1);
 			guiRegistry.getGUI().onUpdateStart(launcherTemplate.getName(), length, null);
 		
 			for(FileMetaData file : downloadFiles.values()) {
@@ -492,7 +467,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				}
 			} else {
 				guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
-				
+				guiRegistry.onUpdateDone(false, null);
 			}
 			
 			File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
