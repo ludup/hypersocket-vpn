@@ -25,7 +25,12 @@ public class ApplicationLauncherResourceDeserializer extends JsonDeserializer<Ap
 		resource.setExe(node.get("exe").asText());
 		resource.setArgs(node.get("args").asText());
 		JsonNode osnode=node.get("os");
-		ApplicationLauncherOS os=ApplicationLauncherOS.values()[((IntNode)osnode.get("id")).intValue()];
+		ApplicationLauncherOS os = null;
+		for(ApplicationLauncherOS o : ApplicationLauncherOS.values()) {
+			if(o.getId() == ((IntNode)osnode.get("id")).intValue()) {
+				os = o;
+			}
+		}
 		resource.setOs(os);
 		resource.setStartupScript(node.get("startupScript").asText());
 		resource.setShutdownScript(node.get("shutdownScript").asText());
