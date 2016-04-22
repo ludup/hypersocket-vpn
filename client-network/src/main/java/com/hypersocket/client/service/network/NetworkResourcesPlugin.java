@@ -206,6 +206,12 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					} else {
 						destinationHostname = serviceClient.processReplacements(destinationHostname, variables);
 					}
+					
+					/* The hostname may resolve as empty if a replacement variables is being used and
+					 * the user has not set this.
+					 */
+					if(destinationHostname.isEmpty())
+						throw new Exception("No hostname.");
 	
 					String name = (String) field.get("name");
 					Long id = (Long) field.get("id");
