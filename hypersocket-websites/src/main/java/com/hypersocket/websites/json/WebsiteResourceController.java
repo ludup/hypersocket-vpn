@@ -298,7 +298,7 @@ public class WebsiteResourceController extends ResourceController {
 	}
 	
 	@AuthenticationRequired
-	@RequestMapping(value = "webistes/export/{id}", method = RequestMethod.GET, produces = { "text/plain" })
+	@RequestMapping(value = "websites/export/{id}", method = RequestMethod.GET, produces = { "text/plain" })
 	@ResponseStatus(value = HttpStatus.OK)
 	@ResponseBody
 	public String export(HttpServletRequest request,
