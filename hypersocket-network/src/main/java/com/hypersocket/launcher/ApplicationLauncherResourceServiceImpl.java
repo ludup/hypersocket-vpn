@@ -45,8 +45,6 @@ import com.hypersocket.resource.ResourceException;
 import com.hypersocket.tables.BootstrapTableResult;
 import com.hypersocket.transactions.TransactionService;
 
-import net.sf.ehcache.transaction.TransactionException;
-
 @Service
 public class ApplicationLauncherResourceServiceImpl extends
 		AbstractResourceServiceImpl<ApplicationLauncherResource> implements
@@ -283,7 +281,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 							if (result instanceof ApplicationLauncherResource) {
 								return (ApplicationLauncherResource) result;
 							} else {
-								throw new TransactionException(
+								throw new IllegalStateException(
 										"Transaction failed",
 										new ResourceCreationException(
 												RESOURCE_BUNDLE,
@@ -295,10 +293,10 @@ public class ApplicationLauncherResourceServiceImpl extends
 									"Failed to create application launcher from template",
 									e);
 							if (e.getCause() instanceof ResourceCreationException) {
-								throw new TransactionException(
+								throw new IllegalStateException(
 										"Transaction failed", e.getCause());
 							}
-							throw new TransactionException(
+							throw new IllegalStateException(
 									"Transaction failed",
 									new ResourceCreationException(
 											RESOURCE_BUNDLE,

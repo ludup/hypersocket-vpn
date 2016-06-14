@@ -13,6 +13,11 @@ import com.hypersocket.server.forward.ForwardingTransport;
 @JsonDeserialize(using = NetworkProtocolDeserializer.class)
 public class NetworkProtocol extends RealmResource {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6615968421593775450L;
+
 	@Column(name = "transport", nullable = false)
 	ForwardingTransport transport;
 

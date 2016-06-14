@@ -33,6 +33,11 @@ import com.hypersocket.server.forward.ForwardingTransport;
 @JsonDeserialize(using=NetworkResourceDeserializer.class)
 public class NetworkResource extends ForwardingResource {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1868740808746520173L;
+
 	@Column(name = "hostname")
 	String hostname;
 

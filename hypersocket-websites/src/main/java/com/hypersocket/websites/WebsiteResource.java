@@ -18,6 +18,11 @@ import com.hypersocket.server.forward.url.URLForwardingResource;
 @Table(name="websites")
 public class WebsiteResource extends URLForwardingResource {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 171663350986638408L;
+
 	@Column(name="launch_url", length=1024)
 	String launchUrl;
 
