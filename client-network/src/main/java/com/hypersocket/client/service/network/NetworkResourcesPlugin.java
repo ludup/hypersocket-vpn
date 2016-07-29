@@ -282,7 +282,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 										logo, 
 										variables, 
 										launcherModifiedDate, 
-										args.split("\\]\\|\\["));
+										args==null ? new String[0] : args.split("\\]\\|\\["));
 								
 								launcherTemplates.add(launcherTemplate);
 								
