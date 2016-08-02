@@ -270,7 +270,10 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 								Number launcherModifiedDateTime = (Number) launcher.get("modifiedDate");
 								launcherModifiedDate.setTimeInMillis(Math.max(modifiedDateTime.longValue(), launcherModifiedDateTime.longValue()));
 								
-								File applicationDirectory = new File(System.getProperty("client.userdir"), n);
+								File applicationDirectory = new File(System.getProperty("user.dir"), n);
+								if(!applicationDirectory.exists()) {
+									applicationDirectory.mkdirs();
+								}
 								
 								ApplicationLauncherTemplate launcherTemplate = new ApplicationLauncherTemplate(
 										lid, 
@@ -278,7 +281,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 										exe, 
 										startupScript,
 										shutdownScript, 
-										applicationDirectory, 
+										applicationDirectory.getAbsolutePath(), 
 										logo, 
 										variables, 
 										launcherModifiedDate, 
@@ -405,32 +408,31 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 		
 		try {
-			boolean newInstall = !launcherTemplate.getApplicationDirectory().exists();
-			if(newInstall) {
-				launcherTemplate.getApplicationDirectory().mkdirs();
-			} else {
-				File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
-				if(installFile.exists()) {
+			
+			boolean newInstall = true;
+			File installDir = new File(launcherTemplate.getApplicationDirectory());
+			File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
+			if(installFile.exists()) {
+				newInstall = false;
+				if(log.isInfoEnabled()) {
+					log.info(String.format("%s is already installed. Last modified timestamp is %d and app current timestamp is %d",
+							launcherTemplate.getName(),
+							installFile.lastModified(), 
+							launcherTemplate.getModifiedDate().getTimeInMillis()));
+				}
+				if(installFile.lastModified()==launcherTemplate.getModifiedDate().getTimeInMillis()) {
 					if(log.isInfoEnabled()) {
-						log.info(String.format("%s is already installed. Last modified timestamp is %d and app current timestamp is %d",
-								launcherTemplate.getName(),
-								installFile.lastModified(), 
-								launcherTemplate.getModifiedDate().getTimeInMillis()));
+						log.info(String.format("%s is up-to-date", launcherTemplate.getName()));
 					}
-					if(installFile.lastModified()==launcherTemplate.getModifiedDate().getTimeInMillis()) {
-						if(log.isInfoEnabled()) {
-							log.info(String.format("%s is up-to-date", launcherTemplate.getName()));
-						}
-						return true;
-					}
+					return true;
 				}
 			}
+			
 			
 			if(log.isInfoEnabled()) {
 				log.info(String.format("%s is being %s", launcherTemplate.getName(), newInstall ? "installed" : "updated"));
 			}
-			Map<String,FileMetaData> downloadFiles = processDownloadRequirements(files,
-					launcherTemplate.getApplicationDirectory());
+			Map<String,FileMetaData> downloadFiles = processDownloadRequirements(files, installDir);
 			
 			long length = 0;
 			long totalSoFar = 0;
@@ -442,7 +444,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			guiRegistry.getGUI().onUpdateStart(launcherTemplate.getName(), length, null);
 		
 			for(FileMetaData file : downloadFiles.values()) {
-				totalSoFar = downloadFile(file, launcherTemplate.getApplicationDirectory(), launcherTemplate.getName(), totalSoFar, length);
+				totalSoFar = downloadFile(file, installDir, launcherTemplate.getName(), totalSoFar, length);
 				guiRegistry.getGUI().onUpdateProgress(launcherTemplate.getName(), file.getFileSize(), totalSoFar, length);
 			}
 		
@@ -454,14 +456,14 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				properties.put("username", serviceClient.getPrincipalName());
 				properties.put("timestamp", String.valueOf(System.currentTimeMillis()));
 				properties.put("java.home", System.getProperty("java.home"));
-				properties.put("client.appdir", launcherTemplate.getApplicationDirectory().getAbsolutePath());
+				properties.put("client.appdir", installDir.getAbsolutePath());
 				for(String prop : ALLOWED_SYSTEM_PROPERTIES) {
 					properties.put(prop.replace("user.", "client.user"), System.getProperty(prop));
 				}
 				
 				properties.putAll(launcherTemplate.getVariables());
 				
-				ScriptLauncher script = new ScriptLauncher(installScript, launcherTemplate.getApplicationDirectory(), properties);
+				ScriptLauncher script = new ScriptLauncher(installScript, installDir, properties);
 				script.addArg(newInstall ? "-i" : "-u");
 				exitCode = script.launch();
 				
@@ -475,8 +477,6 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				guiRegistry.onUpdateComplete(launcherTemplate.getName(), length);
 				guiRegistry.onUpdateDone(false, null);
 			}
-			
-			File installFile = new File(launcherTemplate.getApplicationDirectory(), ".installed");
 			
 			if(!installFile.exists()) {
 				installFile.createNewFile();
