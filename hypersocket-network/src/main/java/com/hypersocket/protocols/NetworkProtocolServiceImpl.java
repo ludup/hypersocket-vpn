@@ -87,8 +87,6 @@ public class NetworkProtocolServiceImpl extends
 				NetworkProtocolPermission.DELETE),
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		menuService.registerExtendableTable(NETWORK_PROTOCOLS_ACTIONS);
-
 		eventService.registerEvent(NetworkProtocolEvent.class, RESOURCE_BUNDLE,
 				this);
 		eventService.registerEvent(NetworkProtocolCreatedEvent.class,

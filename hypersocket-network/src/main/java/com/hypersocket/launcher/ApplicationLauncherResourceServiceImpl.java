@@ -110,8 +110,6 @@ public class ApplicationLauncherResourceServiceImpl extends
 				ApplicationLauncherResourcePermission.DELETE),
 				NetworkResourceServiceImpl.MENU_NETWORK);
 
-		menuService.registerExtendableTable(APPLICATION_LAUNCHER_ACTIONS);
-		
 		eventService.registerEvent(ApplicationLauncherEvent.class,
 				RESOURCE_BUNDLE, this);
 		eventService.registerEvent(ApplicationLauncherCreatedEvent.class,
