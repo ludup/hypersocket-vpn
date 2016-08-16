@@ -59,7 +59,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult tableNetworkResources(
+	public BootstrapTableResult<?> tableNetworkResources(
 			final HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
@@ -162,7 +162,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 			RequestMethod.POST }, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult search(final HttpServletRequest request,
+	public BootstrapTableResult<?> search(final HttpServletRequest request,
 			HttpServletResponse response) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException,
 			NumberFormatException, IOException {

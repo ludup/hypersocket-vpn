@@ -94,7 +94,7 @@ public class NetworkResourceController extends ResourceController {
 	@RequestMapping(value = "networkResources/personalTable", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult personalNetworks(
+	public BootstrapTableResult<?> personalNetworks(
 			final HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {
@@ -159,7 +159,7 @@ public class NetworkResourceController extends ResourceController {
 	@RequestMapping(value = "networkResources/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult tableNetworkResources(
+	public BootstrapTableResult<?> tableNetworkResources(
 			final HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {

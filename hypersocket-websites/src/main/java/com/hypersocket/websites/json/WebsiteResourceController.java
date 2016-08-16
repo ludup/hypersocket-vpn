@@ -93,7 +93,7 @@ public class WebsiteResourceController extends ResourceController {
 	@RequestMapping(value = "websites/personal", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult personalWebsites(final HttpServletRequest request,
+	public BootstrapTableResult<?> personalWebsites(final HttpServletRequest request,
 			HttpServletResponse response) throws AccessDeniedException,
 			UnauthorizedException, SessionTimeoutException {
 
@@ -137,7 +137,7 @@ public class WebsiteResourceController extends ResourceController {
 	@RequestMapping(value = "websites/table", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public BootstrapTableResult tableNetworkResources(
+	public BootstrapTableResult<?> tableNetworkResources(
 			final HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException,
 			SessionTimeoutException {

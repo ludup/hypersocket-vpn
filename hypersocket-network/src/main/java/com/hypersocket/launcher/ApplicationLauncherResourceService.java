@@ -22,7 +22,7 @@ public interface ApplicationLauncherResourceService extends
 			ApplicationLauncherResource id, String name, Map<String,String> properties) throws ResourceChangeException,
 			AccessDeniedException;
 
-	BootstrapTableResult searchTemplates(String search, int iDisplayStart,
+	BootstrapTableResult<?> searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException;
 
 	void downloadTemplateImage(String uuid, HttpServletRequest request,

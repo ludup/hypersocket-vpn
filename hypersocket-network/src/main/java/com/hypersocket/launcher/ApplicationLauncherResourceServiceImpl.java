@@ -211,7 +211,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 	}
 
 	@Override
-	public BootstrapTableResult searchTemplates(String search, int iDisplayStart,
+	public BootstrapTableResult<?> searchTemplates(String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException {
 
 		assertPermission(ApplicationLauncherResourcePermission.CREATE);
