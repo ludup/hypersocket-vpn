@@ -2,6 +2,7 @@ package com.hypersocket.launcher;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,19 +27,23 @@ public class ApplicationLauncherResource extends RealmResource {
 	@Column(name="os")
 	ApplicationLauncherOS os;
 	
-	@Column(name="startup_script", length=8000)
+	@Column(name="startup_script")
+	@Lob
 	String startupScript = "";
 	
-	@Column(name="shutdown_script", length=8000)
+	@Column(name="shutdown_script")
+	@Lob
 	String shutdownScript = "";
 	
-	@Column(name="install_script", length=8000)
+	@Column(name="install_script")
+	@Lob
 	String installScript = "";
 	
 	@Column(name="logo", length=256)
 	String logo;
 	
-	@Column(name="files", length=8000)
+	@Column(name="files")
+	@Lob
 	String files;
 	
 	public String getExe() {

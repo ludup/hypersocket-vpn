@@ -1,0 +1,4 @@
+ALTER TABLE launchers MODIFY startup_script LONGTEXT;
+ALTER TABLE launchers MODIFY shutdown_script LONGTEXT;
+ALTER TABLE launchers MODIFY install_script LONGTEXT;
+ALTER TABLE launchers MODIFY files LONGTEXT;
