@@ -43,10 +43,13 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceGroup;
+import com.hypersocket.resource.ResourceGroupService;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
 import com.hypersocket.ui.IndexPageFilter;
+import com.sshtools.icongenerator.AwesomeIcon;
 
 @Service
 public class NetworkResourceServiceImpl extends AbstractAssignableResourceServiceImpl<NetworkResource>
@@ -84,6 +87,9 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	
 	@Autowired
 	IndexPageFilter indexPageFilter;
+	
+	@Autowired
+	ResourceGroupService resourceGroupService; 
 
 	public NetworkResourceServiceImpl() {
 		super("networkResource");
@@ -136,6 +142,11 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		if (log.isDebugEnabled()) {
 			log.debug("NetworkResourceService constructed");
 		}
+
+		
+		resourceGroupService.registerResourceGroup(new ResourceGroup("NETWORK", RESOURCE_BUNDLE, AwesomeIcon.ICON_BACKWARD.toString()));		
+		resourceGroupService.registerResourceGroup(new ResourceGroup("ENDPOINT", RESOURCE_BUNDLE, AwesomeIcon.ICON_BACKWARD.toString()));		
+		resourceGroupService.registerResourceGroup(new ResourceGroup("BROWSER", RESOURCE_BUNDLE, AwesomeIcon.ICON_BACKWARD.toString()));
 		
 		indexPageFilter.addStyleSheet("${uiPath}/css/networkResources.css");
 	}
