@@ -145,11 +145,9 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
 		website.setAdditionalUrls(additionalUrls);
-		website.getRoles().clear();
-		website.getRoles().addAll(roles);
 		website.setLogo(logo);
 
-		updateResource(website, new HashMap<String, String>());
+		updateResource(website, roles, new HashMap<String, String>());
 		return website;
 	}
 

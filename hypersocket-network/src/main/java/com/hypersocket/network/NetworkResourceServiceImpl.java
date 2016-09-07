@@ -187,10 +187,9 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		resource.setDestinationHostname(destinationHostname);
 		resource.setProtocols(protocols);
 		resource.setLaunchers(launchers);
-		resource.setRoles(roles);
 		resource.setLogo(logo);
 
-		updateResource(resource, new HashMap<String, String>());
+		updateResource(resource, roles, new HashMap<String, String>());
 
 		return resource;
 
