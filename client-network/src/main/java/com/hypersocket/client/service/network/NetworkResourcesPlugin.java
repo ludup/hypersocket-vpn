@@ -196,6 +196,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 				boolean success = false;
 
 				try {
+					String name = (String) field.get("name");
+					Long id = (Long) field.get("id");
 					String hostname = serviceClient.processReplacements((String) field.get("hostname"), variables);
 					String destinationHostname = (String) field.get("destinationHostname");
 					
@@ -211,10 +213,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					 * the user has not set this.
 					 */
 					if(destinationHostname.isEmpty())
-						throw new Exception("No hostname.");
-	
-					String name = (String) field.get("name");
-					Long id = (Long) field.get("id");
+						throw new Exception(String.format("No hostname for resource destinationHostname=%s hostname=%s", 
+								(String) field.get("destinationHostname"), 
+								(String) field.get("hostname")));
 	
 					if(log.isInfoEnabled()) {
 						log.info(String.format("Processing endpoint %s (%d) to %s using hostname %s", name, id, destinationHostname, hostname));
