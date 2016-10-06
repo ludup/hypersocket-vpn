@@ -17,6 +17,7 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.forward.ForwardingService;
 
@@ -28,13 +29,13 @@ public interface NetworkResourceService extends
 			String hostname, String destinationHostname,
 			Set<NetworkProtocol> protocols,
 			Set<ApplicationLauncherResource> launchers, Set<Role> roles, String logo)
-			throws ResourceChangeException, AccessDeniedException;
+			throws ResourceException, AccessDeniedException;
 
 	NetworkResource createResource(String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols,
 			Set<ApplicationLauncherResource> launchers, Set<Role> roles,
-			Realm realm, String logo) throws ResourceCreationException,
-			AccessDeniedException;
+			Realm realm, String logo) throws
+			AccessDeniedException, ResourceException;
 	
 	NetworkResource getResourceById(Long id) throws ResourceNotFoundException, AccessDeniedException;
 

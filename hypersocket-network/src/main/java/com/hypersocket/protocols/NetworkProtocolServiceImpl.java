@@ -28,6 +28,7 @@ import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.server.forward.ForwardingTransport;
 
 @Service
@@ -99,7 +100,7 @@ public class NetworkProtocolServiceImpl extends
 		realmService.registerRealmListener(new RealmAdapter() {
 
 			@Override
-			public void onCreateRealm(Realm realm) {
+			public void onCreateRealm(Realm realm) throws ResourceException {
 				createDefaultProtocols(realm);
 			}
 
@@ -111,7 +112,7 @@ public class NetworkProtocolServiceImpl extends
 		});
 	}
 
-	private void createDefaultProtocols(Realm realm) {
+	private void createDefaultProtocols(Realm realm) throws ResourceException {
 
 		createProtocol(realm, "FTP (Data)", ForwardingTransport.BOTH, 20, null);
 		createProtocol(realm, "FTP (Control)", ForwardingTransport.TCP, 21, null);
@@ -144,7 +145,7 @@ public class NetworkProtocolServiceImpl extends
 
 	@SuppressWarnings("unchecked")
 	void createProtocol(Realm realm, String name, ForwardingTransport transport,
-			Integer start, Integer end) {
+			Integer start, Integer end) throws ResourceException {
 		NetworkProtocol protocol = new NetworkProtocol();
 		protocol.setRealm(realm);
 		protocol.setName(name);

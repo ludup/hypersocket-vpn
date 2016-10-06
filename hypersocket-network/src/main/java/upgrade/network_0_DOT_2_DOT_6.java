@@ -15,6 +15,7 @@ import com.hypersocket.network.NetworkResourceRepository;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.protocols.NetworkProtocolRepository;
 import com.hypersocket.realm.RealmService;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.server.forward.ForwardingTransport;
 
 public class network_0_DOT_2_DOT_6 implements Runnable {
@@ -32,22 +33,30 @@ public class network_0_DOT_2_DOT_6 implements Runnable {
 	@Override
 	public void run() {
 
-		for(NetworkProtocol protocol : protocolRepository.getResources(null)) {
-			protocol.setRealm(realmService.getSystemRealm());
-			protocolRepository.saveResource(protocol, new HashMap<String,String>());
+		try {
+			for(NetworkProtocol protocol : protocolRepository.getResources(null)) {
+				protocol.setRealm(realmService.getSystemRealm());
+				protocolRepository.saveResource(protocol, new HashMap<String,String>());
+			}
+		} catch (ResourceException e) {
+			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	void createProtocol(String name, ForwardingTransport transport, Integer start,
 			Integer end) {
-		NetworkProtocol protocol = new NetworkProtocol();
-		protocol.setName(name);
-		protocol.setTransport(transport);
-		protocol.setStartPort(start);
-		protocol.setEndPort(end);
+		try {
+			NetworkProtocol protocol = new NetworkProtocol();
+			protocol.setName(name);
+			protocol.setTransport(transport);
+			protocol.setStartPort(start);
+			protocol.setEndPort(end);
 
-		protocolRepository.saveResource(protocol, new HashMap<String,String>());
+			protocolRepository.saveResource(protocol, new HashMap<String,String>());
+		} catch (ResourceException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
 
 	}
 

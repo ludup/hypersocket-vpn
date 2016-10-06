@@ -43,6 +43,7 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
@@ -178,7 +179,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	@Override
 	public NetworkResource updateResource(NetworkResource resource, String name, String hostname,
 			String destinationHostname, Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers,
-			Set<Role> roles, String logo) throws ResourceChangeException, AccessDeniedException {
+			Set<Role> roles, String logo) throws AccessDeniedException, ResourceException {
 
 		assertPermission(NetworkResourcePermission.UPDATE);
 
@@ -198,7 +199,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	@Override
 	public NetworkResource createResource(String name, String hostname, String destinationHostname,
 			Set<NetworkProtocol> protocols, Set<ApplicationLauncherResource> launchers, Set<Role> roles, Realm realm, String logo)
-					throws ResourceCreationException, AccessDeniedException {
+					throws AccessDeniedException, ResourceException {
 
 		NetworkResource resource = new NetworkResource();
 

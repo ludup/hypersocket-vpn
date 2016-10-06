@@ -22,6 +22,7 @@ import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
 import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.server.forward.ForwardingTransport;
 import com.hypersocket.session.Session;
 import com.hypersocket.ui.IndexPageFilter;
@@ -140,7 +141,7 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Override
 	public WebsiteResource updateResource(WebsiteResource website, String name, String launchUrl, String additionalUrls,
-			Set<Role> roles, String logo) throws ResourceChangeException, AccessDeniedException {
+			Set<Role> roles, String logo) throws AccessDeniedException, ResourceException {
 
 		website.setName(name);
 		website.setLaunchUrl(launchUrl);
@@ -153,7 +154,7 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@Override
 	public WebsiteResource createResource(String name, String launchUrl, String additionalUrls, Set<Role> roles, String logo)
-			throws ResourceCreationException, AccessDeniedException {
+			throws AccessDeniedException, ResourceException {
 
 		WebsiteResource website = new WebsiteResource();
 		website.setName(name);
