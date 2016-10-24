@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,15 +19,13 @@ import com.hypersocket.server.forward.url.URLForwardingResource;
 @Table(name="websites")
 public class WebsiteResource extends URLForwardingResource {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 171663350986638408L;
 
 	@Column(name="launch_url", length=1024)
 	String launchUrl;
 
-	@Column(name="additional_urls", length=8000)
+	@Column(name="additional_urls")
+	@Lob
 	String additionalUrls;
 
 	@Column(name = "logo")
