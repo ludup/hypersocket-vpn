@@ -294,7 +294,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 									e);
 							if (e.getCause() instanceof ResourceCreationException) {
 								throw new TransactionException(
-										"Transaction failed", e.getCause());
+										e.getCause().getMessage(), e.getCause());
 							}
 							throw new TransactionException(
 									"Transaction failed",

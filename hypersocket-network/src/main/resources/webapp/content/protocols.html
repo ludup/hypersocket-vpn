@@ -138,7 +138,7 @@
 					createResource : function() {
 						protocol = new Object();
 						protocol.name = $('#protocolName').val();
-						protocol.transport = $('#transport').val();
+						protocol.transport = $('#transportButton').widget().getValue();
 						protocol.startPort = $('#start').val();
 						protocol.endPort = $('#end').val();
 						protocol.id = $('#protocolId').val();
