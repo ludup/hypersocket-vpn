@@ -13,9 +13,6 @@ import com.hypersocket.resource.RealmResource;
 @JsonDeserialize(using = ApplicationLauncherResourceDeserializer.class)
 public class ApplicationLauncherResource extends RealmResource {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1278949481466400246L;
 
 	@Column(name="exe", length=1024)
