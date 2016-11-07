@@ -1,4 +1,0 @@
-ALTER TABLE launchers MODIFY startup_script  VARCHAR(MAX);
-ALTER TABLE launchers MODIFY shutdown_script  VARCHAR(MAX);
-ALTER TABLE launchers MODIFY install_script  VARCHAR(MAX);
-ALTER TABLE launchers MODIFY files  VARCHAR(MAX);
