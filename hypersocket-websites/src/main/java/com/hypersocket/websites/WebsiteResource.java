@@ -74,7 +74,7 @@ public class WebsiteResource extends URLForwardingResource {
 			}
 			return new URL(url);
 		} catch (MalformedURLException e) {
-			throw new IllegalStateException(e);
+			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
 	@Override
