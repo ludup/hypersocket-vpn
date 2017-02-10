@@ -15,8 +15,6 @@ import com.hypersocket.permissions.Role;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractAssignableResourceService;
-import com.hypersocket.resource.ResourceChangeException;
-import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.forward.ForwardingService;

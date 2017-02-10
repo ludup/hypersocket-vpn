@@ -35,6 +35,7 @@ import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
+import com.hypersocket.properties.EntityResourcePropertyStore;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractResourceRepository;
@@ -119,7 +120,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 		eventService.registerEvent(ApplicationLauncherDeletedEvent.class,
 				RESOURCE_BUNDLE, this);
 
-		repository.getEntityStore().registerResourceService(
+		EntityResourcePropertyStore.registerResourceService(
 				ApplicationLauncherResource.class, repository);
 	}
 
