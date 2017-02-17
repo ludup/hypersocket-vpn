@@ -24,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hypersocket.auth.json.AuthenticationRequired;
 import com.hypersocket.auth.json.ResourceController;
 import com.hypersocket.auth.json.UnauthorizedException;
+import com.hypersocket.bulk.BulkAssignment;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NServiceImpl;
+import com.hypersocket.json.RequestStatus;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.permissions.AccessDeniedException;
@@ -388,6 +390,52 @@ public class WebsiteResourceController extends ResourceController {
 							I18NServiceImpl.USER_INTERFACE_BUNDLE,
 							"resource.import.failure",
 							e.getMessage()));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "websites/list", method = RequestMethod.GET, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public ResourceList<WebsiteResource> getResources(
+			HttpServletRequest request, HttpServletResponse response)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			return new ResourceList<WebsiteResource>(
+					websiteService.getResources(sessionUtils
+							.getCurrentRealm(request)));
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "websites/bulk", method = RequestMethod.POST, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public RequestStatus bulkAssignmentResource(HttpServletRequest request,
+												HttpServletResponse response,
+												@RequestBody BulkAssignment bulkAssignment)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			websiteService.bulkAssignRolesToResource(bulkAssignment);
+
+			return new RequestStatus(true,
+					I18N.getResource(sessionUtils.getLocale(request),
+							"",
+							"bulk.assignemnt.success"));
+		} catch (Exception e) {
+			return new RequestStatus(false, e.getMessage());
+
 		} finally {
 			clearAuthenticatedContext();
 		}

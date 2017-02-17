@@ -31,8 +31,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hypersocket.auth.json.AuthenticationRequired;
 import com.hypersocket.auth.json.ResourceController;
 import com.hypersocket.auth.json.UnauthorizedException;
+import com.hypersocket.bulk.BulkAssignment;
 import com.hypersocket.i18n.I18N;
 import com.hypersocket.i18n.I18NServiceImpl;
+import com.hypersocket.json.RequestStatus;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.launcher.ApplicationLauncherResource;
@@ -438,6 +440,32 @@ public class NetworkResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceStatus<String>(true, networkService.getFingerprint() + "-" + protocolService.getFingerprint() + "-" + launcherService.getFingerprint());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@AuthenticationRequired
+	@RequestMapping(value = "networkResources/bulk", method = RequestMethod.POST, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public RequestStatus bulkAssignmentResource(HttpServletRequest request,
+												HttpServletResponse response,
+												@RequestBody BulkAssignment bulkAssignment)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			networkService.bulkAssignRolesToResource(bulkAssignment);
+
+			return new RequestStatus(true,
+					I18N.getResource(sessionUtils.getLocale(request),
+							"",
+							"bulk.assignemnt.success"));
+		} catch (Exception e) {
+			return new RequestStatus(false, e.getMessage());
+
 		} finally {
 			clearAuthenticatedContext();
 		}
