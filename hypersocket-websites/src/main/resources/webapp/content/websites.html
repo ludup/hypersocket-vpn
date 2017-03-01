@@ -70,12 +70,11 @@
 				$('#contentWebsites').localize();
 					
 				if(currentMenu.canCreate || currentMenu.canUpdate) {
-					getJSON('roles/list', null, function(data) {
-						$('#tabRoles').multipleSelect({
-							values : data.resources,
-							selectedIsObjectList : true,
-							resourceKey : 'mount'
-						});
+					$('#tabRoles').multipleSearchInput({
+						url: 'roles/table',
+						valueIsNamePair: false,
+						selectedIsObjectList : true,
+						resourceKey : 'mount'
 					});
 				}
 				
@@ -160,7 +159,7 @@
 								$('#resourceName').val('');
 								$('#url').val('');
 								$('#additionalUrls').multipleTextInput();
-								$('#tabRoles').multipleSelect();
+								$('#tabRoles').multipleSearchInput();
 								$('.clickableTab').first().trigger('click');
 								logo.clear();
 							},
@@ -180,7 +179,9 @@
 								$('#resourceName').val(resource.name);
 								$('#url').val(resource.launchUrl);
 								$('#additionalUrls').multipleTextInput({ values: splitFix(resource.additionalUrls) }); 
-								$('#tabRoles').multipleSelect({
+								$('#tabRoles').multipleSearchInput({
+									url: 'roles/table',
+									valueIsNamePair: false,
 									selected : resource.roles,
 									selectedIsObjectList : true,
 									resourceKey : 'website'

@@ -93,14 +93,15 @@
 			});
 		});
 		
-		getJSON('roles/list', null, function(data) {
-				$('#roles').multipleSelect({
-					values : data.resources,
-					selectedIsObjectList : true,
-					resourceKey : 'endpoint',
-					disabled: !currentMenu.canUpdate
-			});
+		
+		$('#roles').multipleSearchInput({
+				url: 'roles/table',
+				valueIsNamePair: false,
+				selectedIsObjectList : true,
+				resourceKey : 'endpoint',
+				disabled: !currentMenu.canUpdate
 		});
+		
 
 		var destinationHostname = $('#destinationHostname').textInput({
 			id: 'destination',
@@ -219,7 +220,7 @@
 							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
 							$('#applications').multipleSelect();
-							$('#roles').multipleSelect();
+							$('#roles').multipleSearchInput();
 							$('#resourceId').val('');
 							
 							$('.endpointPropertiesTab').first().trigger('click');
@@ -264,7 +265,9 @@
 								resourceKey : 'endpoint',
 								disabled: readOnly
 							});
-							$('#roles').multipleSelect({
+							$('#roles').multipleSearchInput({
+								url: 'roles/table',
+								valueIsNamePair: false,
 								selected : resource.roles,
 								selectedIsObjectList : true,
 								resourceKey : 'endpoint',
