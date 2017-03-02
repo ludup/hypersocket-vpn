@@ -270,7 +270,7 @@
 														data = replaceAll(data, encodeURIComponent('${' + variable + '}'), encodeURIComponent($(this).widget().getValue()));
 													});
 													
-													$.post(basePath + '/api/launchers/script', { script: data }, function(data) {
+													postFORM(basePath + '/api/launchers/script', $.params({ script: data }), function(data) {
 														$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
 														$('#addTemplate').children('i').addClass('fa-save');
 														if(data.success) {
