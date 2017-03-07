@@ -96,7 +96,7 @@
 		
 		$('#roles').multipleSearchInput({
 				url: 'roles/table',
-				valueIsNamePair: false,
+				isNamePairValue: false,
 				selectedIsObjectList : true,
 				resourceKey : 'endpoint',
 				disabled: !currentMenu.canUpdate
@@ -267,7 +267,7 @@
 							});
 							$('#roles').multipleSearchInput({
 								url: 'roles/table',
-								valueIsNamePair: false,
+								isNamePairValue: false,
 								selected : resource.roles,
 								selectedIsObjectList : true,
 								resourceKey : 'endpoint',

@@ -72,7 +72,7 @@
 				if(currentMenu.canCreate || currentMenu.canUpdate) {
 					$('#tabRoles').multipleSearchInput({
 						url: 'roles/table',
-						valueIsNamePair: false,
+						isNamePairValue: false,
 						selectedIsObjectList : true,
 						resourceKey : 'mount'
 					});
@@ -181,7 +181,7 @@
 								$('#additionalUrls').multipleTextInput({ values: splitFix(resource.additionalUrls) }); 
 								$('#tabRoles').multipleSearchInput({
 									url: 'roles/table',
-									valueIsNamePair: false,
+									isNamePairValue: false,
 									selected : resource.roles,
 									selectedIsObjectList : true,
 									resourceKey : 'website'
