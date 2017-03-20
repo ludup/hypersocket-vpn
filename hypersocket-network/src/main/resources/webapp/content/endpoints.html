@@ -54,13 +54,13 @@
 					</div>
 					
 					<div id="tabProtocols" class="dialogTab">
-						<div id="protocols"></div>
+						<div class="col-xs-12" id="protocols"></div>
 					</div>
 					<div id="tabApplications" class="dialogTab">
-						<div id="applications"></div>
+						<div class="col-xs-12" id="applications"></div>
 					</div>
 					<div id="tabRoles" class="dialogTab">
-						<div id="roles"></div>
+						<div class="col-xs-12" id="networkRoles"></div>
 					</div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
 				</div>
@@ -93,8 +93,7 @@
 			});
 		});
 		
-		
-		$('#roles').multipleSearchInput({
+		$('#networkRoles').multipleSearchInput({
 				url: 'roles/table',
 				isNamePairValue: false,
 				selectedIsObjectList : true,
@@ -220,7 +219,7 @@
 							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
 							$('#applications').multipleSelect();
-							$('#roles').multipleSearchInput();
+							$('#networkRoles').multipleSearchInput();
 							$('#resourceId').val('');
 							
 							$('.endpointPropertiesTab').first().trigger('click');
@@ -234,7 +233,7 @@
 									.multipleSelectValues();
 							resource.launchers = $('#applications')
 									.multipleSelectValues();
-							resource.roles = $('#roles').multipleSelectValues();
+							resource.roles = $('#networkRoles').multipleSelectValues();
 							resource.id = $('#resourceId').val();
 							resource.logo = logo.getValue();
 							return resource;
@@ -265,7 +264,7 @@
 								resourceKey : 'endpoint',
 								disabled: readOnly
 							});
-							$('#roles').multipleSearchInput({
+							$('#networkRoles').multipleSearchInput({
 								url: 'roles/table',
 								isNamePairValue: false,
 								selected : resource.roles,
