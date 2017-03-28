@@ -223,14 +223,20 @@ public class ApplicationLauncherResourceServiceImpl extends
 		params.put("limit", String.valueOf(iDisplayLength));
 		params.put("order", "asc");
 
+		String url = System.getProperty("hypersocket.templateServerUrl",
+				"https://updates2.hypersocket.com/hypersocket/api/templates")
+				+ "/"
+				+ (Boolean
+						.getBoolean("hypersocketLauncher.enablePrivate") ? "developer"
+						: "table") + "/2";
+		
+		if(log.isDebugEnabled()) {
+			log.debug(String.format("Loading templates from %s", url));
+		}
+		
 		String json = httpUtils
 				.doHttpPost(
-						System.getProperty("hypersocket.templateServerUrl",
-								"https://updates2.hypersocket.com/hypersocket/api/templates")
-								+ "/"
-								+ (Boolean
-										.getBoolean("hypersocketLauncher.enablePrivate") ? "developer"
-										: "table") + "/2", params, true);
+						url, params, true);
 
 		ObjectMapper mapper = new ObjectMapper();
 

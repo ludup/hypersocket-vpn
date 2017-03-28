@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.hypersocket.auth.json.AuthenticationRequired;
+import com.hypersocket.auth.json.AuthenticationRequiredButDontTouchSession;
 import com.hypersocket.auth.json.ResourceController;
 import com.hypersocket.auth.json.UnauthorizedException;
 import com.hypersocket.i18n.I18N;
@@ -213,7 +214,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		}
 	}
 
-	@AuthenticationRequired
+	@AuthenticationRequiredButDontTouchSession
 	@RequestMapping(value = "launchers/image/{uuid}", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseStatus(value = HttpStatus.OK)
 	public void downloadTemplateImage(HttpServletRequest request,
