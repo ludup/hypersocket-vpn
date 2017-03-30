@@ -84,8 +84,7 @@ public class WebsiteResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<WebsiteResource>(
-					websiteService.getResources(sessionUtils
-							.getPrincipal(request)));
+					websiteService.getResources(getCurrentPrincipal()));
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -117,7 +116,7 @@ public class WebsiteResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.searchPersonalResources(
-									sessionUtils.getPrincipal(request),
+									getCurrentPrincipal(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -126,7 +125,7 @@ public class WebsiteResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.getPersonalResourceCount(
-									sessionUtils.getPrincipal(request),
+									getCurrentPrincipal(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -162,7 +161,7 @@ public class WebsiteResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.searchResources(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -171,7 +170,7 @@ public class WebsiteResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return websiteService.getResourceCount(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -408,8 +407,7 @@ public class WebsiteResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<WebsiteResource>(
-					websiteService.getResources(sessionUtils
-							.getCurrentRealm(request)));
+					websiteService.getResources(getCurrentRealm()));
 		} finally {
 			clearAuthenticatedContext();
 		}

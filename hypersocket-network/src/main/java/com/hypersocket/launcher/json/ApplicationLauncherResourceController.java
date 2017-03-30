@@ -83,7 +83,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return resourceService.searchResources(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -92,7 +92,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return resourceService.getResourceCount(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -249,7 +249,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 
 			ApplicationLauncherResource newResource;
 
-			Realm realm = sessionUtils.getCurrentRealm(request);
+			Realm realm = getCurrentRealm();
 
 			Map<String, String> properties = new HashMap<String, String>();
 			for (PropertyItem i : resource.getProperties()) {

@@ -77,7 +77,7 @@ public class NetworkProtocolController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return resourceService.searchResources(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -86,7 +86,7 @@ public class NetworkProtocolController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return resourceService.getResourceCount(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -147,7 +147,7 @@ public class NetworkProtocolController extends ResourceController {
 
 			NetworkProtocol newResource;
 
-			Realm realm = sessionUtils.getCurrentRealm(request);
+			Realm realm = getCurrentRealm();
 
 			if (resource.getId() != null) {
 				newResource = resourceService.updateResource(

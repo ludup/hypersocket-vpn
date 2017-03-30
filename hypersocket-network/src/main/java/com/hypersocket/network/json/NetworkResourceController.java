@@ -85,8 +85,7 @@ public class NetworkResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkResource>(
-					networkService.getResources(sessionUtils
-							.getPrincipal(request)));
+					networkService.getResources(getCurrentPrincipal()));
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -119,7 +118,7 @@ public class NetworkResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.searchPersonalResources(
-									sessionUtils.getPrincipal(request),
+									getCurrentPrincipal(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -128,7 +127,7 @@ public class NetworkResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getPersonalResourceCount(
-									sessionUtils.getPrincipal(request),
+									getCurrentPrincipal(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -150,8 +149,7 @@ public class NetworkResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 		try {
 			return new ResourceList<NetworkResource>(
-					networkService.getResources(sessionUtils
-							.getCurrentRealm(request)));
+					networkService.getResources(getCurrentRealm()));
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -184,7 +182,7 @@ public class NetworkResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.searchResources(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern, start, length, sorting);
 						}
 
@@ -193,7 +191,7 @@ public class NetworkResourceController extends ResourceController {
 								throws UnauthorizedException,
 								AccessDeniedException {
 							return networkService.getResourceCount(
-									sessionUtils.getCurrentRealm(request),
+									getCurrentRealm(),
 									searchColumn, searchPattern);
 						}
 					});
@@ -254,7 +252,7 @@ public class NetworkResourceController extends ResourceController {
 
 			NetworkResource newResource;
 
-			Realm realm = sessionUtils.getCurrentRealm(request);
+			Realm realm = getCurrentRealm();
 
 			Set<NetworkProtocol> protocols = new HashSet<NetworkProtocol>();
 			for (Long id : resource.getProtocols()) {
