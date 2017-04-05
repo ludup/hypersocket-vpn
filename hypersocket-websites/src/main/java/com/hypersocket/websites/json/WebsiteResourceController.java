@@ -431,8 +431,8 @@ public class WebsiteResourceController extends ResourceController {
 
 			return new RequestStatus(true,
 					I18N.getResource(sessionUtils.getLocale(request),
-							"",
-							"bulk.assignemnt.success"));
+                            I18NServiceImpl.USER_INTERFACE_BUNDLE,
+							"bulk.assignment.success"));
 		} catch (Exception e) {
 			return new RequestStatus(false, e.getMessage());
 
