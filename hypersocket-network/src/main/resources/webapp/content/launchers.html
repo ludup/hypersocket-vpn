@@ -164,6 +164,7 @@
 									return 'NETWORK';
 								},
 								resourceUrl : "launchers/launcher",
+								deleteResourcesUrl : "launchers/bulk",
 								fields : [ {
 									name : "name"
 								}],
@@ -174,6 +175,7 @@
 								importUrl: 'launchers/import',
 								exportUrl: 'launchers/export',
 								additionalActions: actions,
+								checkbox : true,
 								additionalButtons: [{
 									resourceKey: 'applicationSearchOnline',
 									buttonClass: 'btn-primary',

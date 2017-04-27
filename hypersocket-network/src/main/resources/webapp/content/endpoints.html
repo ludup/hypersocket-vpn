@@ -172,6 +172,7 @@
 						},
 						tableUrl : "networkResources/table",
 						resourceUrl : "networkResources/networkResource",
+						deleteResourcesUrl : "networkResources/bulk",
 						fields : [ { name: "name" }, 
 						           { name: "protocolsDesc" } ],
 						resourceKey : "endpoint",
@@ -181,6 +182,7 @@
 						importUrl: 'networkResources/import',
 						exportUrl: 'networkResources/export',
 						bulkAssignment: true,
+						checkbox : true,
 						validate : function() {
 
 							if ($('#resourceName').val() == '') {

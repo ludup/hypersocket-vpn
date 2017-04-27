@@ -470,4 +470,44 @@ public class NetworkResourceController extends ResourceController {
 			clearAuthenticatedContext();
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@AuthenticationRequired
+	@RequestMapping(value = "networkResources/bulk", method = RequestMethod.DELETE, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public RequestStatus deleteResources(HttpServletRequest request,
+												HttpServletResponse response,
+												@RequestBody Long[] ids)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			
+			if(ids == null) {
+				ids = new Long[0];
+			}
+			
+			List<NetworkResource> networkResources = networkService.getResourcesByIds(ids);
+
+			if(networkResources == null || networkResources.isEmpty()) {
+				return new RequestStatus(false,
+						I18N.getResource(sessionUtils.getLocale(request),
+								I18NServiceImpl.USER_INTERFACE_BUNDLE,
+								"bulk.delete.empty"));
+			}else {
+				networkService.deleteResources(networkResources);
+				return new RequestStatus(true,
+						I18N.getResource(sessionUtils.getLocale(request),
+								I18NServiceImpl.USER_INTERFACE_BUNDLE,
+								"bulk.delete.success"));
+			}
+			
+		} catch (Exception e) {
+			return new RequestStatus(false, e.getMessage());
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
 }
