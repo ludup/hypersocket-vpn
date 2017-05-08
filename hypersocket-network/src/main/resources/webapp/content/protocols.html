@@ -104,6 +104,7 @@
 					infoHtml: getResource('networkProtocol.help'),
 					tableUrl : "networkProtocols/table",
 					resourceUrl : "networkProtocols/networkProtocol",
+					deleteResourcesUrl : "networkProtocols/bulk",
 					fields : [ { name: "name" }, 
 					           { name: "transport" },
 					           { name: "portRange" } ],
@@ -114,6 +115,7 @@
 					importUrl: 'networkProtocols/import',
 					exportUrl: 'networkProtocols/export',
 					additionalActions: actions,
+					checkbox : true,
 					validate : function() {
 						if ($('#protocolName').val() == '') {
 							showError("error.nameRequired");
