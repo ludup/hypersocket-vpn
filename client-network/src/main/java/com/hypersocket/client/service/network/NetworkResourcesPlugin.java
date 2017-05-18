@@ -145,6 +145,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						res.setModified(c);
 					}
 					res.setResourceLauncher(new BrowserLauncher(template.getLaunchUrl()));
+					res.setConnectionId(serviceClient.getAttachment().getId());
 
 					// Map the Resource to the Template (we will need it later
 					// to start or stop the tunnels)
