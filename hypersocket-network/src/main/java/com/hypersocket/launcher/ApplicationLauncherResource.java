@@ -71,10 +71,6 @@ public class ApplicationLauncherResource extends RealmResource {
 		return os;
 	}
 
-	public void setOs(String os) {
-		this.os = ApplicationLauncherOS.valueOf(os);
-	}
-	
 	public void setOs(ApplicationLauncherOS os) {
 		this.os = os;
 	}
@@ -118,7 +114,4 @@ public class ApplicationLauncherResource extends RealmResource {
 	public void setFiles(String files) {
 		this.files = files;
 	}
-	
-	
-	
 }
