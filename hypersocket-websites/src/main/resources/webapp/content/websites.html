@@ -125,6 +125,7 @@
 							infoHtml: getResource('websites.infoHtml'),
 							icon: 'fa-globe',
 							resourceUrl : "websites/website",
+							deleteResourcesUrl : "websites/bulk",
 							fields : [ {
 								name : "name"
 							}],
@@ -138,6 +139,8 @@
 							canDelete: currentMenu.canDelete,
 							importUrl: 'websites/import',
 							exportUrl: 'websites/export',
+							bulkAssignment: true,
+							checkbox : true,
 							validate : function() {
 
 								if ($('#resourceName').val() == '') {

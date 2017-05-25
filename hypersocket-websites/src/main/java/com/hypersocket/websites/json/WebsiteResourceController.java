@@ -65,7 +65,7 @@ public class WebsiteResourceController extends ResourceController {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
 		try {
-			return new ResourceStatus<String>(true, websiteService.getFingerprint());
+			return new ResourceStatus<>(true, websiteService.getFingerprint());
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -83,7 +83,7 @@ public class WebsiteResourceController extends ResourceController {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
 		try {
-			return new ResourceList<WebsiteResource>(
+			return new ResourceList<>(
 					websiteService.getResources(sessionUtils
 							.getPrincipal(request)));
 		} finally {
@@ -191,7 +191,7 @@ public class WebsiteResourceController extends ResourceController {
 				sessionUtils.getLocale(request));
 
 		try {
-			return new ResourceList<PropertyCategory>();
+			return new ResourceList<>();
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -232,7 +232,7 @@ public class WebsiteResourceController extends ResourceController {
 
 			WebsiteResource newResource;
 
-			Set<Role> roles = new HashSet<Role>();
+			Set<Role> roles = new HashSet<>();
 			for (Long id : resource.getRoles()) {
 				roles.add(permissionRepository.getRoleById(id));
 			}
@@ -247,7 +247,7 @@ public class WebsiteResourceController extends ResourceController {
 						resource.getLaunchUrl(), resource.getAdditionalUrls(),
 						roles, resource.getLogo());
 			}
-			return new ResourceStatus<WebsiteResource>(newResource,
+			return new ResourceStatus<>(newResource,
 					I18N.getResource(sessionUtils.getLocale(request),
 							WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
 							resource.getId() != null ? "resource.updated.info"
@@ -255,7 +255,7 @@ public class WebsiteResourceController extends ResourceController {
 									.getName()));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<WebsiteResource>(false, e.getMessage());
+			return new ResourceStatus<>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -278,7 +278,7 @@ public class WebsiteResourceController extends ResourceController {
 			WebsiteResource resource = websiteService.getResourceById(id);
 
 			if (resource == null) {
-				return new ResourceStatus<WebsiteResource>(false,
+				return new ResourceStatus<>(false,
 						I18N.getResource(sessionUtils.getLocale(request),
 								WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
 								"error.invalidResourceId", id));
@@ -287,13 +287,13 @@ public class WebsiteResourceController extends ResourceController {
 			String preDeletedName = resource.getName();
 			websiteService.deleteResource(resource);
 
-			return new ResourceStatus<WebsiteResource>(true, I18N.getResource(
+			return new ResourceStatus<>(true, I18N.getResource(
 					sessionUtils.getLocale(request),
 					WebsiteResourceServiceImpl.RESOURCE_BUNDLE,
 					"resource.deleted.info", preDeletedName));
 
 		} catch (ResourceException e) {
-			return new ResourceStatus<WebsiteResource>(false, e.getMessage());
+			return new ResourceStatus<>(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
@@ -374,16 +374,16 @@ public class WebsiteResourceController extends ResourceController {
 			}
 			Collection<WebsiteResource> collects = websiteService
 					.importResources(json, getCurrentRealm(), dropExisting);
-			return new ResourceStatus<WebsiteResource>(
+			return new ResourceStatus<>(
 					true,
 					I18N.getResource(
 							sessionUtils.getLocale(request),
 							I18NServiceImpl.USER_INTERFACE_BUNDLE,
 							"resource.import.success", collects.size()));
 		} catch (ResourceException e) {
-			return new ResourceStatus<WebsiteResource>(false, e.getMessage());
+			return new ResourceStatus<>(false, e.getMessage());
 		} catch (Exception e) {
-			return new ResourceStatus<WebsiteResource>(
+			return new ResourceStatus<>(
 					false,
 					I18N.getResource(
 							sessionUtils.getLocale(request),
@@ -407,7 +407,7 @@ public class WebsiteResourceController extends ResourceController {
 		setupAuthenticatedContext(sessionUtils.getSession(request),
 				sessionUtils.getLocale(request));
 		try {
-			return new ResourceList<WebsiteResource>(
+			return new ResourceList<>(
 					websiteService.getResources(sessionUtils
 							.getCurrentRealm(request)));
 		} finally {
@@ -436,6 +436,46 @@ public class WebsiteResourceController extends ResourceController {
 		} catch (Exception e) {
 			return new RequestStatus(false, e.getMessage());
 
+		} finally {
+			clearAuthenticatedContext();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@AuthenticationRequired
+	@RequestMapping(value = "websites/bulk", method = RequestMethod.DELETE, produces = { "application/json" })
+	@ResponseBody
+	@ResponseStatus(value = HttpStatus.OK)
+	public RequestStatus deleteResources(HttpServletRequest request,
+												HttpServletResponse response,
+												@RequestBody Long[] ids)
+			throws AccessDeniedException, UnauthorizedException,
+			SessionTimeoutException {
+		setupAuthenticatedContext(sessionUtils.getSession(request),
+				sessionUtils.getLocale(request));
+		try {
+			
+			if(ids == null) {
+				ids = new Long[0];
+			}
+			
+			List<WebsiteResource> websiteResources = websiteService.getResourcesByIds(ids);
+
+			if(websiteResources == null || websiteResources.isEmpty()) {
+				return new RequestStatus(false,
+						I18N.getResource(sessionUtils.getLocale(request),
+								I18NServiceImpl.USER_INTERFACE_BUNDLE,
+								"bulk.delete.empty"));
+			}else {
+				websiteService.deleteResources(websiteResources);
+				return new RequestStatus(true,
+						I18N.getResource(sessionUtils.getLocale(request),
+								I18NServiceImpl.USER_INTERFACE_BUNDLE,
+								"bulk.delete.success"));
+			}
+			
+		} catch (Exception e) {
+			return new RequestStatus(false, e.getMessage());
 		} finally {
 			clearAuthenticatedContext();
 		}
