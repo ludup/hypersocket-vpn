@@ -55,9 +55,9 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 
 	static Logger log = LoggerFactory.getLogger(NetworkResourcesPlugin.class);
 
-	Map<String, NetworkResource> localForwards = new HashMap<String, NetworkResource>();
-	Map<Resource, NetworkResourceDetail> resourceDetails = new HashMap<Resource, NetworkResourceDetail>();
-	Map<Resource, NetworkResourceDetail> startedResourceDetails = new HashMap<Resource, NetworkResourceDetail>();
+	Map<String, NetworkResource> localForwards = new HashMap<>();
+	Map<Resource, NetworkResourceDetail> resourceDetails = new HashMap<>();
+	Map<Resource, NetworkResourceDetail> startedResourceDetails = new HashMap<>();
 	Map<Resource, List<Resource>> childResources = new HashMap<>();
 
 	HostsFileManager mgr;
@@ -69,6 +69,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 		super("websites", "networkResources");
 	}
 
+	@Override
 	protected void reloadResources(List<Resource> realmResources) {
 		if (log.isInfoEnabled()) {
 			log.info("Loading Network Resources");
@@ -187,7 +188,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	protected int processNetworkResources(final List<Resource> realmResources, String json) throws IOException {
 
 		final Map<String, String> variables = serviceClient.getUserVariables();
-		final Set<Long> alreadyInstalled = new HashSet<Long>();
+		final Set<Long> alreadyInstalled = new HashSet<>();
 
 		return processResourceList(json, new ResourceMapper() {
 
@@ -215,8 +216,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					 */
 					if(destinationHostname.isEmpty())
 						throw new Exception(String.format("No hostname for resource destinationHostname=%s hostname=%s", 
-								(String) field.get("destinationHostname"), 
-								(String) field.get("hostname")));
+								field.get("destinationHostname"), 
+								field.get("hostname")));
 	
 					if(log.isInfoEnabled()) {
 						log.info(String.format("Processing endpoint %s (%d) to %s using hostname %s", name, id, destinationHostname, hostname));
@@ -226,7 +227,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					JSONArray launchers = (JSONArray) field.get("launchers");
 	
 					@SuppressWarnings("unchecked")
-					Iterator<JSONObject> it3 = (Iterator<JSONObject>) launchers.iterator();
+					Iterator<JSONObject> it3 = launchers.iterator();
 	
 					// For now, ignore version if on Linux, os.version is not
 					// that useful for us
@@ -243,7 +244,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					 */
 					Number modifiedDateTime = (Number) field.get("modifiedDate");
 	
-					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<ApplicationLauncherTemplate>();
+					List<ApplicationLauncherTemplate> launcherTemplates = new ArrayList<>();
 					while (it3.hasNext()) {
 						JSONObject launcher = it3.next();
 	
@@ -323,7 +324,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 					JSONArray protocols = (JSONArray) field.get("protocols");
 	
 					@SuppressWarnings("unchecked")
-					Iterator<JSONObject> it2 = (Iterator<JSONObject>) protocols.iterator();
+					Iterator<JSONObject> it2 = protocols.iterator();
 	
 					while (it2.hasNext()) {
 						JSONObject protocol = it2.next();
@@ -358,6 +359,8 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						res.setType(Type.ENDPOINT);
 						res.setLaunchable(false);
 						res.setModified(protocol.getModifiedDate());
+						res.setConnectionId(serviceClient.getAttachment().getId());
+						
 						realmResources.add(res);
 						detail.networkResourceTemplate = template;
 						resourceDetails.put(res, detail);
@@ -373,6 +376,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 						res.setLaunchable(true);
 						res.setModified(launcherTemplate.getModifiedDate());
 						res.setIcon(launcherTemplate.getLogo());
+						res.setConnectionId(serviceClient.getAttachment().getId());
 	
 						// TODO - this is disabled for now, until the grouping
 						// component is completed.
@@ -453,7 +457,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 			int exitCode = 0;
 			if(StringUtils.isNotBlank(installScript)) {
 				
-				Map<String,String> properties = new HashMap<String,String>();
+				Map<String,String> properties = new HashMap<>();
 				
 				properties.put("username", serviceClient.getPrincipalName());
 				properties.put("timestamp", String.valueOf(System.currentTimeMillis()));
@@ -498,7 +502,7 @@ public class NetworkResourcesPlugin extends AbstractServicePlugin {
 	private Map<String,FileMetaData> processDownloadRequirements(String files[], File applicationDirectory) throws IOException {
 		
 		ObjectMapper objectMapper = new ObjectMapper();
-		Map<String,FileMetaData> data = new HashMap<String,FileMetaData>();
+		Map<String,FileMetaData> data = new HashMap<>();
 		
 		for(String file : files) {
 			if(StringUtils.isBlank(file)) {
