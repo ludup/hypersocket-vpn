@@ -2,10 +2,13 @@ package com.hypersocket.websites;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hypersocket.events.EventService;
@@ -17,6 +20,7 @@ import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
 import com.hypersocket.permissions.PermissionService;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.realm.Principal;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
@@ -34,6 +38,8 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 	public static final String RESOURCE_BUNDLE = "WebsiteResourceService";
 
+	private static Logger log = LoggerFactory.getLogger(WebsiteResourceServiceImpl.class);
+	
 	@Autowired
 	WebsiteResourceRepository websiteRepository;
 
@@ -78,8 +84,9 @@ public class WebsiteResourceServiceImpl extends AbstractAssignableResourceServic
 
 		menuService.registerMenu(new MenuRegistration(RESOURCE_BUNDLE, "myWebsites", "fa-globe", "myWebsites", 200) {
 			public boolean canRead() {
+				List<Principal> principals = realmService.getAssociatedPrincipals(getCurrentPrincipal());
 				return websiteRepository
-						.getAssignableResourceCount(realmService.getAssociatedPrincipals(getCurrentPrincipal())) > 0;
+						.getAssignableResourceCount(principals) > 0;
 			}
 		}, MenuService.MENU_MY_RESOURCES);
 
