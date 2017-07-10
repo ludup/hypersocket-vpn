@@ -93,11 +93,8 @@
 			});
 		});
 		
-		$('#networkRoles').multipleSearchInput({
+		$('#networkRoles').roles({
 				url: 'roles/table',
-				isNamePairValue: false,
-				selectedIsObjectList : true,
-				resourceKey : 'endpoint',
 				disabled: !currentMenu.canUpdate
 		});
 		
@@ -221,7 +218,8 @@
 							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
 							$('#applications').multipleSelect();
-							$('#networkRoles').multipleSearchInput();
+							$('#networkRoles').widget().clear();
+							$('#networkRoles').widget().enable();
 							$('#resourceId').val('');
 							
 							$('.endpointPropertiesTab').first().trigger('click');
@@ -235,7 +233,7 @@
 									.multipleSelectValues();
 							resource.launchers = $('#applications')
 									.multipleSelectValues();
-							resource.roles = $('#networkRoles').multipleSelectValues();
+							resource.roles = $('#networkRoles').widget().getValue();
 							resource.id = $('#resourceId').val();
 							resource.logo = logo.getValue();
 							return resource;
@@ -266,14 +264,10 @@
 								resourceKey : 'endpoint',
 								disabled: readOnly
 							});
-							$('#networkRoles').multipleSearchInput({
-								url: 'roles/table',
-								isNamePairValue: false,
-								selected : resource.roles,
-								selectedIsObjectList : true,
-								resourceKey : 'endpoint',
-								disabled: readOnly
-							});
+							$('#networkRoles').widget().setValue(resource.roles);
+							if(readOnly) {
+								$('#networkRoles').widget().disable();
+							}
 						},
 						complete : function() {
 							loadComplete();
