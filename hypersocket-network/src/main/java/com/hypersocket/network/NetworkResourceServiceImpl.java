@@ -41,7 +41,6 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractAssignableResourceRepository;
 import com.hypersocket.resource.AbstractAssignableResourceServiceImpl;
-import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.resource.ResourceNotFoundException;
 import com.hypersocket.server.forward.ForwardingTransport;
@@ -288,7 +287,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 
 	@SuppressWarnings("unchecked")
 	protected void prepareImport(NetworkResource resource, Realm realm)
-			throws ResourceCreationException, AccessDeniedException {
+			throws ResourceException, AccessDeniedException {
 
 		Set<NetworkProtocol> networkProtocolList = new HashSet<NetworkProtocol>();
 		for (NetworkProtocol networkProtocol : resource.getProtocols()) {

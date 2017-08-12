@@ -26,8 +26,6 @@ import com.hypersocket.realm.RealmAdapter;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
-import com.hypersocket.resource.ResourceChangeException;
-import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.server.forward.ForwardingTransport;
 
@@ -217,7 +215,7 @@ public class NetworkProtocolServiceImpl extends
 	@Override
 	public NetworkProtocol updateResource(NetworkProtocol resource,
 			String name, Integer startPort, Integer endPort,
-			ForwardingTransport transport) throws ResourceChangeException,
+			ForwardingTransport transport) throws ResourceException,
 			AccessDeniedException {
 
 		resource.setName(name);
@@ -233,7 +231,7 @@ public class NetworkProtocolServiceImpl extends
 	@Override
 	public NetworkProtocol createResource(String name, Realm realm,
 			Integer startPort, Integer endPort, ForwardingTransport transport)
-			throws ResourceCreationException, AccessDeniedException {
+			throws ResourceException, AccessDeniedException {
 
 		NetworkProtocol resource = new NetworkProtocol();
 		resource.setName(name);

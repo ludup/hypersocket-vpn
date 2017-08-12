@@ -40,7 +40,6 @@ import com.hypersocket.realm.Realm;
 import com.hypersocket.realm.RealmService;
 import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
-import com.hypersocket.resource.ResourceChangeException;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
 import com.hypersocket.tables.BootstrapTableResult;
@@ -187,7 +186,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 	@Override
 	public ApplicationLauncherResource updateResource(
 			ApplicationLauncherResource resource, 
-			String name, Map<String,String> properties) throws ResourceChangeException,
+			String name, Map<String,String> properties) throws ResourceException,
 			AccessDeniedException {
 
 		resource.setName(name);
@@ -200,7 +199,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 	@Override
 	public ApplicationLauncherResource createResource(String name, Realm realm,
 			Map<String,String> properties)
-			throws ResourceCreationException, AccessDeniedException {
+			throws ResourceException, AccessDeniedException {
 
 		ApplicationLauncherResource resource = new ApplicationLauncherResource();
 		resource.setName(name);

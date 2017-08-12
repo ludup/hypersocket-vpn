@@ -3,8 +3,7 @@ package com.hypersocket.protocols;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractResourceService;
-import com.hypersocket.resource.ResourceChangeException;
-import com.hypersocket.resource.ResourceCreationException;
+import com.hypersocket.resource.ResourceException;
 import com.hypersocket.server.forward.ForwardingTransport;
 
 public interface NetworkProtocolService extends
@@ -14,11 +13,11 @@ public interface NetworkProtocolService extends
 
 	NetworkProtocol updateResource(NetworkProtocol resourceById, String name,
 			Integer startPort, Integer endPort, ForwardingTransport transport)
-			throws ResourceChangeException, AccessDeniedException;
+			throws ResourceException, AccessDeniedException;
 
 	NetworkProtocol createResource(String name, Realm realm, Integer startPort,
 			Integer endPort, ForwardingTransport transport)
-			throws ResourceCreationException, AccessDeniedException;
+			throws ResourceException, AccessDeniedException;
 
 
 }
