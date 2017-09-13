@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.hypersocket</groupId>
 	<artifactId>hypersocket-vpn</artifactId>
-	<version>2.1.1-LOCAL</version>
+	<version>3.0.0-LOCAL</version>
 	<packaging>pom</packaging>
 	<name>Hypersocket - VPN Server</name>
 
