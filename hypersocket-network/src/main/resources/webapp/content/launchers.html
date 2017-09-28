@@ -20,12 +20,13 @@
 					</div>
 					<div id="launcherProperties"></div>
 					<input type="hidden" id="resourceId" name="resourceId" value="" />
-				</div>	
+				</div>
 				<div class="modal-footer"></div>
 			</div>
 		</div>
 	</div>
 </div>
+<div id="launch"></div>
 <div id="additionalActions"></div>
 <div id="uploadLauncherDiv"></div>
 <div id="searchLaunchers">
@@ -45,16 +46,16 @@
 							<input class="col-xs-4" type="text" id="searchInput">
 						</div>
 						<div id="searchResults" class="row">
-						
+
 						</div>
 						<div id="pages">
-						
+
 						</div>
 					</div>
 					<div id="templateName"></div>
-	
+
 					<div id="templateVariables" class="searchDialog">
-					
+
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -73,17 +74,20 @@
 			if(count > 0 && ((count % 5) == 0)) {
 				currentElement = $('#searchResults').append('<div class="row"></div>');
 			}
+			var lp = obj.templateLogo;
+			if(lp && lp != '' && lp.indexOf('://') == -1)
+				lp = basePath + '/api/lanchers/image/' + lp;
+			else
+				lp = getLogoPath('APPLICATION_TEMPLATE', lp, obj.name);
 			currentElement.append('<div id="template' + obj.id + '" class="col-xs-2 template"><a href="#"><div class="row"><img width="100px" src="'
-					+ basePath
-					+ '/api/launchers/image/' 
-					+ obj.templateLogo 
-					+ '"></div><div class="row"><span>' 
+					+ lp
+					+ '"></div><div class="row"><span>'
 					+ obj.name
 					+ '</span></div></a></div>');
 			$('#template' + obj.id).data('template', obj);
 			count++;
 		});
-	
+
 		if(count < 10) {
 			for(var i=count;i<10;i++) {
 				if(count > 0 && ((count % 5) == 0)) {
@@ -93,7 +97,7 @@
 				count++;
 			}
 		}
-	
+
 		$('.template a').off('click');
 		$('.template a').on('click', function(e) {
 			e.preventDefault();
@@ -104,17 +108,17 @@
 	}
 
 	$(document).ready(function() {
-		
+
 				$('#contentLaunchers').localize();
 				$('#searchLaunchers').localize();
-				
+
 
 				var templateName = $('#templateName').textInput();
 				$('#templateName').hide();
 				var categoryName = $('#categoryName').textInput();
-		
+
 				var page = 0;
-					
+
 				$('#launcherProperties').propertyPage({
 					url : 'launchers/template',
 					showButtons : false,
@@ -127,7 +131,7 @@
 					},
 					canUpdate : currentMenu.canUpdate
 				});
-				
+
 
 				getJSON('menus/tableActions/applicationLauncherActions', null, function(data) {
 					var actions = new Array();
@@ -150,8 +154,37 @@
 								displayFunction: action.displayFunction
 							});
 						});
+
+						$('#launch').data('action', function(resource, callback) {
+							var urlStr = resource.exe;
+							var vpwidth = 800;
+							var vpheight = 600;
+							if('viewport.width' in resource.variablesMap) {
+								vpwidth = parseInt(resource.variablesMap['viewport.width'], 10);
+							}
+							if('viewport.height' in resource.variablesMap) {
+								vpheight = parseInt(resource.variablesMap['viewport.height'], 10);
+							}
+							
+							/* TODO blegh .. we can't know how high the toolbar is at this point. Maybe
+							 * at least the window could be resized when it is known */
+							vpheight += 46;
+							
+							for(k in resource) {
+								urlStr = urlStr.replace('${' + k + '}',resource[k]);
+							}
+							if(resource.windowTarget === 'TAB') {
+								window.open(urlStr, resource.name, 'title=' + resource.name);
+							}
+							else if(resource.windowTarget === 'SAME') {
+								window.location.href = urlStr;
+							}
+							else {
+								window.open(urlStr, resource.name, 'height=' + vpheight + ',width=' + vpwidth + ',title=' + resource.name);
+							}
+						});
 					}
-					
+
 					var resourcePage = $('#contentLaunchers').ajaxResourcePage(
 							{
 								id : "Launcher",
@@ -189,13 +222,13 @@
 										$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
 										$('#addTemplate').children('i').addClass('fa-save');
 										$('#pages').append('<div id="searchPages"></div>');
-										
+
 										var iDisplayStart = 0;
 										var params = new Array();
 										params['sSearch'] = $('#searchInput').val();
 										params['iDisplayStart'] = iDisplayStart;
 										params['iDisplayLength'] = 10;
-										
+
 										$('#addTemplate').attr('disabled', true);
 										$('#addTemplate').off('click');
 										page = 0;
@@ -209,48 +242,73 @@
 													if(templateName.getValue().trim()=='') {
 														templateName.setValue(template.name);
 													}
-													var variables = splitFix(template.variables);
-													if(variables.length > 0) {
-														$('#templateVariables').empty();
-														$('#templateVariables').append('<div class="row"><p style="text-align: center; margin-bottom: 20px"><strong>' + getResource('info.additionalDetails') + '</strong></p></div>')
-														$.each(variables, function(idx, obj) {
-															var items = obj.split('=');
-															var label = decodeURIComponent(items[0]);
-															var info = decodeURIComponent(items[1]);
-															info = replaceAll(info, '<', "&lt;")
-															info = replaceAll(info, '>', '&gt;');
-															var id = label.replace(/\s/g, "");
-															var variable = id.substring(0,1).toLowerCase() + id.substring(1);
-															$('#templateVariables').append('<div class="propertyItem form-group">'
-																	+ '<label class="col-xs-3 control-label">' + label + '</label>'
-																	+ '<div class="propertyValue col-xs-9"><div id="variable' + id + '" data-variable="' + variable + '" + class="variable"></div><div>'
-																	+ '<span class="help-block">' + info + '</span></div></div></div>');
-														
-															$('#variable' + id).textInput();
-														
+
+													if(template.categories && template.categories.length > 0) {
+														/* Use new style property templates */
+														$('#templateVariables').propertyPage({
+															resources : template.categories,
+															showButtons : false,
+															i18nNamespace: 'launchers',
+															canUpdate: true
 														});
 														page = 1;
 														$('#templateVariables').show();
-													} else {
-														page = 2;
-														$('#addTemplate').trigger('click');
+													}
+													else {
+														/* Use old style variables */
+														var variables = splitFix(template.variables);
+														if(variables.length > 0) {
+															$('#templateVariables').empty();
+															$('#templateVariables').append('<div class="row"><p style="text-align: center; margin-bottom: 20px"><strong>' + getResource('info.additionalDetails') + '</strong></p></div>')
+															$.each(variables, function(idx, obj) {
+																var items = obj.split('=');
+																var label = decodeURIComponent(items[0]);
+																var info = decodeURIComponent(items[1]);
+																info = replaceAll(info, '<', "&lt;")
+																info = replaceAll(info, '>', '&gt;');
+																var id = label.replace(/\s/g, "");
+																var variable = id.substring(0,1).toLowerCase() + id.substring(1);
+																$('#templateVariables').append('<div class="propertyItem form-group">'
+																		+ '<label class="col-xs-3 control-label">' + label + '</label>'
+																		+ '<div class="propertyValue col-xs-9"><div id="variable' + id + '" data-variable="' + variable + '" + class="variable"></div><div>'
+																		+ '<span class="help-block">' + info + '</span></div></div></div>');
+
+																$('#variable' + id).textInput();
+
+															});
+															page = 1;
+															$('#templateVariables').show();
+														} else {
+															page = 2;
+															$('#addTemplate').trigger('click');
+														}
 													}
 													break;
 												}
 												case 1:
 												{
-													var valid = true;
-													$('.variable').each(function(idx) {
-														if($(this).widget().getValue().trim()=='') {
-															valid = false;
+													if(template.categories && template.categories.length > 0) {
+														/* Use new style property templates */
+														if(!$('#templateVariables').validateProperties()) {
+															showError('error.failedToValidateTemplate');
+															return false;
 														}
-													});
-													
-													if(!valid) {
-														showError('error.pleaseProvideAllDetails');
-														return;
 													}
-												
+													else {
+														/* Use old style variables */
+														var valid = true;
+														$('.variable').each(function(idx) {
+															if($(this).widget().getValue().trim()=='') {
+																valid = false;
+															}
+														});
+	
+														if(!valid) {
+															showError('error.pleaseProvideAllDetails');
+															return;
+														}
+													}
+
 													page = 2;
 													$('#addTemplate').trigger('click');
 													break;
@@ -259,19 +317,33 @@
 												{
 													$('#addTemplate').children('i').removeClass('fa-save');
 													$('#addTemplate').children('i').addClass('fa-spin fa-spinner');
-									
-													var data = template.script;
-		 											
+
+													var data = template.resource ? JSON.stringify(template.resource) : template.script;
+
 													var name = templateName.getValue();
 
 													data = replaceAll(data,'${templateName}', name);
-																									
-													$('.variable').each(function(idx) {
-														var variable = $(this).data('variable');
-														data = replaceAll(data, '${' + variable + '}', $(this).widget().getValue());
-														data = replaceAll(data, encodeURIComponent('${' + variable + '}'), encodeURIComponent($(this).widget().getValue()));
-													});
-													
+
+
+													if(template.categories && template.categories.length > 0) {
+														/* Use new style property templates */
+														$('#templateVariables').saveProperties(true,
+															function(items) {
+																$(items).each(function(idx) {
+																	data = replaceAll(data, '${' + this.id + '}', this.value);
+																	data = replaceAll(data, encodeURIComponent('${' + this.id + '}'), encodeURIComponent(this.value));
+																});
+															});
+													}
+													else {
+														/* Use old style variables */
+														$('.variable').each(function(idx) {
+															var variable = $(this).data('variable');
+															data = replaceAll(data, '${' + variable + '}', $(this).widget().getValue());
+															data = replaceAll(data, encodeURIComponent('${' + variable + '}'), encodeURIComponent($(this).widget().getValue()));
+														});
+													}
+
 													postFORM(basePath + '/api/launchers/script', $.param({ script: data }), function(data) {
 														$('#addTemplate').children('i').removeClass('fa-spin fa-spinner');
 														$('#addTemplate').children('i').addClass('fa-save');
@@ -283,11 +355,11 @@
 															});
 														} else {
 															showError(data.message);
-														}   
+														}
 													});
-		 											break;	
+		 											break;
 												}
-																					
+
 												default:
 													{
 														alert('Invaild page!');
@@ -295,18 +367,18 @@
 
 											}
 										});
-										
+
 										$('#searchInput').change(function() {
 											getJSON('launchers/search?iDisplayStart=0&iDisplayLength=10&sSearch=' + $('#searchInput').val(), null, function(data) {
-												
+
 												$('#pages').empty();
 												$('#pages').append('<div id="searchPages"></div>');
 												$('#searchResults').empty();
-												
+
 												if(data.rows.length > 0) {
-												
+
 													populateResults(data.rows);
-													
+
 													// init bootpag
 											        $('#searchPages').bootpag({
 											            total: data.total <= 10 ? 1 : (data.total / 10) + (data.total % 10 != 0 ? 1 : 0),
@@ -318,18 +390,18 @@
 												        		populateResults(data.rows);
 															});
 														}
-											        	
+
 											        });
 												} else {
 													$('#searchResults').append('<p style="width:100%; text-align: center; padding-top:50px;">' + getResource('info.applicationsNoResults').format($('#searchInput').val()));
 												}
-												
+
 											}, function(xmlRequest) {
 												log('Failed to get online templates: ' + xmlRequest.status);
 												showError('error.failedToSearchTemplates');
-											});	
+											});
 										});
-										
+
 										$('#searchInput').trigger('change');
 										$('#searchLaunchersForm').modal({
 											  backdrop: 'static',
@@ -343,24 +415,24 @@
 									}
 								}],
 								validate : function() {
-	
+
 									if ($('#resourceName').val() == '') {
 										showError("error.nameRequired");
 										return false;
 									}
-	
+
 									if(!$('#launcherProperties').validateProperties()) {
 										showError("error.correctValidationErrors");
 										return false;
 									}
-									
+
 									return true;
 								},
 								clearDialog : function(create) {
-									
+
 									$('#resourceId').val('');
 									$('#resourceName').val('');
-									
+
 									if(create) {
 										$('#launcherProperties').propertyPage({
 											url : 'launchers/template',
@@ -375,26 +447,26 @@
 											canUpdate : currentMenu.canUpdate
 										});
 									}
-									
+
 									$('.launcherPropertiesTab').first().trigger('click');
 								},
 								createResource : function() {
 									resource = new Object();
 									resource.id = $('#resourceId').val();
 									resource.name = $('#resourceName').val();
-									
+
 									$('#launcherProperties').saveProperties(true,
 											function(items) {
 										resource.properties = items;
 									});
-									
+
 									return resource;
 								},
 								displayResource : function(resource) {
-									
+
 									$('#resourceId').val(resource.id);
 									$('#resourceName').val(resource.name);
-									
+
 									$('#launcherProperties').propertyPage({
 										url : 'launchers/properties/' + resource.id,
 										showButtons : false,
@@ -407,7 +479,7 @@
 										},
 										canUpdate : currentMenu.canUpdate
 									});
-									
+
 								},
 								complete : function() {
 									loadComplete();

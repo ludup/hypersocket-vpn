@@ -23,6 +23,11 @@
 			<artifactId>hypersocket-ui-bootstrap</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.hypersocket</groupId>
+			<artifactId>hypersocket-templates</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	
 	<build>

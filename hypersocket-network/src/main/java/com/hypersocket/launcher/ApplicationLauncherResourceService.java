@@ -15,12 +15,14 @@ import com.hypersocket.tables.BootstrapTableResult;
 
 public interface ApplicationLauncherResourceService extends
 		AbstractResourceService<ApplicationLauncherResource> {
+	
+	void registerTemplateResolver(ApplicationLauncherTemplateResolver resolver);
 
 	ApplicationLauncherResource updateResource(
 			ApplicationLauncherResource id, String name, Map<String,String> properties) throws ResourceException,
 			AccessDeniedException;
 
-	BootstrapTableResult<?> searchTemplates(String search, int iDisplayStart,
+	BootstrapTableResult<?> searchTemplates(String resolver, String search, int iDisplayStart,
 			int iDisplayLength) throws IOException, AccessDeniedException;
 
 	void downloadTemplateImage(String uuid, HttpServletRequest request,

@@ -175,7 +175,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 			String iDisplayStart = request.getParameter("iDisplayStart");
 			String iDisplayLength = request.getParameter("iDisplayLength");
-			return resourceService.searchTemplates(
+			return resourceService.searchTemplates("builtIn",
 					request.getParameter("sSearch"),
 					iDisplayStart == null ? 0 :Integer.parseInt(iDisplayStart),
 					iDisplayLength == null ? 10 :Integer.parseInt(iDisplayLength));
@@ -198,7 +198,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 
 			ApplicationLauncherResource newResource = resourceService
-					.importResources(script, getCurrentRealm(), false).iterator().next();
+					.importResources("[" + script + "]", getCurrentRealm(), false).iterator().next();
 
 			return new ResourceStatus<ApplicationLauncherResource>(
 					newResource,

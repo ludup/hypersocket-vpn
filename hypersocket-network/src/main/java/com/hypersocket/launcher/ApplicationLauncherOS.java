@@ -17,7 +17,8 @@ public enum ApplicationLauncherOS {
 	MACOSX_YOSEMITE(8, "10.10", "Mac OS X Yosemite", "Mac OS X"),
 	MACOSX_ELCAPITAN(11, "10.11", "Mac OS X El Capitan", "Mac OS X"),
 	MACOSX_SIERA(12, "10.11", "Mac OS X Siera", "Mac OS X"),
-	LINUX(9, "1.0", "Linux", "Linux");
+	LINUX(9, "", "Linux", "Linux"),
+	CROSS_PLATFORM(13, "", "Any", "Cross platform");
 	
 	private final int val;
 	private final String version;

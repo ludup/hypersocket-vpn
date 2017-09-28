@@ -1,11 +1,16 @@
 package com.hypersocket.launcher;
 
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.hypersocket.properties.ResourceUtils;
 import com.hypersocket.resource.RealmResource;
 
 @Entity
@@ -23,6 +28,14 @@ public class ApplicationLauncherResource extends RealmResource {
 
 	@Column(name="os")
 	ApplicationLauncherOS os;
+
+	@Column(name="type")
+	@Enumerated(EnumType.STRING)
+	ApplicationLauncherType type = ApplicationLauncherType.CLIENT;
+
+	@Column(name="window_target")
+	@Enumerated(EnumType.STRING)
+	BrowserWindowTarget windowTarget = BrowserWindowTarget.WINDOW;
 	
 	@Column(name="startup_script")
 	@Lob
@@ -43,6 +56,34 @@ public class ApplicationLauncherResource extends RealmResource {
 	@Lob
 	String files;
 	
+	@Column(name="variables")
+	@Lob
+	String variables;
+	
+	public Map<String, String> getVariablesMap() {
+		return ResourceUtils.explodeMap(variables);
+	}
+	
+	public String getVariables() {
+		return variables;
+	}
+
+	public void setVariablesMap(Map<String,String> variables) {
+		this.variables = ResourceUtils.implodeMap(variables);
+	}
+
+	public void setVariables(String variables) {
+		this.variables = variables;
+	}
+	
+	public BrowserWindowTarget getWindowTarget() {
+		return windowTarget;
+	}
+
+	public void setWindowTarget(BrowserWindowTarget windowTarget) {
+		this.windowTarget = windowTarget;
+	}
+
 	public String getExe() {
 		return exe;
 	}
@@ -53,6 +94,14 @@ public class ApplicationLauncherResource extends RealmResource {
 
 	public void setLogo(String logo) {
 		this.logo = logo;
+	}
+
+	public ApplicationLauncherType getType() {
+		return type;
+	}
+
+	public void setType(ApplicationLauncherType type) {
+		this.type = type;
 	}
 
 	public void setExe(String exe) {
