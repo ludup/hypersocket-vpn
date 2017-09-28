@@ -5,19 +5,14 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.hypersocket.migration.annotation.AllowNameOnlyLookUp;
 import com.hypersocket.resource.RealmResource;
 import com.hypersocket.server.forward.ForwardingTransport;
 
 @Entity
 @Table(name = "network_protocols")
 @JsonDeserialize(using = NetworkProtocolDeserializer.class)
-@AllowNameOnlyLookUp
 public class NetworkProtocol extends RealmResource {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 6615968421593775450L;
 
 	@Column(name = "transport", nullable = false)
