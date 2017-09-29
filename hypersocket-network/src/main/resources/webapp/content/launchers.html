@@ -76,7 +76,7 @@
 			}
 			var lp = obj.templateLogo;
 			if(lp && lp != '' && lp.indexOf('://') == -1)
-				lp = basePath + '/api/lanchers/image/' + lp;
+				lp = basePath + '/api/launchers/image/' + lp;
 			else
 				lp = getLogoPath('APPLICATION_TEMPLATE', lp, obj.name);
 			currentElement.append('<div id="template' + obj.id + '" class="col-xs-2 template"><a href="#"><div class="row"><img width="100px" src="'

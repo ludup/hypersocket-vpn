@@ -175,7 +175,7 @@ public class ApplicationLauncherResourceController extends ResourceController {
 		try {
 			String iDisplayStart = request.getParameter("iDisplayStart");
 			String iDisplayLength = request.getParameter("iDisplayLength");
-			return resourceService.searchTemplates("builtIn",
+			return resourceService.searchTemplates(null,
 					request.getParameter("sSearch"),
 					iDisplayStart == null ? 0 :Integer.parseInt(iDisplayStart),
 					iDisplayLength == null ? 10 :Integer.parseInt(iDisplayLength));

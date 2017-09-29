@@ -43,7 +43,7 @@ public class OnlineTemplateResolver implements ApplicationLauncherTemplateResolv
 		params.put("order", "asc");
 
 		String url = System.getProperty("hypersocket.templateServerUrl",
-				"https://shared.hypersocket.com/hypersocket/api/templates")
+				"https://updates2.hypersocket.com/hypersocket/api/templates")
 				+ "/"
 				+ (Boolean
 						.getBoolean("hypersocketLauncher.enablePrivate") ? "developer"

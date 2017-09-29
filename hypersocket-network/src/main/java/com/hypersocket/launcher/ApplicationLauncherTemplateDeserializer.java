@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hypersocket.properties.PropertyCategory;
-import com.hypersocket.properties.PropertyTemplate;
 import com.hypersocket.properties.ResourceUtils;
 import com.hypersocket.template.TemplateType;
 
