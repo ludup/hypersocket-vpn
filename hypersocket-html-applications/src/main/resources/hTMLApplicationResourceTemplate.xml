@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<propertyTemplates context="hTMLApplicationResource">
+	<propertyCategory resourceKey="hTMLApplication.program"
+		resourceBundle="HTMLApplicationResourceService" weight="0">
+		<property resourceKey="exe" inputType="text" weight="200"
+			defaultValue=""
+			variables="hostname,username,client.username,client.userhome,client.userdir,timestamp,java.home,id" />
+		<property resourceKey="args" inputType="multipleTextInput"
+			defaultValue="" allowOrdering="true"
+			variables="hostname,username,client.username,client.userhome,client.userdir,timestamp,java.home"
+			weight="300" />
+		<property resourceKey="windowTarget" inputType="select"
+			weight="300" nameIsResourceKey="false" allowEmpty="false" defaultValue="WINDOW"
+			url="enum/com.hypersocket.htmlapplications.BrowserWindowTarget/" nameAttr="name" valueAttr="name"
+			visibilityDependsOn="type" visibilityDependsValue="WEB" />
+	</propertyCategory>
+	<propertyCategory resourceKey="hTMLApplication.advanced"
+		resourceBundle="HTMLApplicationResourceService" weight="10">
+		<property resourceKey="os" inputType="select" weight="100"
+			nameIsResourceKey="false" allowEmpty="false" defaultValue=""
+			url="launchers/os" nameAttr="displayName" valueAttr="name" />
+		<property resourceKey="variables" inputType="multipleTextInput"
+			defaultValue="" allowOrdering="true" variables="" weight="200" />
+	</propertyCategory>
+	<propertyCategory resourceKey="hTMLApplication.logo"
+		resourceBundle="HTMLApplicationResourceService" weight="40">
+		<property resourceKey="logo" inputType="logoInput" weight="200"
+			defaultValue="" />
+	</propertyCategory>
+</propertyTemplates>

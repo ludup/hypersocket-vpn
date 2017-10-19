@@ -2,9 +2,6 @@
 <propertyTemplates context="applicationLauncher">
 	<propertyCategory resourceKey="launcher.program"
 		resourceBundle="LauncherService" weight="0">
-		<property resourceKey="type" nameAttr="name" valueAttr="name"
-			inputType="select" allowEmpty="false" defaultValue="CLIENT"
-			url="enum/com.hypersocket.launcher.ApplicationLauncherType/" weight="10" />
 		<property resourceKey="exe" inputType="text" weight="200"
 			defaultValue=""
 			variables="hostname,username,client.username,client.userhome,client.userdir,timestamp,java.home,id" />
@@ -19,37 +16,26 @@
 			nameIsResourceKey="false" allowEmpty="false" defaultValue=""
 			url="launchers/os" nameAttr="displayName" valueAttr="name" />
 		<property resourceKey="variables" inputType="multipleTextInput"	defaultValue="" allowOrdering="true" variables="" weight="200" />
-		<property resourceKey="windowTarget" inputType="select"
-			weight="300" nameIsResourceKey="false" allowEmpty="false" defaultValue="WINDOW"
-			url="enum/com.hypersocket.launcher.BrowserWindowTarget/" nameAttr="name" valueAttr="name"
-			visibilityDependsOn="type" visibilityDependsValue="WEB" />
 	</propertyCategory>
-	<propertyCategory visibilityDependsOn="type"
-		visibilityDependsValue="CLIENT" resourceKey="launcher.scripts"
+	<propertyCategory resourceKey="launcher.scripts"
 		resourceBundle="LauncherService" weight="20">
 		<property resourceKey="startupScript" inputType="textarea"
 			weight="0" defaultValue=""
-			variables="hostname,username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"
-			visibilityDependsOn="type" visibilityDependsValue="CLIENT" />
+			variables="hostname,username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"/>
 		<property resourceKey="shutdownScript" inputType="textarea"
 			weight="100" defaultValue=""
-			variables="hostname,username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"
-			visibilityDependsOn="type" visibilityDependsValue="CLIENT" />
+			variables="hostname,username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"/>
 	</propertyCategory>
-	<propertyCategory visibilityDependsOn="type"
-		visibilityDependsValue="CLIENT" resourceKey="launcher.install"
+	<propertyCategory resourceKey="launcher.install"
 		resourceBundle="LauncherService" weight="30">
 		<property resourceKey="installScript" inputType="textarea"
 			weight="0" defaultValue=""
-			variables="username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"
-			visibilityDependsOn="type" visibilityDependsValue="CLIENT" />
+			variables="username,client.username,client.userhome,client.appdir,client.userdir,timestamp,java.home"/>
 	</propertyCategory>
-	<propertyCategory visibilityDependsOn="type"
-		visibilityDependsValue="CLIENT" resourceKey="launcher.files"
+	<propertyCategory resourceKey="launcher.files"
 		resourceBundle="LauncherService" weight="30">
 		<property resourceKey="files" inputType="multipleFileInput"
-			weight="50" defaultValue="" allowEmpty="true" text=""
-			visibilityDependsOn="type" visibilityDependsValue="CLIENT" />
+			weight="50" defaultValue="" allowEmpty="true" text=""/>
 	</propertyCategory>
 	<propertyCategory resourceKey="launcher.logo"
 		resourceBundle="LauncherService" weight="40">

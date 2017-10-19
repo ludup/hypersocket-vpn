@@ -8,15 +8,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>hypersocket-network</artifactId>
-	<name>Hypersocket - Network Resources</name>
+	<artifactId>hypersocket-html-applications</artifactId>
+	<name>Hypersocket - HTML Applications</name>
 	<parent>
 		<groupId>com.hypersocket</groupId>
 		<artifactId>hypersocket-vpn</artifactId>
 		<version>2.1.2-LOCAL</version>
 		<relativePath>..</relativePath>
 	</parent>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.hypersocket</groupId>
@@ -34,7 +34,7 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-
+	
 	<build>
 		<pluginManagement>
 			<plugins>

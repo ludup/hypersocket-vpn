@@ -1,4 +1,4 @@
-package com.hypersocket.launcher;
+package com.hypersocket.htmlapplications;
 
 import java.util.Map;
 

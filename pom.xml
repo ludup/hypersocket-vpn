@@ -13,7 +13,9 @@
 
 	<modules>
 		<module>hypersocket-network</module>
+		<module>hypersocket-html-applications</module>
 		<module>hypersocket-websites</module>
+		<module>hypersocket-applications</module>
 		<module>client-network</module>
 	</modules>
 

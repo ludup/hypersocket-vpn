@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hypersocket.applications.ApplicationOS;
 import com.hypersocket.auth.json.AuthenticationRequired;
 import com.hypersocket.auth.json.AuthenticationRequiredButDontTouchSession;
 import com.hypersocket.auth.json.ResourceController;
@@ -33,7 +34,6 @@ import com.hypersocket.json.PropertyItem;
 import com.hypersocket.json.RequestStatus;
 import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
-import com.hypersocket.launcher.ApplicationLauncherOS;
 import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.launcher.ApplicationLauncherResourceColumns;
 import com.hypersocket.launcher.ApplicationLauncherResourceService;
@@ -347,11 +347,11 @@ public class ApplicationLauncherResourceController extends ResourceController {
 	@RequestMapping(value = "launchers/os", method = RequestMethod.GET, produces = { "application/json" })
 	@ResponseBody
 	@ResponseStatus(value = HttpStatus.OK)
-	public ResourceList<ApplicationLauncherOS> getResourcesByCurrentPrincipal(
+	public ResourceList<ApplicationOS> getResourcesByCurrentPrincipal(
 			HttpServletRequest request, HttpServletResponse response)
 			throws AccessDeniedException, UnauthorizedException {
-		return new ResourceList<ApplicationLauncherOS>(
-				Arrays.asList(ApplicationLauncherOS.values()));
+		return new ResourceList<ApplicationOS>(
+				Arrays.asList(ApplicationOS.values()));
 	}
 
 	@AuthenticationRequired

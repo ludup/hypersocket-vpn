@@ -1,9 +1,11 @@
-package com.hypersocket.launcher;
+package com.hypersocket.applications;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonSerialize(using = ApplicationLauncherOSSerializer.class)
-public enum ApplicationLauncherOS {
+@JsonSerialize(using = ApplicationOSSerializer.class)
+@JsonDeserialize(using = ApplicationOSDeserializer.class)
+public enum ApplicationOS {
 
 	WINDOWS_VISTA(0, "6.0", "Windows Vista", "Windows"),
 	WINDOWS_7(1, "6.1", "Windows 7", "Windows"),
@@ -25,11 +27,18 @@ public enum ApplicationLauncherOS {
 	private final String name;
 	private final String family;
 	
-	private ApplicationLauncherOS(final int val, final String version, final String name, final String family) {
+	private ApplicationOS(final int val, final String version, final String name, final String family) {
 		this.val = val;
 		this.version = version;
 		this.name = name;
 		this.family = family;
+	}
+	
+	public static ApplicationOS fromId(int id) {
+		for(ApplicationOS o : ApplicationOS.values())
+			if(o.val == id)
+				return o;
+		return ApplicationOS.CROSS_PLATFORM;
 	}
 	
 	public int getId() {

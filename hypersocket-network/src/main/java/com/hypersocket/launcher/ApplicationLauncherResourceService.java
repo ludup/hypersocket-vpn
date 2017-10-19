@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.hypersocket.applications.ApplicationTemplateResolver;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.AbstractResourceService;
@@ -16,7 +17,7 @@ import com.hypersocket.tables.BootstrapTableResult;
 public interface ApplicationLauncherResourceService extends
 		AbstractResourceService<ApplicationLauncherResource> {
 	
-	void registerTemplateResolver(ApplicationLauncherTemplateResolver resolver);
+	void registerTemplateResolver(ApplicationTemplateResolver<ApplicationLauncherTemplate> resolver);
 
 	ApplicationLauncherResource updateResource(
 			ApplicationLauncherResource id, String name, Map<String,String> properties) throws ResourceException,

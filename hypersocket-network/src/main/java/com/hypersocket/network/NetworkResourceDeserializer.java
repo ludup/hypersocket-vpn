@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.IntNode;
-import com.hypersocket.launcher.ApplicationLauncherOS;
+import com.hypersocket.applications.ApplicationOS;
 import com.hypersocket.launcher.ApplicationLauncherResource;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.server.forward.ForwardingTransport;
@@ -70,7 +70,7 @@ public class NetworkResourceDeserializer extends
 			applicationLauncher.setExe(launcher.get("exe").asText());
 			applicationLauncher.setArgs(launcher.get("args").asText());
 			JsonNode osnode = launcher.get("os");
-			ApplicationLauncherOS os = ApplicationLauncherOS.values()[((IntNode) osnode
+			ApplicationOS os = ApplicationOS.values()[((IntNode) osnode
 					.get("id")).intValue()];
 			applicationLauncher.setOs(os);
 			applicationLauncher.setStartupScript(launcher.get("startupScript")

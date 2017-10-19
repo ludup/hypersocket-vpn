@@ -1,4 +1,4 @@
-package com.hypersocket.launcher;
+package com.hypersocket.applications;
 
 import java.io.IOException;
 
@@ -7,10 +7,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-public class ApplicationLauncherOSSerializer extends JsonSerializer<ApplicationLauncherOS> {
+public class ApplicationOSSerializer extends JsonSerializer<ApplicationOS> {
 
 		  @Override
-		  public void serialize(ApplicationLauncherOS value, JsonGenerator generator,
+		  public void serialize(ApplicationOS value, JsonGenerator generator,
 		            SerializerProvider provider) throws IOException,
 		            JsonProcessingException {
 
