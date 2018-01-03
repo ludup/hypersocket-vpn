@@ -378,7 +378,7 @@ public class NetworkResourceController extends ResourceController {
 		try {
 			response.setHeader("Content-Disposition", "attachment; filename=\""
 					+ networkService.getResourceCategory() + ".json\"");
-			return networkService.exportAllResoures();
+			return networkService.exportAllResources();
 		} finally {
 			clearAuthenticatedContext();
 		}
