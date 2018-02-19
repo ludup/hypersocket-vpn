@@ -217,8 +217,14 @@
 							destinationHostname.setValue('');
 							$('#protocols').multipleSelect();
 							$('#applications').multipleSelect();
+							
 							$('#networkRoles').widget().clear();
-							$('#networkRoles').widget().enable();
+							if((create && currentMenu.canCreate) || (!create && currentMenu.canUpdate)) {
+								$('#networkRoles').widget().enable();
+							} else {
+								$('#networkRoles').widget().disable();
+							}
+							
 							$('#resourceId').val('');
 							
 							$('.endpointPropertiesTab').first().trigger('click');

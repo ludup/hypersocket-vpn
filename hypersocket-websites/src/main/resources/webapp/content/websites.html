@@ -69,14 +69,7 @@
 	$(document).ready(function() {
 				$('#contentWebsites').localize();
 					
-				if(currentMenu.canCreate || currentMenu.canUpdate) {
-					$('#tabRoles').multipleSearchInput({
-						url: 'roles/table',
-						isNamePairValue: false,
-						selectedIsObjectList : true,
-						resourceKey : 'mount'
-					});
-				}
+				$('#tabRoles').roles();
 				
 				$('#websiteProperties').propertyPage({
 					url : 'websites/template',
@@ -157,12 +150,19 @@
 
 								return false;
 							},
-							clearDialog : function() {	
+							clearDialog : function(create) {	
 								$('#resourceId').val('');
 								$('#resourceName').val('');
 								$('#url').val('');
 								$('#additionalUrls').multipleTextInput();
-								$('#tabRoles').multipleSearchInput();
+								
+								$('#tabRoles').widget().clear();
+								if((create && currentMenu.canCreate) || (!create && currentMenu.canUpdate)) {
+									$('#tabRoles').widget().enable();
+								} else {
+									$('#tabRoles').widget().disable();
+								}
+								
 								$('.clickableTab').first().trigger('click');
 								logo.clear();
 							},
@@ -172,7 +172,7 @@
 								resource.name = $('#resourceName').val();
 								resource.launchUrl = $('#url').val();
 								resource.additionalUrls = fixSplit($('#additionalUrls').multipleSelectValues());
-								resource.roles = $('#tabRoles').multipleSelectValues();
+								resource.roles = $('#tabRoles').widget().getValue();
 								resource.logo = logo.getValue();
 								
 								return resource;
@@ -182,13 +182,13 @@
 								$('#resourceName').val(resource.name);
 								$('#url').val(resource.launchUrl);
 								$('#additionalUrls').multipleTextInput({ values: splitFix(resource.additionalUrls) }); 
-								$('#tabRoles').multipleSearchInput({
-									url: 'roles/table',
-									isNamePairValue: false,
-									selected : resource.roles,
-									selectedIsObjectList : true,
-									resourceKey : 'website'
-								});
+								
+								$('#tabRoles').widget().setValue(resource.roles);
+								
+								if(readOnly) {
+									$('#tabRoles').widget().disable();
+								} 
+								
 								if(resource.logo == '')
 									logo.clear();
 								else

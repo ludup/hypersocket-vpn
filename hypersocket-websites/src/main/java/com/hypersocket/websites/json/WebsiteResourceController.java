@@ -1,7 +1,6 @@
 package com.hypersocket.websites.json;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +31,7 @@ import com.hypersocket.json.ResourceList;
 import com.hypersocket.json.ResourceStatus;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.permissions.RoleUtils;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.resource.ResourceColumns;
 import com.hypersocket.resource.ResourceException;
@@ -232,10 +232,7 @@ public class WebsiteResourceController extends ResourceController {
 
 			WebsiteResource newResource;
 
-			Set<Role> roles = new HashSet<>();
-			for (Long id : resource.getRoles()) {
-				roles.add(permissionRepository.getRoleById(id));
-			}
+			Set<Role> roles = RoleUtils.processPermissions(resource.getRoles());
 
 			if (resource.getId() != null) {
 				newResource = websiteService.updateResource(

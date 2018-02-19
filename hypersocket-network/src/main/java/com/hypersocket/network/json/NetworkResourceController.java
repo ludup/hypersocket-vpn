@@ -45,6 +45,7 @@ import com.hypersocket.network.NetworkResourceService;
 import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.Role;
+import com.hypersocket.permissions.RoleUtils;
 import com.hypersocket.properties.PropertyCategory;
 import com.hypersocket.protocols.NetworkProtocol;
 import com.hypersocket.protocols.NetworkProtocolService;
@@ -266,10 +267,7 @@ public class NetworkResourceController extends ResourceController {
 				launchers.add(launcherService.getResourceById(id));
 			}
 
-			Set<Role> roles = new HashSet<Role>();
-			for (Long id : resource.getRoles()) {
-				roles.add(permissionRepository.getRoleById(id));
-			}
+			Set<Role> roles = RoleUtils.processPermissions(resource.getRoles());
 
 			if (resource.getId() != null) {
 				newResource = networkService.updateResource(
