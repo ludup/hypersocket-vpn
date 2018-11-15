@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE xml>
 <propertyTemplates context="applicationLauncher">
 	<propertyCategory resourceKey="launcher.program" resourceBundle="LauncherService" weight="0" >
 		<property resourceKey="os" inputType="select" weight="0" nameIsResourceKey="false" allowEmpty="false"
