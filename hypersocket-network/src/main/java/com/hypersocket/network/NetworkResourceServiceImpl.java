@@ -270,7 +270,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 		return NetworkResource.class;
 	}
 
-	protected void prepareExport(NetworkResource resource, boolean stripIdentity) {
+	protected boolean prepareExport(NetworkResource resource, boolean stripIdentity) {
 
 		super.prepareExport(resource, stripIdentity);
 
@@ -285,6 +285,8 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 				applicationLauncherResource.setRealm(null);
 			}
 		}
+		
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
