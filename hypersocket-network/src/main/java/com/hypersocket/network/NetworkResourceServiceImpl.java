@@ -288,7 +288,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void prepareImport(NetworkResource resource, Realm realm)
+	protected boolean prepareImport(NetworkResource resource, Realm realm)
 			throws ResourceException, AccessDeniedException {
 
 		Set<NetworkProtocol> networkProtocolList = new HashSet<NetworkProtocol>();
@@ -330,5 +330,7 @@ public class NetworkResourceServiceImpl extends AbstractAssignableResourceServic
 			}
 		}
 		resource.setLaunchers(launcherList);
+		
+		return true;
 	}
 }
