@@ -2,47 +2,69 @@ package com.hypersocket.launcher;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.hypersocket.realm.Realm;
 import com.hypersocket.resource.RealmResource;
 
 @Entity
-@Table(name="launchers")
+@Table(name = "launchers")
 @JsonDeserialize(using = ApplicationLauncherResourceDeserializer.class)
 public class ApplicationLauncherResource extends RealmResource {
 
 	private static final long serialVersionUID = 1278949481466400246L;
 
-	@Column(name="exe", length=1024)
+	@Column(name = "exe", length = 1024)
 	String exe;
-	
-	@Column(name="args", length=1024)
+
+	@Column(name = "args", length = 1024)
 	String args;
 
-	@Column(name="os")
+	@Column(name = "os")
 	ApplicationLauncherOS os;
-	
-	@Column(name="startup_script")
+
+	@Column(name = "startup_script")
 	@Lob
 	String startupScript = "";
-	
-	@Column(name="shutdown_script")
+
+	@Column(name = "shutdown_script")
 	@Lob
 	String shutdownScript = "";
-	
-	@Column(name="install_script")
+
+	@Column(name = "install_script")
 	@Lob
 	String installScript = "";
-	
-	@Column(name="logo", length=256)
+
+	@Column(name = "logo", length = 256)
 	String logo;
-	
-	@Column(name="files")
+
+	@Column(name = "files")
 	@Lob
 	String files;
 	
+	@ManyToOne
+	@JoinColumn(name = "realm_id", foreignKey = @ForeignKey(name = "launchers_cascade_1"))
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	protected Realm realm;
+
+	@Override
+	protected Realm doGetRealm() {
+		return realm;
+	}
+
+	@Override
+	public void setRealm(Realm realm) {
+		this.realm = realm;
+	}
+
 	public String getExe() {
 		return exe;
 	}
@@ -74,13 +96,13 @@ public class ApplicationLauncherResource extends RealmResource {
 	public void setOs(ApplicationLauncherOS os) {
 		this.os = os;
 	}
-	
+
 	public String getOsFamily() {
-		return os==null? "" : os.getFamily();
+		return os == null ? "" : os.getFamily();
 	}
-	
+
 	public String getOsVersion() {
-		return os==null? "" : os.getVersion();
+		return os == null ? "" : os.getVersion();
 	}
 
 	public String getStartupScript() {
@@ -98,7 +120,7 @@ public class ApplicationLauncherResource extends RealmResource {
 	public void setInstallScript(String installScript) {
 		this.installScript = installScript;
 	}
-	
+
 	public String getShutdownScript() {
 		return shutdownScript == null ? "" : shutdownScript;
 	}
