@@ -169,7 +169,7 @@
 				<plugin>
 					<groupId>com.nervepoint</groupId>
 					<artifactId>google-translate-v2-java-maven-plugin</artifactId>
-					<version>0.9-10-SNAPSHOT</version>
+					<version>0.9.0-SNAPSHOT</version>
 					<configuration>
 						<apikey>${googleAPIKey}</apikey>
 						<cacheTag>main</cacheTag>
