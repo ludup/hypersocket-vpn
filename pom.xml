@@ -52,7 +52,6 @@
 	<modules>
 		<module>hypersocket-network</module>
 		<module>hypersocket-websites</module>
-		<module>client-network</module>
 	</modules>
 
 	<dependencies>
