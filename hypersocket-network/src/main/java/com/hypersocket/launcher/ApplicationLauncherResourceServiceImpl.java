@@ -30,7 +30,6 @@ import com.hypersocket.launcher.events.ApplicationLauncherEvent;
 import com.hypersocket.launcher.events.ApplicationLauncherUpdatedEvent;
 import com.hypersocket.menus.MenuRegistration;
 import com.hypersocket.menus.MenuService;
-import com.hypersocket.netty.HttpRequestDispatcherHandler;
 import com.hypersocket.network.NetworkResourceServiceImpl;
 import com.hypersocket.permissions.AccessDeniedException;
 import com.hypersocket.permissions.PermissionCategory;
@@ -42,6 +41,7 @@ import com.hypersocket.resource.AbstractResourceRepository;
 import com.hypersocket.resource.AbstractResourceServiceImpl;
 import com.hypersocket.resource.ResourceCreationException;
 import com.hypersocket.resource.ResourceException;
+import com.hypersocket.server.HypersocketServer;
 import com.hypersocket.tables.BootstrapTableResult;
 import com.hypersocket.transactions.TransactionService;
 
@@ -247,7 +247,7 @@ public class ApplicationLauncherResourceServiceImpl extends
 			HttpServletResponse response) throws IOException {
 
 		request.setAttribute(
-				HttpRequestDispatcherHandler.CONTENT_INPUTSTREAM,
+				HypersocketServer.CONTENT_INPUTSTREAM,
 				httpUtils.doHttpGet(
 						System.getProperty(
 								"hypersocket.templateServerImageUrl",
